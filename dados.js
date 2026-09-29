@@ -53,11 +53,11 @@ window.FIT_DADOS = {
   },
 
   // Sobremesas no pote de 250 g (fonte: grupo Informes e Promoções, 29/09/2026).
-  // preco: null = valor confirmado pela equipe no WhatsApp. Quando tiver o preço, troque null pelo número (ex.: 15).
+  // preco: valor por pote. Use null para mostrar "valor a confirmar".
   sobremesas: {
     categoria: 'Sobremesas',
     peso: '250 g',
-    preco: null,
+    preco: 18,
     imagem: 'fotos/sobremesas-250g.jpg',
     itens: ['Torta de limão', 'Marido gelado', 'Banoffee', 'Brigadeirão', 'Pudim', 'Bombom de uva'],
   },

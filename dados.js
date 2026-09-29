@@ -17,7 +17,7 @@ window.FIT_DADOS = {
 
   // Preço por marmita em cada combo, por categoria.
   combos: [
-    { id: 7,  nome: 'Plano Semanal',   marmitas: 7,  maxPratos: 3,  precos: { Frango: 30, Carne: 33, Peixe: 33 }, freteGratis: false },
+    { id: 10, nome: 'Plano Semanal',   marmitas: 10, maxPratos: 4,  precos: { Frango: 30, Carne: 33, Peixe: 33 }, freteGratis: false },
     { id: 15, nome: 'Plano Quinzenal', marmitas: 15, maxPratos: 5,  precos: { Frango: 28, Carne: 31, Peixe: 31 }, freteGratis: true, destaque: 'Mais pedido' },
     { id: 30, nome: 'Plano Mensal',    marmitas: 30, maxPratos: 10, precos: { Frango: 26, Carne: 29, Peixe: 29 }, freteGratis: true, destaque: 'Melhor preço' },
   ],

@@ -169,6 +169,9 @@
     $('#bm-total').textContent = brl(subtotal);
     $('#bm-info').textContent = `${total} de ${c.marmitas} marmitas`;
     $('#barra-movel').classList.toggle('visivel', total + totalExtras() > 0);
+    const bm = $('#bm-btn');
+    bm.textContent = ok ? 'Finalizar pedido' : 'Ver pedido';
+    bm.classList.toggle('btn-whats', ok);
   }
 
   function atualizar() {
@@ -208,6 +211,11 @@
   $('#inp-data').min = amanha.toISOString().slice(0, 10);
 
   $('#btn-finalizar').addEventListener('click', () => dlg.showModal());
+  $('#bm-btn').addEventListener('click', (e) => {
+    if ($('#btn-finalizar').disabled) return;
+    e.preventDefault();
+    dlg.showModal();
+  });
   $('#btn-fechar').addEventListener('click', () => dlg.close());
   form.addEventListener('change', () => {
     const entrega = form.tipo.value === 'Entrega';

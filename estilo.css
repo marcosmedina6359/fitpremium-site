@@ -17,7 +17,7 @@
 
 * { box-sizing: border-box; }
 html { scroll-behavior: smooth; scroll-padding-top: 84px; }
-body { margin: 0; background: var(--creme-claro); color: var(--texto); font: 16px/1.6 var(--sans); }
+body { -webkit-text-size-adjust: 100%; margin: 0; background: var(--creme-claro); color: var(--texto); font: 16px/1.6 var(--sans); }
 img { max-width: 100%; height: auto; }
 a { color: var(--laranja-escuro); }
 h1, h2, h3 { font-family: var(--serif); color: var(--marrom); line-height: 1.15; margin: 0 0 .5em; }
@@ -95,10 +95,11 @@ h3 { font-size: 1.3rem; }
 .opcao-combo { background: var(--branco); border: 2px solid var(--linha); border-radius: 14px; padding: 12px 22px; font: 500 .95rem var(--sans); color: var(--texto); cursor: pointer; text-align: left; }
 .opcao-combo strong { display: block; font: 700 1.1rem var(--serif); color: var(--marrom); }
 .opcao-combo[aria-checked="true"] { border-color: var(--laranja); background: #fff6ec; box-shadow: 0 0 0 3px rgba(194, 85, 27, .15); }
-.montador-grid { display: grid; grid-template-columns: 1fr 360px; gap: 28px; max-width: 1180px; margin: 0 auto; align-items: start; }
+.montador-grid > * { min-width: 0; }
+.montador-grid { display: grid; grid-template-columns: minmax(0, 1fr) 360px; gap: 28px; max-width: 1180px; margin: 0 auto; align-items: start; }
 
 .filtros { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 18px; }
-.filtro { border: 1px solid var(--linha); background: var(--branco); padding: 8px 16px; border-radius: 999px; font: 500 .92rem var(--sans); color: var(--texto); cursor: pointer; }
+.filtro { min-height: 44px; border: 1px solid var(--linha); background: var(--branco); padding: 8px 18px; border-radius: 999px; font: 500 .92rem var(--sans); color: var(--texto); cursor: pointer; }
 .filtro[aria-selected="true"] { background: var(--marrom); border-color: var(--marrom); color: #fff; }
 
 .grupo h4 { font: 700 1.05rem var(--serif); color: var(--marrom); margin: 18px 0 10px; display: flex; align-items: baseline; justify-content: space-between; gap: 8px; }
@@ -110,7 +111,7 @@ h3 { font-size: 1.3rem; }
 .prato-nome { flex: 1; font-weight: 500; color: var(--marrom); }
 .prato-nome small { display: block; font-weight: 400; color: var(--suave); font-size: .82rem; }
 .contador { display: flex; align-items: center; gap: 4px; flex-shrink: 0; }
-.contador button { width: 36px; height: 36px; border-radius: 50%; border: 1px solid var(--linha); background: var(--creme-claro); font: 700 1.2rem/1 var(--sans); color: var(--marrom); cursor: pointer; }
+.contador button { width: 44px; height: 44px; touch-action: manipulation; border-radius: 50%; border: 1px solid var(--linha); background: var(--creme-claro); font: 700 1.2rem/1 var(--sans); color: var(--marrom); cursor: pointer; }
 .contador button:hover:not(:disabled) { background: var(--laranja); border-color: var(--laranja); color: #fff; }
 .contador button:disabled { opacity: .35; cursor: not-allowed; }
 .contador output { min-width: 28px; text-align: center; font-weight: 700; color: var(--marrom); }
@@ -173,22 +174,43 @@ dialog::backdrop { background: rgba(43, 28, 22, .6); }
 
 /* Responsivo */
 @media (max-width: 960px) {
-  .montador-grid { grid-template-columns: 1fr; }
+  .montador-grid { grid-template-columns: minmax(0, 1fr); }
   .resumo { position: static; }
   .combos { grid-template-columns: 1fr; max-width: 460px; }
   .galeria { grid-template-columns: repeat(3, 1fr); }
   .info { grid-template-columns: 1fr; }
-  .barra-movel { position: fixed; left: 0; right: 0; bottom: 0; z-index: 30; display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 12px 16px; background: var(--marrom); color: #fff; box-shadow: 0 -8px 24px rgba(0, 0, 0, .15); transform: translateY(100%); transition: transform .25s; }
+  .barra-movel { position: fixed; left: 0; right: 0; bottom: 0; z-index: 30; display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 12px 16px calc(12px + env(safe-area-inset-bottom)); background: var(--marrom); color: #fff; box-shadow: 0 -8px 24px rgba(0, 0, 0, .15); transform: translateY(100%); transition: transform .25s; }
   .barra-movel.visivel { transform: none; }
   .barra-movel strong { display: block; font: 700 1.2rem var(--serif); }
   .barra-movel span { font-size: .82rem; color: #e3cdb9; }
 }
 @media (max-width: 720px) {
   .topo nav a:not(.btn) { display: none; }
+  .topo { padding: 8px 16px; }
+  .marca { font-size: 1.1rem; white-space: nowrap; }
+  .marca img { width: 44px; height: 44px; }
+  .marca small { font-size: .6rem; letter-spacing: .25em; }
+  .topo .btn { white-space: nowrap; }
+  .hero { padding-top: 32px; }
+  .hero-acoes { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+  .hero-acoes .btn { padding: 13px 8px; font-size: .88rem; white-space: nowrap; }
+  .hero-fatos { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; }
+  .hero-fatos li { padding-left: 8px; }
+  .hero-fatos strong { font-size: .95rem; }
+  .hero-fatos span { font-size: .75rem; }
+  .passo-combo { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
+  .opcao-combo { padding: 10px 6px; text-align: center; font-size: .78rem; line-height: 1.35; }
+  .opcao-combo strong { font-size: 1rem; }
+  .filtros { flex-wrap: nowrap; overflow-x: auto; margin: 0 -16px 18px; padding: 0 16px 4px; scrollbar-width: none; }
+  .filtro { flex-shrink: 0; }
+  .prato-foto { width: 52px; height: 52px; }
+  .prato-nome { font-size: .95rem; line-height: 1.3; }
+  dialog { width: 100vw; max-width: 100vw; max-height: 100dvh; height: 100dvh; margin: 0; border-radius: 0; }
+  #form-checkout { padding: 20px 16px calc(20px + env(safe-area-inset-bottom)); }
   .hero { grid-template-columns: 1fr; text-align: left; }
   .hero-fotos { transform: none; margin-bottom: 20px; }
   .galeria { display: flex; overflow-x: auto; scroll-snap-type: x mandatory; margin: 0 -16px; padding: 0 16px 8px; }
-  .galeria figure { flex: 0 0 72%; scroll-snap-align: center; }
+  .galeria figure { flex: 0 0 72%; scroll-snap-align: start; scroll-margin-left: 16px; }
   .hero-fatos { gap: 18px; }
   .prato { padding: 10px 10px 10px 14px; }
   .duas { grid-template-columns: 1fr; }

@@ -61,8 +61,8 @@ window.FIT_DADOS = {
         { nome: 'Canjica', preco: 25 },
         { nome: 'Caldo de alho-poró com bacon', preco: 25 },
         { nome: 'Canja de galinha', preco: 25 },
-        { nome: 'Caldo de batata-baroa com gorgonzola e bacon', preco: 25 },
-        { nome: 'Caldo de feijão-branco com camarão', preco: 25 },
+        { nome: 'Caldo de batata-baroa com gorgonzola e bacon', preco: 35 },
+        { nome: 'Caldo de feijão-branco com camarão', preco: 35 },
       ],
     },
     {

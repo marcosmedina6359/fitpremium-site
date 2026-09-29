@@ -36,19 +36,25 @@
   const menorPreco = (c) => Math.min(...Object.values(c.precos));
 
   // ---------- Cards de combos ----------
-  $('#lista-combos').innerHTML = D.combos.map((c) => `
+  const AVULSA = D.combos.find((c) => c.avulso);
+  const combosReais = D.combos.filter((c) => !c.avulso);
+  // Economia do combo em relação a comprar as mesmas marmitas avulsas (frango).
+  const economia = (c) => (AVULSA ? (AVULSA.precos.Frango - c.precos.Frango) * c.marmitas : 0);
+  $('#lista-combos').innerHTML = combosReais.map((c) => `
     <article class="combo${c.destaque ? ' destaque' : ''}">
       ${c.destaque ? `<span class="tag">${c.destaque}</span>` : ''}
       <div class="qtd">${c.marmitas}<small>marmitas</small></div>
       <h3>${c.nome}</h3>
       <p class="sub">Até ${c.maxPratos} pratos diferentes</p>
       <table class="tabela-precos">
-        <tr><td>Frango</td><td>${brl(c.precos.Frango)}</td></tr>
-        <tr><td>Carne ou peixe</td><td>${brl(c.precos.Carne)}</td></tr>
+        <tr><td>Frango</td><td>${AVULSA ? `<s>${brl(AVULSA.precos.Frango)}</s> ` : ''}${brl(c.precos.Frango)}</td></tr>
+        <tr><td>Carne ou peixe</td><td>${AVULSA ? `<s>${brl(AVULSA.precos.Carne)}</s> ` : ''}${brl(c.precos.Carne)}</td></tr>
       </table>
-      <p class="beneficio${c.freteGratis ? '' : ' neutro'}">${c.freteGratis ? 'Frete grátis em Jacarepaguá' : 'Taxa de entrega conforme o endereço'}</p>
+      ${economia(c) > 0 ? `<p class="economia">Economize ${brl(economia(c))}</p>` : ''}
+      <p class="beneficio${c.freteGratis ? '' : ' neutro'}">${c.freteGratis ? 'Frete grátis em Jacarepaguá' : 'Entrega a partir de R$ 10'}</p>
       <button class="btn${c.destaque ? '' : ' btn-contorno'}" data-escolher="${c.id}">Montar combo de ${c.marmitas}</button>
-    </article>`).join('');
+    </article>`).join('')
+    + (AVULSA ? `<p class="avulsa-nota">Quer só algumas? Marmitas avulsas (de ${AVULSA.minimo} a ${AVULSA.marmitas}): frango ${brl(AVULSA.precos.Frango)} · carne ou peixe ${brl(AVULSA.precos.Carne)}. <button class="link-limpar" data-escolher="${AVULSA.id}">Pedir avulsas</button></p>` : '');
 
   document.querySelectorAll('[data-escolher]').forEach((b) => b.addEventListener('click', () => {
     escolherCombo(Number(b.dataset.escolher));
@@ -59,7 +65,9 @@
   function desenharSeletor() {
     $('#seletor-combo').innerHTML = D.combos.map((c) => `
       <button class="opcao-combo" role="radio" aria-checked="${c.id === estado.combo}" data-combo="${c.id}">
-        <strong>${c.marmitas} marmitas</strong>até ${c.maxPratos} pratos · desde ${brl(menorPreco(c))}
+        ${c.avulso
+    ? `<strong>Avulsas</strong>${c.minimo} a ${c.marmitas} un. · ${brl(menorPreco(c))}`
+    : `<strong>${c.marmitas} marmitas</strong>até ${c.maxPratos} pratos · desde ${brl(menorPreco(c))}`}
       </button>`).join('');
     document.querySelectorAll('[data-combo]').forEach((b) =>
       b.addEventListener('click', () => escolherCombo(Number(b.dataset.combo))));
@@ -106,7 +114,7 @@
     let html = '';
     categorias.forEach((cat) => {
       if (estado.filtro !== 'Todos' && estado.filtro !== cat) return;
-      html += `<div class="grupo"><h4>${cat}<span>${brl(c.precos[cat])} cada no combo de ${c.marmitas}</span></h4>`;
+      html += `<div class="grupo"><h4>${cat}<span>${brl(c.precos[cat])} cada ${c.avulso ? '(avulsa)' : `no combo de ${c.marmitas}`}</span></h4>`;
       D.pratos[cat].forEach((p) => {
         const q = estado.itens[p] || 0;
         html += linhaPrato(p, q, !cheio && (q > 0 || !limitePratos), 'itens');
@@ -158,8 +166,8 @@
     const total = totalMarmitas();
     const distintos = pratosDistintos();
 
-    $('#prog-marmitas').textContent = `${total} de ${c.marmitas} marmitas`;
-    $('#prog-pratos').textContent = `${distintos} de ${c.maxPratos} pratos`;
+    $('#prog-marmitas').textContent = c.avulso ? `${total} marmita${total === 1 ? '' : 's'} avulsa${total === 1 ? '' : 's'}` : `${total} de ${c.marmitas} marmitas`;
+    $('#prog-pratos').textContent = c.avulso ? `até ${c.marmitas}` : `${distintos} de ${c.maxPratos} pratos`;
     const fill = $('#barra-fill');
     fill.style.width = Math.min(100, (total / c.marmitas) * 100) + '%';
     fill.classList.toggle('completo', total === c.marmitas);
@@ -187,7 +195,16 @@
 
     const aviso = $('#aviso');
     let ok = false;
-    if (total > c.marmitas) aviso.textContent = `Você escolheu ${total} marmitas. Remova ${total - c.marmitas} para o combo de ${c.marmitas}.`;
+    const proximo = combosReais[0];
+    if (c.avulso && total >= proximo.marmitas) aviso.textContent = `Com ${total} marmitas vale mais o combo de ${proximo.marmitas}: escolha o combo acima e economize.`;
+    else if (c.avulso && total > 0) {
+      const falta = proximo.marmitas - total;
+      aviso.textContent = total >= proximo.marmitas - 3
+        ? `Faltam só ${falta} para o combo de ${proximo.marmitas}, que sai ${brl(c.precos.Frango - proximo.precos.Frango)} mais barato por marmita.`
+        : 'Pronto! É só finalizar.';
+      ok = true;
+    }
+    else if (total > c.marmitas) aviso.textContent = `Você escolheu ${total} marmitas. Remova ${total - c.marmitas} para o combo de ${c.marmitas}.`;
     else if (distintos > c.maxPratos) aviso.textContent = `O combo de ${c.marmitas} permite até ${c.maxPratos} pratos diferentes. Remova ${distintos - c.maxPratos}.`;
     else if (total === 0) aviso.textContent = '';
     else if (total < c.marmitas) aviso.textContent = `Faltam ${c.marmitas - total} marmita${c.marmitas - total > 1 ? 's' : ''} para completar o combo.`;
@@ -197,7 +214,7 @@
 
     // Barra do celular
     $('#bm-total').textContent = brl(subtotal);
-    $('#bm-info').textContent = `${total} de ${c.marmitas} marmitas`;
+    $('#bm-info').textContent = c.avulso ? `${total} avulsa${total === 1 ? '' : 's'}` : `${total} de ${c.marmitas} marmitas`;
     $('#barra-movel').classList.toggle('visivel', total + totalExtras() > 0);
     const bm = $('#bm-btn');
     bm.textContent = ok ? 'Finalizar pedido' : 'Ver pedido';
@@ -437,7 +454,7 @@
     const msg = [
       codigo ? `Olá, Fit Premium! Fiz o pedido *#${codigo}* pelo site 💚` : `Olá, Fit Premium! Quero fazer um pedido pelo site 💚`,
       ``,
-      `*${c.nome} — ${c.marmitas} marmitas*`,
+      c.avulso ? `*${c.nome} — ${totalMarmitas()} un.*` : `*${c.nome} — ${c.marmitas} marmitas*`,
       ...linhas.map((l) => `• ${l.qtd}× ${l.nome} (${brl(l.preco)})`),
       ...(avulsos.length ? [``, `*Caldos, feijões e empadão*`, ...avulsos.map((l) => `• ${l.qtd}× ${l.nome} (${brl(l.preco)})`)] : []),
       ...(extras.length ? [``, `*Avulsos (camarão)*`, ...extras.map((l) => `• ${l.qtd}× ${l.nome} (${brl(l.preco)})`)] : []),

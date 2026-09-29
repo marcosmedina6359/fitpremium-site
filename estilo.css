@@ -300,3 +300,10 @@ dialog::backdrop { background: rgba(43, 28, 22, .6); }
 .pix-box { background: #eaf6ef; border: 1px solid #b9dcc7; border-radius: 14px; padding: 14px; display: flex; flex-direction: column; gap: 8px; text-align: left; }
 .pix-box p { margin: 0; }
 .pix-chave { font: 700 1.05rem var(--sans); color: var(--marrom); word-break: break-all; user-select: all; background: #fff; padding: 8px 10px; border-radius: 8px; }
+
+/* Marmitas avulsas e economia dos combos */
+.tabela-precos s { color: var(--suave); font-weight: 400; font-size: .85em; margin-right: 4px; }
+.combo .economia { display: inline-block; align-self: flex-start; margin: 0 0 12px; background: #eaf6ef; color: var(--verde); font-weight: 700; font-size: .9rem; padding: 4px 12px; border-radius: 999px; }
+.avulsa-nota { grid-column: 1 / -1; text-align: center; color: var(--suave); margin: 4px 0 0; }
+.avulsa-nota .link-limpar { display: inline; margin: 0 0 0 6px; color: var(--laranja-escuro); font-weight: 700; }
+@media (max-width: 720px) { .passo-combo { grid-template-columns: repeat(2, 1fr); } }

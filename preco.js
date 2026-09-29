@@ -48,7 +48,7 @@
   }
 
   /**
-   * sel = { combo: 7|15|30, itens: {prato: qtd}, extras: {...}, avulsos: {...}, doces: {...} }
+   * sel = { combo: 1 (avulsas)|10|15|30, itens: {prato: qtd}, extras: {...}, avulsos: {...}, doces: {...} }
    * Retorna linhas com preços do cardápio, subtotal e a lista de erros (vazia quando o pedido é válido).
    */
   function calcularPedido(D, sel) {
@@ -81,7 +81,9 @@
 
     const totalMarmitas = itens.reduce((a, l) => a + l.qtd, 0);
     const pratosDistintos = itens.length;
-    if (combo) {
+    if (combo && combo.avulso) {
+      if (totalMarmitas < combo.minimo || totalMarmitas > combo.marmitas) erros.push(`Marmitas avulsas: de ${combo.minimo} a ${combo.marmitas} unidades (tem ${totalMarmitas}).`);
+    } else if (combo) {
       if (totalMarmitas !== combo.marmitas) erros.push(`O combo de ${combo.marmitas} precisa de ${combo.marmitas} marmitas (tem ${totalMarmitas}).`);
       if (pratosDistintos > combo.maxPratos) erros.push(`O combo de ${combo.marmitas} permite até ${combo.maxPratos} pratos diferentes.`);
     }

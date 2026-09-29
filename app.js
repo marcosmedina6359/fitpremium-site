@@ -8,7 +8,7 @@
 
   // ---------- Estado ----------
   const CHAVE = 'fitpremium-pedido';
-  let estado = { combo: 15, itens: {}, extras: {}, doces: {}, filtro: 'Todos' };
+  let estado = { combo: 15, itens: {}, extras: {}, doces: {}, avulsos: {}, filtro: 'Todos' };
   try {
     const salvo = JSON.parse(localStorage.getItem(CHAVE));
     if (salvo && D.combos.some((c) => c.id === salvo.combo)) estado = { ...estado, ...salvo, filtro: 'Todos' };
@@ -18,12 +18,15 @@
   estado.itens = filtrar(estado.itens, Object.keys(categoriaDe));
   estado.extras = filtrar(estado.extras, D.extras.pratos);
   estado.doces = filtrar(estado.doces, D.sobremesas.itens);
+  const precoAvulso = {};
+  D.avulsos.forEach((g) => g.itens.forEach((i) => (precoAvulso[i.nome] = i.preco)));
+  estado.avulsos = filtrar(estado.avulsos, Object.keys(precoAvulso));
   const salvar = () => { try { localStorage.setItem(CHAVE, JSON.stringify(estado)); } catch {} };
 
   const combo = () => D.combos.find((c) => c.id === estado.combo);
   const totalMarmitas = () => Object.values(estado.itens).reduce((a, b) => a + b, 0);
   const pratosDistintos = () => Object.values(estado.itens).filter((n) => n > 0).length;
-  const totalExtras = () => [...Object.values(estado.extras), ...Object.values(estado.doces)].reduce((a, b) => a + b, 0);
+  const totalExtras = () => [...Object.values(estado.extras), ...Object.values(estado.doces), ...Object.values(estado.avulsos)].reduce((a, b) => a + b, 0);
   const S = D.sobremesas;
   const precoDoce = () => (S.preco == null ? 'valor a confirmar' : brl(S.preco));
   // Texto das ofertas, ex.: "1 por R$ 18 · 2 por R$ 32 · 3 por R$ 45"
@@ -78,10 +81,12 @@
   }
 
   // ---------- Filtros ----------
-  const filtros = ['Todos', ...categorias, D.extras.categoria, S.categoria];
+  const filtros = ['Todos', ...categorias, D.extras.categoria, ...D.avulsos.map((g) => g.categoria), S.categoria];
   function desenharFiltros() {
     $('#filtros').innerHTML = filtros.map((f) =>
       `<button class="filtro" role="tab" aria-selected="${f === estado.filtro}" data-filtro="${f}">${f}</button>`).join('');
+    const barra = $('#filtros'), ativo = barra.querySelector('[aria-selected="true"]');
+    if (ativo) barra.scrollLeft = ativo.offsetLeft - barra.offsetLeft - 16;
     document.querySelectorAll('[data-filtro]').forEach((b) => b.addEventListener('click', () => {
       estado.filtro = b.dataset.filtro;
       desenharFiltros();
@@ -90,8 +95,8 @@
   }
 
   // ---------- Lista de pratos ----------
-  function linhaPrato(nome, qtd, podeMais, extra) {
-    const obs = D.observacoes[nome];
+  function linhaPrato(nome, qtd, podeMais, extra, info) {
+    const obs = info || D.observacoes[nome];
     const foto = D.fotosPratos[nome];
     return `
       <div class="prato${qtd ? ' ativo' : ''}">
@@ -124,6 +129,12 @@
       D.extras.pratos.forEach((p) => { html += linhaPrato(p, estado.extras[p] || 0, true, 'extras'); });
       html += '</div>';
     }
+    D.avulsos.forEach((g) => {
+      if (estado.filtro !== 'Todos' && estado.filtro !== g.categoria) return;
+      html += `<div class="grupo"><h4>${g.categoria}<span>avulso · fora dos combos</span></h4>`;
+      g.itens.forEach((i) => { html += linhaPrato(i.nome, estado.avulsos[i.nome] || 0, true, 'avulsos', brl(i.preco)); });
+      html += '</div>';
+    });
     if (estado.filtro === 'Todos' || estado.filtro === S.categoria) {
       html += `<div class="grupo" id="grupo-doces"><h4>${S.categoria}<span>${ofertasDoces()}</span></h4>`;
       if (S.precoNoCombo) html += `<p class="pequeno oferta-combo">🎁 ${ofertaCombo()}</p>`;
@@ -153,15 +164,16 @@
     });
     const extras = Object.entries(estado.extras).map(([p, q]) => ({ nome: p, qtd: q, preco: D.extras.preco, total: D.extras.preco * q }));
     const doces = Object.entries(estado.doces).map(([p, q]) => ({ nome: p, qtd: q, preco: S.preco, total: (S.preco || 0) * q }));
+    const avulsos = Object.entries(estado.avulsos).map(([p, q]) => ({ nome: p, qtd: q, preco: precoAvulso[p], total: precoAvulso[p] * q }));
     const qtdDoces = doces.reduce((a, l) => a + l.qtd, 0);
     const descontoDoces = qtdDoces * (S.preco || 0) - totalDoces(qtdDoces, c);
-    const subtotal = [...linhas, ...extras, ...doces].reduce((a, l) => a + l.total, 0) - descontoDoces;
-    return { c, linhas, extras, doces, descontoDoces, subtotal };
+    const subtotal = [...linhas, ...extras, ...avulsos, ...doces].reduce((a, l) => a + l.total, 0) - descontoDoces;
+    return { c, linhas, extras, avulsos, doces, descontoDoces, subtotal };
   }
 
   // ---------- Resumo ----------
   function desenharResumo() {
-    const { c, linhas, extras, doces, descontoDoces, subtotal } = calcular();
+    const { c, linhas, extras, avulsos, doces, descontoDoces, subtotal } = calcular();
     const total = totalMarmitas();
     const distintos = pratosDistintos();
 
@@ -173,8 +185,12 @@
 
     let html = linhas.map((l) => `<li><span>${l.qtd}× ${l.nome}</span><span>${brl(l.total)}</span></li>`).join('');
     if (extras.length) {
-      html += '<li class="extra-label">Avulsos</li>';
+      html += '<li class="extra-label">Camarão</li>';
       html += extras.map((l) => `<li><span>${l.qtd}× ${l.nome}</span><span>${brl(l.total)}</span></li>`).join('');
+    }
+    if (avulsos.length) {
+      html += '<li class="extra-label">Caldos, feijões e empadão</li>';
+      html += avulsos.map((l) => `<li><span>${l.qtd}× ${l.nome}</span><span>${brl(l.total)}</span></li>`).join('');
     }
     if (doces.length) {
       html += '<li class="extra-label">Sobremesas</li>';
@@ -214,7 +230,7 @@
     salvar();
   }
 
-  $('#btn-limpar').addEventListener('click', () => { estado.itens = {}; estado.extras = {}; estado.doces = {}; atualizar(); });
+  $('#btn-limpar').addEventListener('click', () => { estado.itens = {}; estado.extras = {}; estado.doces = {}; estado.avulsos = {}; atualizar(); });
 
   // ---------- Cardápio ----------
   $('#cardapio-lista').innerHTML = [
@@ -222,6 +238,8 @@
       <ul>${D.pratos[cat].map((p) => `<li>${p}${D.observacoes[p] ? ` <span class="pequeno">(${D.observacoes[p].toLowerCase()})</span>` : ''}</li>`).join('')}</ul></div>`),
     `<div class="cardapio-cat"><h3>${D.extras.categoria}<span>${brl(D.extras.preco)} cada</span></h3>
       <ul>${D.extras.pratos.map((p) => `<li>${p}</li>`).join('')}</ul><p class="pequeno">Vendido avulso, fora dos combos.</p></div>`,
+    ...D.avulsos.map((g) => `<div class="cardapio-cat"><h3>${g.categoria}<span>avulso</span></h3>
+      <ul>${g.itens.map((i) => `<li>${i.nome} <span class="pequeno">· ${brl(i.preco)}</span></li>`).join('')}</ul></div>`),
     `<div class="cardapio-cat"><h3>${S.categoria}<span>pote de ${S.peso}</span></h3>
       <ul>${S.itens.map((p) => `<li>${p}</li>`).join('')}</ul><p class="pequeno">Pote de ${S.peso}: ${ofertasDoces()}. ${ofertaCombo()}.</p></div>`,
   ].join('');
@@ -279,7 +297,7 @@
 
   form.addEventListener('submit', (e) => {
     e.preventDefault();
-    const { c, linhas, extras, doces, descontoDoces, subtotal } = calcular();
+    const { c, linhas, extras, avulsos, doces, descontoDoces, subtotal } = calcular();
     const f = Object.fromEntries(new FormData(form));
     const data = f.data ? f.data.split('-').reverse().join('/') : 'A combinar';
     const msg = [
@@ -287,6 +305,7 @@
       ``,
       `*${c.nome} — ${c.marmitas} marmitas*`,
       ...linhas.map((l) => `• ${l.qtd}× ${l.nome} (${brl(l.preco)})`),
+      ...(avulsos.length ? [``, `*Caldos, feijões e empadão*`, ...avulsos.map((l) => `• ${l.qtd}× ${l.nome} (${brl(l.preco)})`)] : []),
       ...(extras.length ? [``, `*Avulsos (camarão)*`, ...extras.map((l) => `• ${l.qtd}× ${l.nome} (${brl(l.preco)})`)] : []),
       ...(doces.length ? [``, `*Sobremesas (pote de ${S.peso})*`, ...doces.map((l) => `• ${l.qtd}× ${l.nome}${l.preco == null ? '' : ` (${brl(l.preco)})`}`),
         ...(descontoDoces > 0 ? [`Desconto nas sobremesas: − ${brl(descontoDoces)}`] : [])] : []),

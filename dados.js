@@ -52,6 +52,35 @@ window.FIT_DADOS = {
     pratos: ['Escondidinho de camarão', 'Estrogonofe de camarão', 'Bobó de camarão'],
   },
 
+  // Itens avulsos (fora dos combos), preço por unidade. Fonte: equipe, 29/09/2026.
+  avulsos: [
+    {
+      categoria: 'Caldos',
+      itens: [
+        { nome: 'Caldo verde', preco: 25 },
+        { nome: 'Canjica', preco: 25 },
+        { nome: 'Caldo de alho-poró com bacon', preco: 25 },
+        { nome: 'Canja de galinha', preco: 25 },
+        { nome: 'Caldo de batata-baroa com gorgonzola e bacon', preco: 25 },
+        { nome: 'Caldo de feijão-branco com camarão', preco: 25 },
+      ],
+    },
+    {
+      categoria: 'Feijões',
+      itens: [
+        { nome: 'Feijão vermelho', preco: 22 },
+        { nome: 'Feijão preto', preco: 22.9 },
+      ],
+    },
+    {
+      categoria: 'Empadão',
+      itens: [
+        { nome: 'Empadão de frango 500 g', preco: 30 },
+        { nome: 'Empadão de frango 250 g', preco: 16.5 },
+      ],
+    },
+  ],
+
   // Sobremesas no pote de 250 g (fonte: grupo Informes e Promoções, 29/09/2026).
   // preco: valor por pote. Use null para mostrar "valor a confirmar".
   sobremesas: {

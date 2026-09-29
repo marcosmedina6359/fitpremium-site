@@ -33,17 +33,6 @@
   const listaOfertas = () => [`1 por ${brl(S.preco)}`, ...[...(S.pacotes || [])].sort((a, b) => a.qtd - b.qtd).map((p) => `${p.qtd} por ${brl(p.preco)}`)];
   const ofertasDoces = () => S.preco == null ? 'valor a confirmar' : listaOfertas().join(' · ');
   const ofertaCombo = () => S.precoNoCombo ? `${brl(S.precoNoCombo.preco)} cada nos combos de ${S.precoNoCombo.aPartirDe} ou mais` : '';
-  // Menor preço para n potes: pacotes + avulsos, ou preço fixo dentro dos combos maiores.
-  function totalDoces(n, c) {
-    if (S.preco == null || !n) return 0;
-    if (S.precoNoCombo && c.marmitas >= S.precoNoCombo.aPartirDe) return n * S.precoNoCombo.preco;
-    const melhor = [0];
-    for (let i = 1; i <= n; i++) {
-      melhor[i] = melhor[i - 1] + S.preco;
-      (S.pacotes || []).forEach((p) => { if (i >= p.qtd) melhor[i] = Math.min(melhor[i], melhor[i - p.qtd] + p.preco); });
-    }
-    return melhor[n];
-  }
   const menorPreco = (c) => Math.min(...Object.values(c.precos));
 
   // ---------- Cards de combos ----------
@@ -156,19 +145,11 @@
   });
 
   // ---------- Cálculos ----------
+  // Mesmo cálculo que o servidor usa (preco.js).
+  const selecao = () => ({ combo: estado.combo, itens: estado.itens, extras: estado.extras, avulsos: estado.avulsos, doces: estado.doces });
   function calcular() {
-    const c = combo();
-    const linhas = Object.entries(estado.itens).map(([p, q]) => {
-      const preco = c.precos[categoriaDe[p]];
-      return { nome: p, qtd: q, preco, total: preco * q };
-    });
-    const extras = Object.entries(estado.extras).map(([p, q]) => ({ nome: p, qtd: q, preco: D.extras.preco, total: D.extras.preco * q }));
-    const doces = Object.entries(estado.doces).map(([p, q]) => ({ nome: p, qtd: q, preco: S.preco, total: (S.preco || 0) * q }));
-    const avulsos = Object.entries(estado.avulsos).map(([p, q]) => ({ nome: p, qtd: q, preco: precoAvulso[p], total: precoAvulso[p] * q }));
-    const qtdDoces = doces.reduce((a, l) => a + l.qtd, 0);
-    const descontoDoces = qtdDoces * (S.preco || 0) - totalDoces(qtdDoces, c);
-    const subtotal = [...linhas, ...extras, ...avulsos, ...doces].reduce((a, l) => a + l.total, 0) - descontoDoces;
-    return { c, linhas, extras, avulsos, doces, descontoDoces, subtotal };
+    const r = window.FIT_PRECO.calcularPedido(D, selecao());
+    return { c: combo(), linhas: r.itens, extras: r.extras, avulsos: r.avulsos, doces: r.doces, descontoDoces: r.descontoDoces, subtotal: r.subtotal };
   }
 
   // ---------- Resumo ----------
@@ -267,7 +248,8 @@
 
   // ---------- Avaliações ----------
   // Texto vindo de clientes: montado com textContent (nunca innerHTML).
-  const avs = (D.avaliacoes || []).filter((a) => a && a.nota >= 1 && a.nota <= 5 && a.texto);
+  function mostrarAvaliacoes(lista) {
+  const avs = (lista || []).filter((a) => a && Number.isInteger(a.nota) && a.nota >= 1 && a.nota <= 5 && a.texto);
   if (avs.length) {
     const media = avs.reduce((s, a) => s + a.nota, 0) / avs.length;
     $('#media-avaliacoes').textContent = `★ ${media.toFixed(1).replace('.', ',')} de 5 · ${avs.length} avaliaç${avs.length > 1 ? 'ões' : 'ão'} de clientes`;
@@ -286,6 +268,14 @@
       return fig;
     }));
     $('#avaliacoes').hidden = false;
+  }
+  }
+  mostrarAvaliacoes(D.avaliacoes);
+  if (D.loja.api) {
+    fetch(`${D.loja.api}/api/avaliacoes`, { signal: AbortSignal.timeout(8000) })
+      .then((r) => (r.ok ? r.json() : null))
+      .then((j) => { if (j && Array.isArray(j.avaliacoes) && j.avaliacoes.length) mostrarAvaliacoes([...(D.avaliacoes || []), ...j.avaliacoes]); })
+      .catch(() => {});
   }
 
   // ---------- Infos ----------
@@ -307,24 +297,55 @@
     dlg.showModal();
   });
   $('#btn-fechar').addEventListener('click', () => dlg.close());
+  dlg.addEventListener('close', () => { form.hidden = false; $('#pedido-ok').hidden = true; });
   form.addEventListener('change', () => {
     const entrega = form.tipo.value === 'Entrega';
     $('#campos-endereco').hidden = !entrega;
     form.endereco.required = entrega;
   });
   form.endereco.required = true;
+  form.telefone.addEventListener('input', () => {
+    const d = form.telefone.value.replace(/\D/g, '').slice(0, 11);
+    form.telefone.value = d.length > 7 ? `(${d.slice(0, 2)}) ${d.slice(2, d.length - 4)}-${d.slice(-4)}` : d.length > 2 ? `(${d.slice(0, 2)}) ${d.slice(2)}` : d;
+  });
   form.cep.addEventListener('input', () => {
     const d = form.cep.value.replace(/\D/g, '').slice(0, 8);
     form.cep.value = d.length > 5 ? d.slice(0, 5) + '-' + d.slice(5) : d;
   });
 
-  form.addEventListener('submit', (e) => {
+  let enviando = false;
+  form.addEventListener('submit', async (e) => {
     e.preventDefault();
+    if (enviando) return;
+    const tel = form.telefone.value.replace(/\D/g, '');
+    if (tel.length < 10) { form.telefone.setCustomValidity('Informe o WhatsApp com DDD.'); form.telefone.reportValidity(); form.telefone.setCustomValidity(''); return; }
+    enviando = true;
+    const btn = form.querySelector('button[type="submit"]');
+    btn.disabled = true;
+    btn.textContent = 'Registrando pedido…';
+    // Abre a aba já no clique: navegadores de celular bloqueiam janelas abertas depois de uma espera.
+    const janela = window.open('', '_blank');
+
     const { c, linhas, extras, avulsos, doces, descontoDoces, subtotal } = calcular();
     const f = Object.fromEntries(new FormData(form));
+    let codigo = null;
+    if (D.loja.api) {
+      try {
+        const r = await fetch(`${D.loja.api}/api/pedidos`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ selecao: selecao(), cliente: {
+            nome: f.nome, telefone: tel, tipo: f.tipo, endereco: f.endereco, bairro: f.bairro,
+            cep: f.cep, pagamento: f.pagamento, data: f.data, obs: f.obs } }),
+          signal: AbortSignal.timeout(12000),
+        });
+        if (r.ok) codigo = (await r.json()).codigo;
+      } catch {}
+    }
+
     const data = f.data ? f.data.split('-').reverse().join('/') : 'A combinar';
     const msg = [
-      `Olá, Fit Premium! Quero fazer um pedido pelo site 💚`,
+      codigo ? `Olá, Fit Premium! Fiz o pedido *#${codigo}* pelo site 💚` : `Olá, Fit Premium! Quero fazer um pedido pelo site 💚`,
       ``,
       `*${c.nome} — ${c.marmitas} marmitas*`,
       ...linhas.map((l) => `• ${l.qtd}× ${l.nome} (${brl(l.preco)})`),
@@ -336,6 +357,7 @@
       `*Subtotal: ${brl(subtotal)}*${doces.length && S.preco == null ? ' + sobremesas (valor a confirmar)' : ''}`,
       ``,
       `Nome: ${f.nome}`,
+      `WhatsApp: ${form.telefone.value}`,
       `Recebimento: ${f.tipo}`,
       ...(f.tipo === 'Entrega' ? [`Endereço: ${f.endereco}`, `Bairro: ${f.bairro}`, `CEP: ${f.cep || '-'}`] : []),
       `Pagamento: ${f.pagamento}`,
@@ -344,9 +366,25 @@
       ``,
       `Aguardo a confirmação de disponibilidade, entrega e total.`,
     ].join('\n');
-    window.open(`https://wa.me/${D.loja.whatsapp}?text=${encodeURIComponent(msg)}`, '_blank', 'noopener');
-    dlg.close();
+    const url = `https://wa.me/${D.loja.whatsapp}?text=${encodeURIComponent(msg)}`;
+    if (janela) { janela.opener = null; janela.location.href = url; } else window.location.href = url;
+
+    // Tela de confirmação
+    $('#ok-codigo').textContent = codigo ? `Pedido #${codigo}` : 'Pedido pronto';
+    $('#ok-texto').textContent = codigo
+      ? 'Seu pedido foi registrado. Agora é só tocar em enviar no WhatsApp para a equipe confirmar disponibilidade, entrega e total.'
+      : 'Toque em enviar no WhatsApp para a equipe confirmar disponibilidade, entrega e total.';
+    $('#ok-whats').href = url;
+    form.hidden = true;
+    $('#pedido-ok').hidden = false;
+    estado.itens = {}; estado.extras = {}; estado.doces = {}; estado.avulsos = {};
+    atualizar();
+    btn.disabled = false;
+    btn.textContent = 'Enviar pedido pelo WhatsApp';
+    enviando = false;
   });
+  const fecharDialogo = () => { dlg.close(); form.hidden = false; $('#pedido-ok').hidden = true; };
+  $('#ok-fechar').addEventListener('click', fecharDialogo);
 
   desenharFiltros();
   atualizar();

@@ -2,7 +2,7 @@
 <html lang="pt-BR">
 <head>
   <meta charset="utf-8">
-  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src 'self' data:; connect-src 'self'; object-src 'none'; base-uri 'self'; form-action 'self'">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src 'self' data:; connect-src 'self' https://fitpremium-api.onrender.com; object-src 'none'; base-uri 'self'; form-action 'self'">
   <meta name="referrer" content="strict-origin-when-cross-origin">
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
   <title>Fit Premium Marmitaria · Monte seu combo</title>
@@ -174,7 +174,8 @@
         <button type="button" class="fechar" id="btn-fechar" aria-label="Fechar">×</button>
       </div>
       <p class="pequeno">Ao enviar, abriremos o WhatsApp da Fit Premium com o seu pedido pronto. A equipe confirma disponibilidade, entrega e total antes de fechar.</p>
-      <label>Nome<input name="nome" required autocomplete="name"></label>
+      <label>Nome<input name="nome" required autocomplete="name" maxlength="80"></label>
+      <label>Seu WhatsApp<input name="telefone" required inputmode="tel" autocomplete="tel-national" placeholder="(21) 99999-9999" maxlength="16"></label>
       <fieldset class="opcoes">
         <legend>Receber como?</legend>
         <label><input type="radio" name="tipo" value="Entrega" checked> Entrega</label>
@@ -194,9 +195,17 @@
       <label>Observações<textarea name="obs" rows="2" placeholder="Opcional"></textarea></label>
       <button class="btn btn-bloco btn-whats" type="submit">Enviar pedido pelo WhatsApp</button>
     </form>
+    <div class="pedido-ok" id="pedido-ok" hidden>
+      <p class="selo">Quase lá ✓</p>
+      <h3 id="ok-codigo">Pedido registrado</h3>
+      <p id="ok-texto"></p>
+      <a class="btn btn-bloco btn-whats" id="ok-whats" href="#" target="_blank" rel="noopener">Abrir o WhatsApp de novo</a>
+      <button type="button" class="link-limpar" id="ok-fechar">Fechar</button>
+    </div>
   </dialog>
 
   <script src="dados.js"></script>
+  <script src="preco.js"></script>
   <script src="app.js"></script>
 </body>
 </html>

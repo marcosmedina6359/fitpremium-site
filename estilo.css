@@ -230,6 +230,11 @@ dialog::backdrop { background: rgba(43, 28, 22, .6); }
 .opcoes legend { font-size: .88rem; font-weight: 500; color: var(--marrom); margin-bottom: 4px; }
 #form-checkout .opcoes label { flex-direction: row; align-items: center; gap: 6px; font-weight: 400; font-size: 1rem; }
 
+/* Confirmação do pedido */
+.pedido-ok { padding: 28px 24px; display: flex; flex-direction: column; gap: 12px; text-align: center; }
+.pedido-ok h3 { font-size: 1.8rem; margin: 0; }
+.pedido-ok p { margin: 0; }
+
 /* Responsivo */
 @media (max-width: 960px) {
   .montador-grid { grid-template-columns: minmax(0, 1fr); }

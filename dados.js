@@ -4,6 +4,8 @@ window.FIT_DADOS = {
   loja: {
     nome: 'Fit Premium Marmitaria',
     whatsapp: '5521993046464',
+    // Servidor de pedidos e avaliações (Render). Se estiver fora do ar, o site usa só o WhatsApp.
+    api: 'https://fitpremium-api.onrender.com',
     whatsappExibicao: '(21) 99304-6464',
     instagram: 'fitpremiumarmitaria',
     horario: 'Todos os dias, das 8h às 20h',

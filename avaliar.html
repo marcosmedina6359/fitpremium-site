@@ -2,7 +2,7 @@
 <html lang="pt-BR">
 <head>
   <meta charset="utf-8">
-  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src 'self' data:; connect-src 'self'; object-src 'none'; base-uri 'self'; form-action 'self'">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src 'self' data:; connect-src 'self' https://fitpremium-api.onrender.com; object-src 'none'; base-uri 'self'; form-action 'self'">
   <meta name="referrer" content="strict-origin-when-cross-origin">
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
   <meta name="robots" content="noindex">
@@ -66,14 +66,14 @@
       <label class="check"><input type="checkbox" name="autoriza" checked> Autorizo a Fit Premium a mostrar minha avaliação no site e nas redes, só com o primeiro nome e o bairro.</label>
 
       <p class="aviso" id="aviso-avaliar" aria-live="polite"></p>
-      <button class="btn btn-bloco btn-whats" type="submit">Enviar avaliação pelo WhatsApp</button>
+      <button class="btn btn-bloco" type="submit">Enviar avaliação</button>
       <p class="pequeno centro">Sua avaliação chega direto para a nossa equipe.</p>
     </form>
 
     <section class="avaliar-card obrigado" id="obrigado" hidden>
       <p class="selo">Muito obrigado!</p>
-      <h1>Sua avaliação foi preparada 💚</h1>
-      <p class="lead">Confira se o WhatsApp abriu com a mensagem e toque em <strong>enviar</strong>.</p>
+      <h1>Avaliação recebida 💚</h1>
+      <p class="lead" id="obrigado-lead">Sua opinião já chegou para a nossa equipe.</p>
       <div id="obrigado-extra"></div>
       <a class="btn btn-contorno btn-bloco" href="./#montar">Montar meu próximo combo</a>
     </section>

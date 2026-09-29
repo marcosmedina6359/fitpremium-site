@@ -245,9 +245,9 @@
   // ---------- Fotos ----------
   const nomeDaFoto = Object.fromEntries(Object.entries(D.fotosPratos).map(([n, f]) => [f, n]));
   $('#hero-fotos').innerHTML = D.fotosTopo.map((f) =>
-    `<img src="${f}" alt="${nomeDaFoto[f] || 'Marmita Fit Premium'}" width="450" height="450">`).join('');
+    `<img src="${f}" alt="${nomeDaFoto[f] ? `${nomeDaFoto[f]} — marmita fit Fit Premium` : 'Marmita fit congelada Fit Premium'}" width="450" height="450">`).join('');
   $('#galeria').innerHTML = D.galeria.map((f) =>
-    `<figure><img src="${f}" alt="Marmitas Fit Premium" loading="lazy" width="450" height="560"></figure>`).join('');
+    `<figure><img src="${f}" alt="${nomeDaFoto[f] ? `${nomeDaFoto[f]} — marmita congelada` : 'Marmitas fit congeladas Fit Premium em Jacarepaguá'}" loading="lazy" width="450" height="560"></figure>`).join('');
 
   // ---------- Vitrine de sobremesas ----------
   $('#doces-foto').src = S.imagem;

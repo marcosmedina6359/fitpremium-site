@@ -307,3 +307,10 @@ dialog::backdrop { background: rgba(43, 28, 22, .6); }
 .avulsa-nota { grid-column: 1 / -1; text-align: center; color: var(--suave); margin: 4px 0 0; }
 .avulsa-nota .link-limpar { display: inline; margin: 0 0 0 6px; color: var(--laranja-escuro); font-weight: 700; }
 @media (max-width: 720px) { .passo-combo { grid-template-columns: repeat(2, 1fr); } }
+
+/* SEO: selo dentro do h1 e bairros atendidos */
+h1 .selo { display: block; font-family: var(--sans); font-size: .8rem; line-height: 1.4; margin-bottom: 14px; }
+.regioes { background: var(--creme-claro); }
+.lista-bairros { list-style: none; padding: 0; margin: 0 auto; max-width: 900px; display: grid; gap: 12px; }
+.lista-bairros li { background: var(--branco); border: 1px solid var(--linha); border-radius: 14px; padding: 14px 18px; line-height: 1.5; }
+.lista-bairros strong { color: var(--marrom); }

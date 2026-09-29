@@ -1,0 +1,5 @@
+User-agent: *
+Allow: /
+Disallow: /avaliar.html
+
+Sitemap: https://fitpremium.onrender.com/sitemap.xml

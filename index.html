@@ -2,7 +2,7 @@
 <html lang="pt-BR">
 <head>
   <meta charset="utf-8">
-  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src 'self' data:; connect-src 'self' https://fitpremium-api.onrender.com; object-src 'none'; base-uri 'self'; form-action 'self'">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src 'self' data:; connect-src 'self' https://fitpremium-api.onrender.com https://viacep.com.br; object-src 'none'; base-uri 'self'; form-action 'self'">
   <meta name="referrer" content="strict-origin-when-cross-origin">
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
   <title>Fit Premium Marmitaria · Monte seu combo</title>
@@ -139,8 +139,17 @@
     <section id="entrega" class="secao info">
       <div class="info-card">
         <h3>Entrega</h3>
-        <p>Entregamos em <strong>Jacarepaguá</strong>, conforme disponibilidade para o endereço.</p>
-        <p><strong>Frete grátis</strong> a partir de 15 marmitas. Para o combo de 7, a taxa é informada conforme o endereço.</p>
+        <p><strong>Jacarepaguá: R$ 10</strong> · grátis a partir de 15 marmitas.<br>Barra e região: R$ 15 · demais bairros do Rio, Niterói e Baixada: R$ 20.</p>
+        <form class="sera-entrega" id="form-sera" novalidate>
+          <label for="inp-sera">Será que entrega?</label>
+          <div><input id="inp-sera" list="lista-bairros" placeholder="Seu bairro ou CEP" autocomplete="off" maxlength="60"><button class="btn btn-pequeno">Ver</button></div>
+          <p id="res-sera" aria-live="polite"></p>
+        </form>
+      </div>
+      <div class="info-card">
+        <h3>Indique e ganhe R$ 30</h3>
+        <p>Indicou um amigo e ele fez o primeiro pedido? Você ganha <strong>R$ 30 de crédito</strong> para usar em até 30 dias. O amigo só precisa informar o seu WhatsApp no pedido.</p>
+        <p>E na <strong>primeira compra do combo de 30</strong>, a sobremesa é por nossa conta. 🎁</p>
       </div>
       <div class="info-card">
         <h3>Pagamento</h3>
@@ -182,23 +191,42 @@
         <label><input type="radio" name="tipo" value="Retirada"> Retirada</label>
       </fieldset>
       <div id="campos-endereco">
-        <label>Endereço completo<input name="endereco" autocomplete="street-address" placeholder="Rua, número, complemento"></label>
+        <label>CEP<input name="cep" inputmode="numeric" autocomplete="postal-code" placeholder="00000-000 (preenche o endereço)" maxlength="9"></label>
+        <label>Endereço completo<input name="endereco" autocomplete="street-address" placeholder="Rua, número, complemento" maxlength="200"></label>
         <div class="duas">
-          <label>Bairro<input name="bairro" value="Jacarepaguá"></label>
-          <label>CEP<input name="cep" inputmode="numeric" autocomplete="postal-code" placeholder="00000-000" maxlength="9"></label>
+          <label>Bairro<input name="bairro" list="lista-bairros" autocomplete="off" placeholder="Ex.: Taquara" maxlength="60"></label>
+          <label>Cidade<select name="cidade" id="sel-cidade"></select></label>
         </div>
+        <datalist id="lista-bairros"></datalist>
+        <p class="taxa-entrega" id="taxa-entrega" aria-live="polite"></p>
       </div>
       <div class="duas">
         <label>Pagamento<select name="pagamento" id="sel-pagamento" required></select></label>
         <label>Data desejada<input name="data" type="date" id="inp-data"></label>
       </div>
-      <label>Observações<textarea name="obs" rows="2" placeholder="Opcional"></textarea></label>
+      <label>Observações<textarea name="obs" rows="2" placeholder="Opcional" maxlength="300"></textarea></label>
+      <details class="extras-checkout">
+        <summary>🎁 Primeira compra? Indicação de amigo?</summary>
+        <label id="campo-brinde">Primeira compra no combo de 30 ganha uma sobremesa de 250 g. Escolha o sabor:
+          <select name="brinde" id="sel-brinde"><option value="">Não é minha primeira compra</option></select></label>
+        <p class="pequeno" id="aviso-brinde" hidden>🎁 Na primeira compra do combo de 30, a sobremesa é por nossa conta.</p>
+        <label>Quem te indicou? (WhatsApp)<input name="indicadoPor" inputmode="tel" placeholder="(21) 99999-9999" maxlength="16"></label>
+        <p class="pequeno">Conferimos pelo seu WhatsApp se é a primeira compra. Créditos de indicação que você tiver entram sozinhos no total.</p>
+      </details>
+      <div class="total-checkout" id="total-checkout"></div>
+      <p class="pequeno">Vale-refeição e vale-alimentação são pagos na maquininha, na entrega.</p>
       <button class="btn btn-bloco btn-whats" type="submit">Enviar pedido pelo WhatsApp</button>
     </form>
     <div class="pedido-ok" id="pedido-ok" hidden>
       <p class="selo">Quase lá ✓</p>
       <h3 id="ok-codigo">Pedido registrado</h3>
       <p id="ok-texto"></p>
+      <div class="pix-box" id="pix-box" hidden>
+        <p><strong>Pagamento via Pix</strong><br>Chave (<span id="pix-tipo"></span>):</p>
+        <p class="pix-chave" id="pix-chave"></p>
+        <button type="button" class="btn btn-contorno btn-bloco" id="btn-copiar-pix">Copiar chave Pix</button>
+        <p class="pequeno">Depois de pagar, envie o comprovante no WhatsApp.</p>
+      </div>
       <a class="btn btn-bloco btn-whats" id="ok-whats" href="#" target="_blank" rel="noopener">Abrir o WhatsApp de novo</a>
       <button type="button" class="link-limpar" id="ok-fechar">Fechar</button>
     </div>

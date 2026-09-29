@@ -21,6 +21,32 @@
 
   const centavos = (v) => Math.round(v * 100) / 100;
 
+  // "Freguesia (Jacarepaguá)" -> "freguesia (jacarepagua)"
+  const normalizar = (t) => String(t || '').normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase().replace(/\s+/g, ' ').trim();
+
+  /**
+   * Taxa de entrega pelo bairro/cidade. Retorna { atendido, taxa, gratis, bairro, cidade }.
+   * Bairro fora da tabela: atendido = false (a equipe combina pelo WhatsApp).
+   */
+  function taxaEntrega(D, bairro, cidade, marmitas) {
+    const E = D.entrega;
+    if (!E) return { atendido: false, taxa: null, gratis: false };
+    let b = normalizar(bairro);
+    const c = normalizar(cidade || 'Rio de Janeiro');
+    const apelidos = Object.fromEntries(Object.entries(E.apelidos || {}).map(([k, v]) => [normalizar(k), v]));
+    if (apelidos[b]) b = normalizar(apelidos[b]);
+    const semParenteses = (t) => t.replace(/\s*\(.*\)\s*/g, '').trim();
+    let achado = null;
+    for (const f of E.faixas) {
+      if (normalizar(f.cidade) !== c) continue;
+      const nome = f.bairros.find((x) => normalizar(x) === b) || f.bairros.find((x) => semParenteses(normalizar(x)) === semParenteses(b) && !/\(/.test(b));
+      if (nome) { achado = { f, nome }; break; }
+    }
+    if (!achado) return { atendido: false, taxa: null, gratis: false };
+    const gratis = !!achado.f.freteGratisAPartirDe && (marmitas || 0) >= achado.f.freteGratisAPartirDe;
+    return { atendido: true, taxa: gratis ? 0 : achado.f.taxa, taxaCheia: achado.f.taxa, gratis, bairro: achado.nome, cidade: achado.f.cidade };
+  }
+
   /**
    * sel = { combo: 7|15|30, itens: {prato: qtd}, extras: {...}, avulsos: {...}, doces: {...} }
    * Retorna linhas com preços do cardápio, subtotal e a lista de erros (vazia quando o pedido é válido).
@@ -67,5 +93,5 @@
     return { ok: erros.length === 0, erros, combo, itens, extras, avulsos, doces, descontoDoces, subtotal, totalMarmitas, pratosDistintos };
   }
 
-  return { calcularPedido, totalDoces };
+  return { calcularPedido, totalDoces, taxaEntrega, normalizar };
 });

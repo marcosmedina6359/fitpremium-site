@@ -281,3 +281,22 @@ dialog::backdrop { background: rgba(43, 28, 22, .6); }
   .duas { grid-template-columns: 1fr; }
   #btn-doces { width: 100%; }
 }
+
+/* Entrega, brinde e indicação no checkout */
+.info { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+.taxa-entrega { margin: 0; font-size: .92rem; font-weight: 500; color: var(--marrom); min-height: 1.4em; }
+.taxa-entrega.gratis { color: var(--verde); font-weight: 700; }
+.total-checkout { display: flex; justify-content: space-between; align-items: baseline; border-top: 1px dashed var(--linha); padding-top: 10px; }
+.total-checkout strong { font: 700 1.4rem var(--serif); color: var(--marrom); }
+.extras-checkout { border: 1px solid var(--linha); border-radius: 12px; padding: 10px 14px; background: var(--creme-claro); }
+.extras-checkout summary { cursor: pointer; font-weight: 700; color: var(--laranja-escuro); min-height: 32px; display: flex; align-items: center; }
+.extras-checkout[open] { display: flex; flex-direction: column; gap: 10px; }
+.sera-entrega { display: flex; flex-direction: column; gap: 6px; margin-top: 14px; }
+.sera-entrega label { color: #fff; font-weight: 700; }
+.sera-entrega div { display: flex; gap: 8px; }
+.sera-entrega input { flex: 1; min-width: 0; font: 1rem var(--sans); padding: 10px 12px; border-radius: 10px; border: 0; }
+.sera-entrega p { margin: 0; min-height: 1.4em; color: #fff3df; font-weight: 500; }
+@media (max-width: 960px) { .info { grid-template-columns: 1fr; } }
+.pix-box { background: #eaf6ef; border: 1px solid #b9dcc7; border-radius: 14px; padding: 14px; display: flex; flex-direction: column; gap: 8px; text-align: left; }
+.pix-box p { margin: 0; }
+.pix-chave { font: 700 1.05rem var(--sans); color: var(--marrom); word-break: break-all; user-select: all; background: #fff; padding: 8px 10px; border-radius: 8px; }

@@ -182,8 +182,8 @@
     $('#subtotal').textContent = brl(subtotal);
     $('#nota-doces').hidden = !(doces.length && S.preco == null);
     $('#frete-info').innerHTML = c.freteGratis
-      ? '<span class="gratis">Grátis</span> em Jacarepaguá'
-      : 'Taxa conforme endereço';
+      ? '<span class="gratis">Grátis</span> em Jacarepaguá · outros R$ 15–20'
+      : 'R$ 10 em Jacarepaguá · outros bairros R$ 15–20';
 
     const aviso = $('#aviso');
     let ok = false;
@@ -290,11 +290,94 @@
   const amanha = new Date(Date.now() + 864e5);
   $('#inp-data').min = amanha.toISOString().slice(0, 10);
 
-  $('#btn-finalizar').addEventListener('click', () => dlg.showModal());
+  // ---------- Entrega: cidades, bairros e taxa ----------
+  const E = D.entrega;
+  const cidades = [...new Set(E.faixas.map((f) => f.cidade))];
+  $('#sel-cidade').replaceChildren(...cidades.map((c) => new Option(c, c)));
+  function listarBairros() {
+    const c = form.cidade.value;
+    const nomes = E.faixas.filter((f) => f.cidade === c).flatMap((f) => f.bairros).sort((a, b) => a.localeCompare(b, 'pt-BR'));
+    $('#lista-bairros').replaceChildren(...nomes.map((n) => new Option(n)));
+  }
+  const taxaAtual = () => window.FIT_PRECO.taxaEntrega(D, form.bairro.value, form.cidade.value, totalMarmitas());
+  function atualizarTaxa() {
+    // Brinde só aparece no combo que dá direito (ex.: 30 marmitas).
+    const podeBrinde = totalMarmitas() >= ((D.primeiraCompra && D.primeiraCompra.aPartirDe) || 0);
+    $('#campo-brinde').hidden = !podeBrinde;
+    $('#aviso-brinde').hidden = podeBrinde;
+    if (!podeBrinde) form.brinde.value = '';
+    const entrega = form.tipo.value === 'Entrega';
+    const { subtotal } = calcular();
+    const t = entrega ? taxaAtual() : { atendido: true, taxa: 0 };
+    const el = $('#taxa-entrega');
+    if (!entrega) el.textContent = '';
+    else if (!form.bairro.value.trim()) el.textContent = 'Informe o bairro (ou o CEP) para calcular a entrega.';
+    else if (!t.atendido) el.textContent = '⚠️ Bairro fora da nossa tabela: a equipe confirma a taxa pelo WhatsApp.';
+    else el.textContent = t.gratis ? `🎉 Entrega grátis em ${t.bairro}!` : `🚚 Entrega em ${t.bairro}: ${brl(t.taxa)}`;
+    el.classList.toggle('gratis', !!t.gratis);
+    const total = subtotal + (t.atendido ? t.taxa : 0);
+    $('#total-checkout').replaceChildren(
+      Object.assign(document.createElement('span'), { textContent: entrega && !t.atendido ? 'Total (+ entrega a combinar)' : 'Total' }),
+      Object.assign(document.createElement('strong'), { textContent: brl(total) }));
+  }
+  listarBairros();
+  form.bairro.addEventListener('input', atualizarTaxa);
+  form.cidade.addEventListener('change', () => { listarBairros(); atualizarTaxa(); });
+
+  // CEP: busca rua e bairro no ViaCEP (serviço público dos Correios).
+  async function buscarCep(cep) {
+    try {
+      const r = await fetch(`https://viacep.com.br/ws/${cep}/json/`, { signal: AbortSignal.timeout(6000) });
+      const j = await r.json();
+      return j && !j.erro ? j : null;
+    } catch { return null; }
+  }
+  form.cep.addEventListener('input', async () => {
+    const d = form.cep.value.replace(/\D/g, '');
+    if (d.length !== 8) return;
+    const j = await buscarCep(d);
+    if (!j) { $('#taxa-entrega').textContent = 'CEP não encontrado. Preencha o endereço e o bairro.'; return; }
+    if (j.logradouro && !form.endereco.value) form.endereco.value = `${j.logradouro}, `;
+    if (cidades.includes(j.localidade)) { form.cidade.value = j.localidade; listarBairros(); }
+    if (j.bairro) form.bairro.value = j.bairro;
+    atualizarTaxa();
+    form.endereco.focus();
+    form.endereco.setSelectionRange(form.endereco.value.length, form.endereco.value.length);
+  });
+
+  // Brinde da 1ª compra
+  $('#sel-brinde').append(...S.itens.map((n) => new Option(`🎁 ${n}`, n)));
+  form.indicadoPor.addEventListener('input', () => {
+    const d = form.indicadoPor.value.replace(/\D/g, '').slice(0, 11);
+    form.indicadoPor.value = d.length > 7 ? `(${d.slice(0, 2)}) ${d.slice(2, d.length - 4)}-${d.slice(-4)}` : d.length > 2 ? `(${d.slice(0, 2)}) ${d.slice(2)}` : d;
+  });
+
+  // "Será que entrega?"
+  $('#form-sera').addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const v = $('#inp-sera').value.trim();
+    const res = $('#res-sera');
+    if (!v) return;
+    let bairro = v, cidade = 'Rio de Janeiro';
+    if (/^\d{5}-?\d{3}$/.test(v)) {
+      res.textContent = 'Buscando…';
+      const j = await buscarCep(v.replace(/\D/g, ''));
+      if (!j) { res.textContent = 'CEP não encontrado.'; return; }
+      bairro = j.bairro; cidade = j.localidade;
+    }
+    const t = window.FIT_PRECO.taxaEntrega(D, bairro, cidade, 0);
+    const livre = E.faixas.find((f) => f.freteGratisAPartirDe && f.bairros.includes(t.bairro));
+    res.textContent = t.atendido
+      ? `✅ Entregamos em ${t.bairro}${t.cidade !== 'Rio de Janeiro' ? ` (${t.cidade})` : ''}: ${brl(t.taxaCheia)}${livre ? ` · grátis a partir de ${livre.freteGratisAPartirDe} marmitas` : ''}.`
+      : `${bairro || v}: fale com a gente no WhatsApp para ver se entregamos aí.`;
+  });
+
+  $('#btn-finalizar').addEventListener('click', () => { dlg.showModal(); atualizarTaxa(); });
   $('#bm-btn').addEventListener('click', (e) => {
     if ($('#btn-finalizar').disabled) return;
     e.preventDefault();
     dlg.showModal();
+    atualizarTaxa();
   });
   $('#btn-fechar').addEventListener('click', () => dlg.close());
   dlg.addEventListener('close', () => { form.hidden = false; $('#pedido-ok').hidden = true; });
@@ -302,6 +385,7 @@
     const entrega = form.tipo.value === 'Entrega';
     $('#campos-endereco').hidden = !entrega;
     form.endereco.required = entrega;
+    atualizarTaxa();
   });
   form.endereco.required = true;
   form.telefone.addEventListener('input', () => {
@@ -328,20 +412,26 @@
 
     const { c, linhas, extras, avulsos, doces, descontoDoces, subtotal } = calcular();
     const f = Object.fromEntries(new FormData(form));
-    let codigo = null;
+    let codigo = null, srv = null;
     if (D.loja.api) {
       try {
         const r = await fetch(`${D.loja.api}/api/pedidos`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ selecao: selecao(), cliente: {
-            nome: f.nome, telefone: tel, tipo: f.tipo, endereco: f.endereco, bairro: f.bairro,
-            cep: f.cep, pagamento: f.pagamento, data: f.data, obs: f.obs } }),
+            nome: f.nome, telefone: tel, tipo: f.tipo, endereco: f.endereco, bairro: f.bairro, cidade: f.cidade,
+            cep: f.cep, pagamento: f.pagamento, data: f.data, obs: f.obs, brinde: f.brinde, indicadoPor: f.indicadoPor } }),
           signal: AbortSignal.timeout(12000),
         });
-        if (r.ok) codigo = (await r.json()).codigo;
+        if (r.ok) { srv = await r.json(); codigo = srv.codigo; }
       } catch {}
     }
+    // Sem servidor: calcula a entrega aqui mesmo (a equipe confere no WhatsApp).
+    const tLocal = f.tipo === 'Entrega' ? taxaAtual() : { atendido: true, taxa: 0 };
+    const taxa = srv ? srv.taxa : (tLocal.atendido ? tLocal.taxa : null);
+    const credito = srv ? srv.credito : 0;
+    const total = srv ? srv.total : subtotal + (taxa || 0);
+    const brinde = srv ? srv.brinde : (f.brinde || null);
 
     const data = f.data ? f.data.split('-').reverse().join('/') : 'A combinar';
     const msg = [
@@ -353,13 +443,18 @@
       ...(extras.length ? [``, `*Avulsos (camarão)*`, ...extras.map((l) => `• ${l.qtd}× ${l.nome} (${brl(l.preco)})`)] : []),
       ...(doces.length ? [``, `*Sobremesas (pote de ${S.peso})*`, ...doces.map((l) => `• ${l.qtd}× ${l.nome}${l.preco == null ? '' : ` (${brl(l.preco)})`}`),
         ...(descontoDoces > 0 ? [`Desconto nas sobremesas: − ${brl(descontoDoces)}`] : [])] : []),
+      ...(brinde ? [``, `🎁 *Brinde de 1ª compra:* 1× ${brinde}${srv ? '' : ' (se for mesmo a minha 1ª compra)'}`] : []),
       ``,
-      `*Subtotal: ${brl(subtotal)}*${doces.length && S.preco == null ? ' + sobremesas (valor a confirmar)' : ''}`,
+      `Itens: ${brl(subtotal)}`,
+      ...(f.tipo === 'Entrega' ? [`Entrega: ${taxa == null ? 'a combinar' : taxa === 0 ? 'grátis' : brl(taxa)}`] : []),
+      ...(credito > 0 ? [`Crédito de indicação: − ${brl(credito)}`] : []),
+      `*Total: ${brl(total)}*${taxa == null && f.tipo === 'Entrega' ? ' + entrega' : ''}`,
       ``,
       `Nome: ${f.nome}`,
       `WhatsApp: ${form.telefone.value}`,
       `Recebimento: ${f.tipo}`,
-      ...(f.tipo === 'Entrega' ? [`Endereço: ${f.endereco}`, `Bairro: ${f.bairro}`, `CEP: ${f.cep || '-'}`] : []),
+      ...(f.tipo === 'Entrega' ? [`Endereço: ${f.endereco}`, `Bairro: ${f.bairro} · ${f.cidade}`, `CEP: ${f.cep || '-'}`] : []),
+      ...(f.indicadoPor && !srv ? [`Indicado por: ${f.indicadoPor}`] : []),
       `Pagamento: ${f.pagamento}`,
       `Data desejada: ${data}`,
       ...(f.obs ? [`Obs.: ${f.obs}`] : []),
@@ -371,10 +466,16 @@
 
     // Tela de confirmação
     $('#ok-codigo').textContent = codigo ? `Pedido #${codigo}` : 'Pedido pronto';
-    $('#ok-texto').textContent = codigo
-      ? 'Seu pedido foi registrado. Agora é só tocar em enviar no WhatsApp para a equipe confirmar disponibilidade, entrega e total.'
-      : 'Toque em enviar no WhatsApp para a equipe confirmar disponibilidade, entrega e total.';
+    $('#ok-texto').textContent = (codigo
+      ? `Seu pedido foi registrado. Total: ${brl(total)}${taxa == null && f.tipo === 'Entrega' ? ' + entrega' : ''}.`
+      : `Total: ${brl(total)}.`)
+      + (brinde && srv ? ` 🎁 Você ganhou 1 ${brinde} de brinde!` : '')
+      + (credito > 0 ? ` Crédito de indicação aplicado: − ${brl(credito)}.` : '')
+      + ' Agora é só tocar em enviar no WhatsApp para a equipe confirmar.';
     $('#ok-whats').href = url;
+    const pix = D.loja.pix;
+    $('#pix-box').hidden = !(f.pagamento === 'Pix' && pix && pix.chave);
+    if (pix && pix.chave) { $('#pix-tipo').textContent = pix.tipo.toLowerCase(); $('#pix-chave').textContent = pix.chave; }
     form.hidden = true;
     $('#pedido-ok').hidden = false;
     estado.itens = {}; estado.extras = {}; estado.doces = {}; estado.avulsos = {};
@@ -382,6 +483,10 @@
     btn.disabled = false;
     btn.textContent = 'Enviar pedido pelo WhatsApp';
     enviando = false;
+  });
+  $('#btn-copiar-pix').addEventListener('click', async (e) => {
+    try { await navigator.clipboard.writeText(D.loja.pix.chave); e.target.textContent = 'Chave copiada ✓'; }
+    catch { e.target.textContent = 'Selecione e copie a chave acima'; }
   });
   const fecharDialogo = () => { dlg.close(); form.hidden = false; $('#pedido-ok').hidden = true; };
   $('#ok-fechar').addEventListener('click', fecharDialogo);

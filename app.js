@@ -13,6 +13,10 @@
     const salvo = JSON.parse(localStorage.getItem(CHAVE));
     if (salvo && D.combos.some((c) => c.id === salvo.combo)) estado = { ...estado, ...salvo, filtro: 'Todos' };
   } catch {}
+  // Descarta pratos salvos que saíram do cardápio ou mudaram de nome.
+  const filtrar = (obj, validos) => Object.fromEntries(Object.entries(obj || {}).filter(([p, q]) => validos.includes(p) && q > 0));
+  estado.itens = filtrar(estado.itens, Object.keys(categoriaDe));
+  estado.extras = filtrar(estado.extras, D.extras.pratos);
   const salvar = () => { try { localStorage.setItem(CHAVE, JSON.stringify(estado)); } catch {} };
 
   const combo = () => D.combos.find((c) => c.id === estado.combo);
@@ -70,8 +74,10 @@
   // ---------- Lista de pratos ----------
   function linhaPrato(nome, qtd, podeMais, extra) {
     const obs = D.observacoes[nome];
+    const foto = D.fotosPratos[nome];
     return `
       <div class="prato${qtd ? ' ativo' : ''}">
+        ${foto ? `<img class="prato-foto" src="${foto}" alt="" loading="lazy" width="64" height="64">` : ''}
         <div class="prato-nome">${nome}${obs ? `<small>${obs}</small>` : ''}</div>
         <div class="contador">
           <button type="button" data-menos="${nome}" data-extra="${extra}" ${qtd ? '' : 'disabled'} aria-label="Remover ${nome}">−</button>
@@ -181,6 +187,13 @@
     `<div class="cardapio-cat"><h3>${D.extras.categoria}<span>${brl(D.extras.preco)} cada</span></h3>
       <ul>${D.extras.pratos.map((p) => `<li>${p}</li>`).join('')}</ul><p class="pequeno">Vendido avulso, fora dos combos.</p></div>`,
   ].join('');
+
+  // ---------- Fotos ----------
+  const nomeDaFoto = Object.fromEntries(Object.entries(D.fotosPratos).map(([n, f]) => [f, n]));
+  $('#hero-fotos').innerHTML = D.fotosTopo.map((f) =>
+    `<img src="${f}" alt="${nomeDaFoto[f] || 'Marmita Fit Premium'}" width="450" height="450">`).join('');
+  $('#galeria').innerHTML = D.galeria.map((f) =>
+    `<figure><img src="${f}" alt="Marmitas Fit Premium" loading="lazy" width="450" height="560"></figure>`).join('');
 
   // ---------- Infos ----------
   $('#lista-pagamentos').textContent = D.pagamentos.join(' · ');

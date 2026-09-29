@@ -22,10 +22,10 @@ window.FIT_DADOS = {
     Frango: [
       'Escondidinho de frango',
       'Estrogonofe de frango',
-      'Arroz, legumes e frango xadrez',
-      'Sobrecoxa assada com legumes e arroz',
+      'Frango xadrez com arroz e legumes',
+      'Sobrecoxa assada com arroz e legumes',
       'Panqueca de frango',
-      'Parmegiana de frango com batata gratinada',
+      'Frango à parmegiana com batata gratinada',
       'Frango grelhado com cebola caramelizada e batata gratinada',
     ],
     Carne: [
@@ -35,7 +35,7 @@ window.FIT_DADOS = {
       'Estrogonofe de carne',
       'Espaguete à bolonhesa',
       'Panqueca de carne',
-      'Parmegiana de carne com purê e legumes',
+      'Carne à parmegiana com purê e legumes',
       'Carne assada desfiada com purê',
       'Lasanha à bolonhesa',
       'Lasanha de berinjela',
@@ -51,6 +51,22 @@ window.FIT_DADOS = {
     preco: 40,
     pratos: ['Escondidinho de camarão', 'Estrogonofe de camarão', 'Bobó de camarão'],
   },
+
+  // Foto de cada prato (pasta fotos/). Pratos sem foto aparecem sem imagem.
+  fotosPratos: {
+    'Carne moída com purê e legumes': 'fotos/foto-02.jpg',
+    'Frango xadrez com arroz e legumes': 'fotos/foto-08.jpg',
+    'Estrogonofe de frango': 'fotos/foto-10.jpg',
+    'Carne assada desfiada com purê': 'fotos/foto-15.jpg',
+    'Espaguete à bolonhesa': 'fotos/foto-19.jpg',
+    'Carne moída com purê de abóbora': 'fotos/foto-20.jpg',
+  },
+
+  // Fotos da galeria "Nossas marmitas" e do topo do site.
+  fotosTopo: ['fotos/foto-08.jpg', 'fotos/foto-15.jpg', 'fotos/foto-20.jpg', 'fotos/foto-02.jpg'],
+  galeria: ['fotos/foto-03.jpg', 'fotos/foto-05.jpg', 'fotos/foto-09.jpg', 'fotos/foto-11.jpg',
+            'fotos/foto-12.jpg', 'fotos/foto-13.jpg', 'fotos/foto-16.jpg', 'fotos/foto-19.jpg',
+            'fotos/foto-01.jpg', 'fotos/foto-07.jpg', 'fotos/foto-18.jpg', 'fotos/foto-21.jpg'],
 
   observacoes: {
     'Lasanha de berinjela': 'Leva carne moída',

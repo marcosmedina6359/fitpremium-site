@@ -42,6 +42,7 @@ window.FIT_DADOS = {
     ],
     Peixe: [
       'Filé de peixe com purê de batata e legumes',
+      'Moqueca de peixe com arroz',
     ],
   },
 
@@ -103,6 +104,7 @@ window.FIT_DADOS = {
     'Carne assada desfiada com purê': 'fotos/foto-15.jpg',
     'Espaguete à bolonhesa': 'fotos/foto-19.jpg',
     'Carne moída com purê de abóbora': 'fotos/foto-20.jpg',
+    'Moqueca de peixe com arroz': 'fotos/foto-09.jpg',
   },
 
   // Fotos da galeria "Nossas marmitas" e do topo do site.
@@ -110,6 +112,12 @@ window.FIT_DADOS = {
   galeria: ['fotos/foto-03.jpg', 'fotos/foto-05.jpg', 'fotos/foto-09.jpg', 'fotos/foto-11.jpg',
             'fotos/foto-12.jpg', 'fotos/foto-13.jpg', 'fotos/foto-16.jpg', 'fotos/foto-19.jpg',
             'fotos/foto-01.jpg', 'fotos/foto-07.jpg', 'fotos/foto-18.jpg', 'fotos/foto-21.jpg'],
+
+  // Avaliações aprovadas para aparecer no site (seção "Clientes satisfeitos").
+  // Chegam pelo WhatsApp a partir da página avaliar.html. Copie só as que o cliente autorizou.
+  // Formato: { nome: 'Ana', bairro: 'Freguesia', nota: 5, texto: 'Comida deliciosa...', prato: 'Estrogonofe de frango' },
+  avaliacoes: [
+  ],
 
   observacoes: {
     'Lasanha de berinjela': 'Leva carne moída',

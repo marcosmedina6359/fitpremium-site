@@ -1,0 +1,85 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src 'self' data:; connect-src 'self'; object-src 'none'; base-uri 'self'; form-action 'self'">
+  <meta name="referrer" content="strict-origin-when-cross-origin">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="robots" content="noindex">
+  <title>Avalie seu pedido · Fit Premium</title>
+  <meta name="description" content="Conte para a Fit Premium como foi o seu pedido.">
+  <link rel="icon" href="logo-fit-premium.png">
+  <meta property="og:title" content="Como foi o seu pedido Fit Premium?">
+  <meta property="og:description" content="Leva menos de 1 minuto. Sua opinião ajuda a gente a melhorar.">
+  <meta property="og:image" content="https://fitpremium.onrender.com/compartilhar.jpg">
+  <meta name="theme-color" content="#fff3df">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,700&family=DM+Sans:wght@400;500;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="estilo.css">
+</head>
+<body class="pagina-avaliar">
+  <header class="topo">
+    <a href="./" class="marca" aria-label="Fit Premium — site">
+      <img src="logo-fit-premium.png" alt="" width="52" height="52">
+      <span>Fit Premium<small>Marmitaria</small></span>
+    </a>
+  </header>
+
+  <main class="avaliar">
+    <form id="form-avaliar" class="avaliar-card" novalidate>
+      <p class="selo">Pedido entregue ✓</p>
+      <h1>Como foi a sua experiência?</h1>
+      <p class="lead">Leva menos de 1 minuto. Sua opinião ajuda a gente a melhorar e a escolher os próximos pratos.</p>
+
+      <fieldset class="estrelas" id="estrelas">
+        <legend>Sua nota</legend>
+        <div class="estrelas-linha">
+          <input type="radio" name="nota" id="n5" value="5"><label for="n5" title="Excelente">★</label>
+          <input type="radio" name="nota" id="n4" value="4"><label for="n4" title="Muito bom">★</label>
+          <input type="radio" name="nota" id="n3" value="3"><label for="n3" title="Bom">★</label>
+          <input type="radio" name="nota" id="n2" value="2"><label for="n2" title="Ruim">★</label>
+          <input type="radio" name="nota" id="n1" value="1"><label for="n1" title="Muito ruim">★</label>
+        </div>
+        <p class="nota-texto" id="nota-texto" aria-live="polite">Toque nas estrelas</p>
+      </fieldset>
+
+      <fieldset class="aspectos">
+        <legend>O que você mais gostou? <span>(opcional)</span></legend>
+        <div class="chips" id="aspectos"></div>
+      </fieldset>
+
+      <label><span>Prato favorito <span class="opcional">(opcional)</span></span>
+        <select name="prato" id="sel-prato"><option value="">Escolha um prato</option></select>
+      </label>
+
+      <label><span>Conte como foi <span class="opcional">(opcional)</span></span>
+        <textarea name="comentario" rows="4" maxlength="400" placeholder="Ex.: comida saborosa, porção generosa, chegou no horário…"></textarea>
+        <small class="contador-texto" id="contador-texto">0 / 400</small>
+      </label>
+
+      <div class="duas">
+        <label>Seu nome<input name="nome" maxlength="40" autocomplete="given-name" placeholder="Ex.: Ana"></label>
+        <label>Bairro<input name="bairro" maxlength="40" value="Jacarepaguá"></label>
+      </div>
+
+      <label class="check"><input type="checkbox" name="autoriza" checked> Autorizo a Fit Premium a mostrar minha avaliação no site e nas redes, só com o primeiro nome e o bairro.</label>
+
+      <p class="aviso" id="aviso-avaliar" aria-live="polite"></p>
+      <button class="btn btn-bloco btn-whats" type="submit">Enviar avaliação pelo WhatsApp</button>
+      <p class="pequeno centro">Sua avaliação chega direto para a nossa equipe.</p>
+    </form>
+
+    <section class="avaliar-card obrigado" id="obrigado" hidden>
+      <p class="selo">Muito obrigado!</p>
+      <h1>Sua avaliação foi preparada 💚</h1>
+      <p class="lead">Confira se o WhatsApp abriu com a mensagem e toque em <strong>enviar</strong>.</p>
+      <div id="obrigado-extra"></div>
+      <a class="btn btn-contorno btn-bloco" href="./#montar">Montar meu próximo combo</a>
+    </section>
+  </main>
+
+  <script src="dados.js"></script>
+  <script src="avaliar.js"></script>
+</body>
+</html>

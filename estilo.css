@@ -16,6 +16,7 @@
 }
 
 * { box-sizing: border-box; }
+[hidden] { display: none !important; }
 html { scroll-behavior: smooth; scroll-padding-top: 84px; }
 body { -webkit-text-size-adjust: 100%; margin: 0; background: var(--creme-claro); color: var(--texto); font: 16px/1.6 var(--sans); }
 img { max-width: 100%; height: auto; }
@@ -150,6 +151,46 @@ h3 { font-size: 1.3rem; }
 .doces-combo { color: #ffb98a; font-weight: 500; margin: 0 0 22px; }
 .resumo-itens li.desconto span { color: var(--verde); font-weight: 700; }
 .oferta-combo { margin: -4px 0 10px; color: var(--verde); font-weight: 500; }
+
+/* Depoimentos */
+.avaliacoes { background: var(--creme); }
+.depoimentos { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 20px; max-width: 1080px; margin: 0 auto; }
+.depoimento { margin: 0; background: var(--branco); border: 1px solid var(--linha); border-radius: var(--raio); padding: 24px; box-shadow: var(--sombra); display: flex; flex-direction: column; gap: 10px; }
+.dep-estrelas { margin: 0; color: #e0a526; font-size: 1.2rem; letter-spacing: 2px; }
+.depoimento blockquote { margin: 0; font-size: 1.02rem; color: var(--texto); }
+.depoimento figcaption { margin-top: auto; font-size: .88rem; color: var(--suave); font-weight: 500; }
+.link-rodape { color: #ffb98a; font-weight: 700; }
+
+/* Página de avaliação */
+.pagina-avaliar { background: var(--creme); }
+.avaliar { padding: 32px 16px 60px; }
+.avaliar-card { max-width: 560px; margin: 0 auto; background: var(--branco); border: 1px solid var(--linha); border-radius: 24px; padding: 32px 28px; box-shadow: var(--sombra); display: flex; flex-direction: column; gap: 16px; }
+.avaliar-card h1 { font-size: clamp(1.8rem, 6vw, 2.4rem); margin: 0; }
+.avaliar-card .lead { font-size: 1rem; color: var(--suave); margin: 0; }
+.avaliar-card .selo { margin: 0; }
+.avaliar-card fieldset { border: 0; padding: 0; margin: 0; }
+.avaliar-card legend { font-weight: 700; color: var(--marrom); margin-bottom: 8px; }
+.avaliar-card legend span, .opcional { font-weight: 400; color: var(--suave); font-size: .85rem; }
+.avaliar-card > label, .avaliar-card .duas label { display: flex; flex-direction: column; gap: 6px; font-weight: 700; color: var(--marrom); font-size: .95rem; }
+.avaliar-card input:not([type=radio]):not([type=checkbox]), .avaliar-card select, .avaliar-card textarea { font: 1rem var(--sans); padding: 12px; border: 1px solid var(--linha); border-radius: 12px; background: var(--creme-claro); color: var(--texto); width: 100%; font-weight: 400; }
+.estrelas-linha { display: flex; flex-direction: row-reverse; justify-content: flex-end; gap: 4px; }
+.estrelas-linha input { position: absolute; opacity: 0; width: 1px; height: 1px; }
+.estrelas-linha label { font-size: 2.8rem; line-height: 1; color: #e6d5c3; cursor: pointer; padding: 2px; transition: transform .1s, color .1s; }
+.estrelas-linha label:hover, .estrelas-linha label:hover ~ label, .estrelas-linha input:checked ~ label { color: #e0a526; }
+.estrelas-linha input:focus-visible + label { outline: 3px solid var(--laranja); border-radius: 8px; }
+.estrelas-linha label:active { transform: scale(1.15); }
+.nota-texto { margin: 4px 0 0; color: var(--suave); font-size: .9rem; min-height: 1.4em; }
+.chips { display: flex; flex-wrap: wrap; gap: 8px; }
+.chip { display: inline-flex; align-items: center; min-height: 44px; padding: 8px 16px; border: 1px solid var(--linha); border-radius: 999px; background: var(--creme-claro); cursor: pointer; font-size: .92rem; color: var(--texto); user-select: none; }
+.chip input { position: absolute; opacity: 0; width: 1px; height: 1px; }
+.chip:has(input:checked) { background: var(--marrom); border-color: var(--marrom); color: #fff; }
+.chip:has(input:focus-visible) { outline: 3px solid var(--laranja); outline-offset: 2px; }
+.contador-texto { align-self: flex-end; font-weight: 400; color: var(--suave); font-size: .8rem; }
+.check { flex-direction: row !important; align-items: flex-start; gap: 10px !important; font-weight: 400 !important; color: var(--texto) !important; font-size: .9rem !important; }
+.check input { width: 22px; height: 22px; flex-shrink: 0; margin-top: 1px; accent-color: var(--laranja); }
+.centro { text-align: center; margin: 0; }
+.obrigado #obrigado-extra { display: flex; flex-direction: column; gap: 12px; }
+.obrigado #obrigado-extra p { margin: 0; }
 
 /* Cardápio */
 .cardapio { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 22px; max-width: 1080px; margin: 0 auto; }

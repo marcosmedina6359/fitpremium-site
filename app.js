@@ -265,6 +265,29 @@
     $('#montar').scrollIntoView();
   });
 
+  // ---------- Avaliações ----------
+  // Texto vindo de clientes: montado com textContent (nunca innerHTML).
+  const avs = (D.avaliacoes || []).filter((a) => a && a.nota >= 1 && a.nota <= 5 && a.texto);
+  if (avs.length) {
+    const media = avs.reduce((s, a) => s + a.nota, 0) / avs.length;
+    $('#media-avaliacoes').textContent = `★ ${media.toFixed(1).replace('.', ',')} de 5 · ${avs.length} avaliaç${avs.length > 1 ? 'ões' : 'ão'} de clientes`;
+    $('#depoimentos').replaceChildren(...avs.map((a) => {
+      const fig = document.createElement('figure');
+      fig.className = 'depoimento';
+      const est = document.createElement('p');
+      est.className = 'dep-estrelas';
+      est.setAttribute('aria-label', `${a.nota} de 5 estrelas`);
+      est.textContent = '★'.repeat(a.nota) + '☆'.repeat(5 - a.nota);
+      const q = document.createElement('blockquote');
+      q.textContent = `“${a.texto}”`;
+      const cap = document.createElement('figcaption');
+      cap.textContent = [a.nome, a.bairro].filter(Boolean).join(' · ') + (a.prato ? ` — pediu ${a.prato}` : '');
+      fig.append(est, q, cap);
+      return fig;
+    }));
+    $('#avaliacoes').hidden = false;
+  }
+
   // ---------- Infos ----------
   $('#lista-pagamentos').textContent = D.pagamentos.join(' · ');
   $('#link-whats').href = `https://wa.me/${D.loja.whatsapp}`;

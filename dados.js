@@ -58,6 +58,10 @@ window.FIT_DADOS = {
     categoria: 'Sobremesas',
     peso: '250 g',
     preco: 18,
+    // Descontos por quantidade: o site monta a melhor combinação de pacotes para o cliente.
+    pacotes: [{ qtd: 3, preco: 45 }, { qtd: 2, preco: 32 }],
+    // Nos combos a partir de 15 marmitas, cada pote sai por este valor.
+    precoNoCombo: { aPartirDe: 15, preco: 15 },
     imagem: 'fotos/sobremesas-250g.jpg',
     itens: ['Torta de limão', 'Marido gelado', 'Banoffee', 'Brigadeirão', 'Pudim', 'Bombom de uva'],
   },

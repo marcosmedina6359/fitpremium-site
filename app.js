@@ -26,6 +26,21 @@
   const totalExtras = () => [...Object.values(estado.extras), ...Object.values(estado.doces)].reduce((a, b) => a + b, 0);
   const S = D.sobremesas;
   const precoDoce = () => (S.preco == null ? 'valor a confirmar' : brl(S.preco));
+  // Texto das ofertas, ex.: "1 por R$ 18 · 2 por R$ 32 · 3 por R$ 45"
+  const listaOfertas = () => [`1 por ${brl(S.preco)}`, ...[...(S.pacotes || [])].sort((a, b) => a.qtd - b.qtd).map((p) => `${p.qtd} por ${brl(p.preco)}`)];
+  const ofertasDoces = () => S.preco == null ? 'valor a confirmar' : listaOfertas().join(' · ');
+  const ofertaCombo = () => S.precoNoCombo ? `${brl(S.precoNoCombo.preco)} cada nos combos de ${S.precoNoCombo.aPartirDe} ou mais` : '';
+  // Menor preço para n potes: pacotes + avulsos, ou preço fixo dentro dos combos maiores.
+  function totalDoces(n, c) {
+    if (S.preco == null || !n) return 0;
+    if (S.precoNoCombo && c.marmitas >= S.precoNoCombo.aPartirDe) return n * S.precoNoCombo.preco;
+    const melhor = [0];
+    for (let i = 1; i <= n; i++) {
+      melhor[i] = melhor[i - 1] + S.preco;
+      (S.pacotes || []).forEach((p) => { if (i >= p.qtd) melhor[i] = Math.min(melhor[i], melhor[i - p.qtd] + p.preco); });
+    }
+    return melhor[n];
+  }
   const menorPreco = (c) => Math.min(...Object.values(c.precos));
 
   // ---------- Cards de combos ----------
@@ -110,7 +125,8 @@
       html += '</div>';
     }
     if (estado.filtro === 'Todos' || estado.filtro === S.categoria) {
-      html += `<div class="grupo" id="grupo-doces"><h4>${S.categoria}<span>pote de ${S.peso} · ${precoDoce()}</span></h4>`;
+      html += `<div class="grupo" id="grupo-doces"><h4>${S.categoria}<span>${ofertasDoces()}</span></h4>`;
+      if (S.precoNoCombo) html += `<p class="pequeno oferta-combo">🎁 ${ofertaCombo()}</p>`;
       S.itens.forEach((p) => { html += linhaPrato(p, estado.doces[p] || 0, true, 'doces'); });
       html += '</div>';
     }
@@ -137,13 +153,15 @@
     });
     const extras = Object.entries(estado.extras).map(([p, q]) => ({ nome: p, qtd: q, preco: D.extras.preco, total: D.extras.preco * q }));
     const doces = Object.entries(estado.doces).map(([p, q]) => ({ nome: p, qtd: q, preco: S.preco, total: (S.preco || 0) * q }));
-    const subtotal = [...linhas, ...extras, ...doces].reduce((a, l) => a + l.total, 0);
-    return { c, linhas, extras, doces, subtotal };
+    const qtdDoces = doces.reduce((a, l) => a + l.qtd, 0);
+    const descontoDoces = qtdDoces * (S.preco || 0) - totalDoces(qtdDoces, c);
+    const subtotal = [...linhas, ...extras, ...doces].reduce((a, l) => a + l.total, 0) - descontoDoces;
+    return { c, linhas, extras, doces, descontoDoces, subtotal };
   }
 
   // ---------- Resumo ----------
   function desenharResumo() {
-    const { c, linhas, extras, doces, subtotal } = calcular();
+    const { c, linhas, extras, doces, descontoDoces, subtotal } = calcular();
     const total = totalMarmitas();
     const distintos = pratosDistintos();
 
@@ -161,6 +179,7 @@
     if (doces.length) {
       html += '<li class="extra-label">Sobremesas</li>';
       html += doces.map((l) => `<li><span>${l.qtd}× ${l.nome}</span><span>${l.preco == null ? 'a confirmar' : brl(l.total)}</span></li>`).join('');
+      if (descontoDoces > 0) html += `<li class="desconto"><span>Desconto nas sobremesas</span><span>− ${brl(descontoDoces)}</span></li>`;
     }
     $('#resumo-itens').innerHTML = html || '<li class="vazio">Adicione pratos para montar seu combo</li>';
     $('#subtotal').textContent = brl(subtotal);
@@ -204,7 +223,7 @@
     `<div class="cardapio-cat"><h3>${D.extras.categoria}<span>${brl(D.extras.preco)} cada</span></h3>
       <ul>${D.extras.pratos.map((p) => `<li>${p}</li>`).join('')}</ul><p class="pequeno">Vendido avulso, fora dos combos.</p></div>`,
     `<div class="cardapio-cat"><h3>${S.categoria}<span>pote de ${S.peso}</span></h3>
-      <ul>${S.itens.map((p) => `<li>${p}</li>`).join('')}</ul><p class="pequeno">Vendidas avulsas · ${precoDoce()}.</p></div>`,
+      <ul>${S.itens.map((p) => `<li>${p}</li>`).join('')}</ul><p class="pequeno">Pote de ${S.peso}: ${ofertasDoces()}. ${ofertaCombo()}.</p></div>`,
   ].join('');
 
   // ---------- Fotos ----------
@@ -218,7 +237,9 @@
   $('#doces-foto').src = S.imagem;
   $('#doces-peso').textContent = S.peso;
   $('#doces-lista').innerHTML = S.itens.map((p) => `<li>${p}</li>`).join('');
-  $('#doces-preco').textContent = S.preco == null ? 'Consulte o valor no WhatsApp.' : `${brl(S.preco)} cada.`;
+  if (S.preco == null) $('#doces-preco').textContent = 'Consulte o valor no WhatsApp.';
+  else $('#doces-preco').innerHTML = listaOfertas().map((o) => `<span>${o}</span>`).join('');
+  $('#doces-combo').textContent = ofertaCombo() ? `🎁 ${ofertaCombo()}` : '';
   $('#btn-doces').addEventListener('click', () => {
     estado.filtro = S.categoria;
     desenharFiltros();
@@ -258,7 +279,7 @@
 
   form.addEventListener('submit', (e) => {
     e.preventDefault();
-    const { c, linhas, extras, doces, subtotal } = calcular();
+    const { c, linhas, extras, doces, descontoDoces, subtotal } = calcular();
     const f = Object.fromEntries(new FormData(form));
     const data = f.data ? f.data.split('-').reverse().join('/') : 'A combinar';
     const msg = [
@@ -267,7 +288,8 @@
       `*${c.nome} — ${c.marmitas} marmitas*`,
       ...linhas.map((l) => `• ${l.qtd}× ${l.nome} (${brl(l.preco)})`),
       ...(extras.length ? [``, `*Avulsos (camarão)*`, ...extras.map((l) => `• ${l.qtd}× ${l.nome} (${brl(l.preco)})`)] : []),
-      ...(doces.length ? [``, `*Sobremesas (pote de ${S.peso})*`, ...doces.map((l) => `• ${l.qtd}× ${l.nome}${l.preco == null ? '' : ` (${brl(l.preco)})`}`)] : []),
+      ...(doces.length ? [``, `*Sobremesas (pote de ${S.peso})*`, ...doces.map((l) => `• ${l.qtd}× ${l.nome}${l.preco == null ? '' : ` (${brl(l.preco)})`}`),
+        ...(descontoDoces > 0 ? [`Desconto nas sobremesas: − ${brl(descontoDoces)}`] : [])] : []),
       ``,
       `*Subtotal: ${brl(subtotal)}*${doces.length && S.preco == null ? ' + sobremesas (valor a confirmar)' : ''}`,
       ``,

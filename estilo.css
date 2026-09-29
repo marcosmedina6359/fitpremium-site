@@ -145,6 +145,11 @@ h3 { font-size: 1.3rem; }
 .doces-lista li::before { content: ''; position: absolute; left: 0; top: .55em; width: 9px; height: 9px; border-radius: 50%; background: #f08a4b; }
 .doces .pequeno { color: #e3cdb9; margin-bottom: 20px; }
 #nota-doces { margin: 0; text-align: right; }
+.doces-preco { display: flex; flex-wrap: wrap; gap: 8px; margin: 0 0 12px; }
+.doces-preco span { background: #fff3df; color: var(--marrom); font: 700 1rem var(--serif); padding: 8px 14px; border-radius: 999px; white-space: nowrap; }
+.doces-combo { color: #ffb98a; font-weight: 500; margin: 0 0 22px; }
+.resumo-itens li.desconto span { color: var(--verde); font-weight: 700; }
+.oferta-combo { margin: -4px 0 10px; color: var(--verde); font-weight: 500; }
 
 /* Cardápio */
 .cardapio { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 22px; max-width: 1080px; margin: 0 auto; }

@@ -158,7 +158,7 @@ window.FIT_DADOS = {
   sobremesas: {
     categoria: 'Sobremesas',
     peso: '250 g',
-    preco: 18,
+    preco: 20.9,
     // Descontos por quantidade: o site monta a melhor combinação de pacotes para o cliente.
     pacotes: [{ qtd: 3, preco: 45 }, { qtd: 2, preco: 32 }],
     // Nos combos a partir de 15 marmitas, cada pote sai por este valor.

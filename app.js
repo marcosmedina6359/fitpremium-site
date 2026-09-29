@@ -1,0 +1,239 @@
+(() => {
+  const D = window.FIT_DADOS;
+  const $ = (s) => document.querySelector(s);
+  const brl = (v) => v.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
+  const categorias = Object.keys(D.pratos);
+  const categoriaDe = {};
+  categorias.forEach((c) => D.pratos[c].forEach((p) => (categoriaDe[p] = c)));
+
+  // ---------- Estado ----------
+  const CHAVE = 'fitpremium-pedido';
+  let estado = { combo: 15, itens: {}, extras: {}, filtro: 'Todos' };
+  try {
+    const salvo = JSON.parse(localStorage.getItem(CHAVE));
+    if (salvo && D.combos.some((c) => c.id === salvo.combo)) estado = { ...estado, ...salvo, filtro: 'Todos' };
+  } catch {}
+  const salvar = () => { try { localStorage.setItem(CHAVE, JSON.stringify(estado)); } catch {} };
+
+  const combo = () => D.combos.find((c) => c.id === estado.combo);
+  const totalMarmitas = () => Object.values(estado.itens).reduce((a, b) => a + b, 0);
+  const pratosDistintos = () => Object.values(estado.itens).filter((n) => n > 0).length;
+  const totalExtras = () => Object.values(estado.extras).reduce((a, b) => a + b, 0);
+  const menorPreco = (c) => Math.min(...Object.values(c.precos));
+
+  // ---------- Cards de combos ----------
+  $('#lista-combos').innerHTML = D.combos.map((c) => `
+    <article class="combo${c.destaque ? ' destaque' : ''}">
+      ${c.destaque ? `<span class="tag">${c.destaque}</span>` : ''}
+      <div class="qtd">${c.marmitas}<small>marmitas</small></div>
+      <h3>${c.nome}</h3>
+      <p class="sub">Até ${c.maxPratos} pratos diferentes</p>
+      <table class="tabela-precos">
+        <tr><td>Frango</td><td>${brl(c.precos.Frango)}</td></tr>
+        <tr><td>Carne ou peixe</td><td>${brl(c.precos.Carne)}</td></tr>
+      </table>
+      <p class="beneficio${c.freteGratis ? '' : ' neutro'}">${c.freteGratis ? 'Frete grátis em Jacarepaguá' : 'Taxa de entrega conforme o endereço'}</p>
+      <button class="btn${c.destaque ? '' : ' btn-contorno'}" data-escolher="${c.id}">Montar combo de ${c.marmitas}</button>
+    </article>`).join('');
+
+  document.querySelectorAll('[data-escolher]').forEach((b) => b.addEventListener('click', () => {
+    escolherCombo(Number(b.dataset.escolher));
+    $('#montar').scrollIntoView();
+  }));
+
+  // ---------- Seletor de combo ----------
+  function desenharSeletor() {
+    $('#seletor-combo').innerHTML = D.combos.map((c) => `
+      <button class="opcao-combo" role="radio" aria-checked="${c.id === estado.combo}" data-combo="${c.id}">
+        <strong>${c.marmitas} marmitas</strong>até ${c.maxPratos} pratos · desde ${brl(menorPreco(c))}
+      </button>`).join('');
+    document.querySelectorAll('[data-combo]').forEach((b) =>
+      b.addEventListener('click', () => escolherCombo(Number(b.dataset.combo))));
+  }
+  function escolherCombo(id) {
+    estado.combo = id;
+    atualizar();
+  }
+
+  // ---------- Filtros ----------
+  const filtros = ['Todos', ...categorias, D.extras.categoria];
+  function desenharFiltros() {
+    $('#filtros').innerHTML = filtros.map((f) =>
+      `<button class="filtro" role="tab" aria-selected="${f === estado.filtro}" data-filtro="${f}">${f}</button>`).join('');
+    document.querySelectorAll('[data-filtro]').forEach((b) => b.addEventListener('click', () => {
+      estado.filtro = b.dataset.filtro;
+      desenharFiltros();
+      desenharPratos();
+    }));
+  }
+
+  // ---------- Lista de pratos ----------
+  function linhaPrato(nome, qtd, podeMais, extra) {
+    const obs = D.observacoes[nome];
+    return `
+      <div class="prato${qtd ? ' ativo' : ''}">
+        <div class="prato-nome">${nome}${obs ? `<small>${obs}</small>` : ''}</div>
+        <div class="contador">
+          <button type="button" data-menos="${nome}" data-extra="${extra}" ${qtd ? '' : 'disabled'} aria-label="Remover ${nome}">−</button>
+          <output aria-label="Quantidade de ${nome}">${qtd}</output>
+          <button type="button" data-mais="${nome}" data-extra="${extra}" ${podeMais ? '' : 'disabled'} aria-label="Adicionar ${nome}">+</button>
+        </div>
+      </div>`;
+  }
+
+  function desenharPratos() {
+    const c = combo();
+    const cheio = totalMarmitas() >= c.marmitas;
+    const limitePratos = pratosDistintos() >= c.maxPratos;
+    let html = '';
+    categorias.forEach((cat) => {
+      if (estado.filtro !== 'Todos' && estado.filtro !== cat) return;
+      html += `<div class="grupo"><h4>${cat}<span>${brl(c.precos[cat])} cada no combo de ${c.marmitas}</span></h4>`;
+      D.pratos[cat].forEach((p) => {
+        const q = estado.itens[p] || 0;
+        html += linhaPrato(p, q, !cheio && (q > 0 || !limitePratos), false);
+      });
+      html += '</div>';
+    });
+    if (estado.filtro === 'Todos' || estado.filtro === D.extras.categoria) {
+      html += `<div class="grupo"><h4>${D.extras.categoria}<span>${brl(D.extras.preco)} cada · fora dos combos</span></h4>`;
+      D.extras.pratos.forEach((p) => { html += linhaPrato(p, estado.extras[p] || 0, true, true); });
+      html += '</div>';
+    }
+    $('#lista-pratos').innerHTML = html;
+  }
+
+  $('#lista-pratos').addEventListener('click', (e) => {
+    const b = e.target.closest('button[data-mais], button[data-menos]');
+    if (!b || b.disabled) return;
+    const nome = b.dataset.mais || b.dataset.menos;
+    const alvo = b.dataset.extra === 'true' ? estado.extras : estado.itens;
+    const delta = b.dataset.mais ? 1 : -1;
+    alvo[nome] = Math.max(0, (alvo[nome] || 0) + delta);
+    if (!alvo[nome]) delete alvo[nome];
+    atualizar();
+  });
+
+  // ---------- Cálculos ----------
+  function calcular() {
+    const c = combo();
+    const linhas = Object.entries(estado.itens).map(([p, q]) => {
+      const preco = c.precos[categoriaDe[p]];
+      return { nome: p, qtd: q, preco, total: preco * q };
+    });
+    const extras = Object.entries(estado.extras).map(([p, q]) => ({ nome: p, qtd: q, preco: D.extras.preco, total: D.extras.preco * q }));
+    const subtotal = [...linhas, ...extras].reduce((a, l) => a + l.total, 0);
+    return { c, linhas, extras, subtotal };
+  }
+
+  // ---------- Resumo ----------
+  function desenharResumo() {
+    const { c, linhas, extras, subtotal } = calcular();
+    const total = totalMarmitas();
+    const distintos = pratosDistintos();
+
+    $('#prog-marmitas').textContent = `${total} de ${c.marmitas} marmitas`;
+    $('#prog-pratos').textContent = `${distintos} de ${c.maxPratos} pratos`;
+    const fill = $('#barra-fill');
+    fill.style.width = Math.min(100, (total / c.marmitas) * 100) + '%';
+    fill.classList.toggle('completo', total === c.marmitas);
+
+    let html = linhas.map((l) => `<li><span>${l.qtd}× ${l.nome}</span><span>${brl(l.total)}</span></li>`).join('');
+    if (extras.length) {
+      html += '<li class="extra-label">Avulsos</li>';
+      html += extras.map((l) => `<li><span>${l.qtd}× ${l.nome}</span><span>${brl(l.total)}</span></li>`).join('');
+    }
+    $('#resumo-itens').innerHTML = html || '<li class="vazio">Adicione pratos para montar seu combo</li>';
+    $('#subtotal').textContent = brl(subtotal);
+    $('#frete-info').innerHTML = c.freteGratis
+      ? '<span class="gratis">Grátis</span> em Jacarepaguá'
+      : 'Taxa conforme endereço';
+
+    const aviso = $('#aviso');
+    let ok = false;
+    if (total > c.marmitas) aviso.textContent = `Você escolheu ${total} marmitas. Remova ${total - c.marmitas} para o combo de ${c.marmitas}.`;
+    else if (distintos > c.maxPratos) aviso.textContent = `O combo de ${c.marmitas} permite até ${c.maxPratos} pratos diferentes. Remova ${distintos - c.maxPratos}.`;
+    else if (total === 0) aviso.textContent = '';
+    else if (total < c.marmitas) aviso.textContent = `Faltam ${c.marmitas - total} marmita${c.marmitas - total > 1 ? 's' : ''} para completar o combo.`;
+    else { aviso.textContent = 'Combo completo! É só finalizar.'; ok = true; }
+    aviso.classList.toggle('ok', ok);
+    $('#btn-finalizar').disabled = !ok;
+
+    // Barra do celular
+    $('#bm-total').textContent = brl(subtotal);
+    $('#bm-info').textContent = `${total} de ${c.marmitas} marmitas`;
+    $('#barra-movel').classList.toggle('visivel', total + totalExtras() > 0);
+  }
+
+  function atualizar() {
+    desenharSeletor();
+    desenharPratos();
+    desenharResumo();
+    salvar();
+  }
+
+  $('#btn-limpar').addEventListener('click', () => { estado.itens = {}; estado.extras = {}; atualizar(); });
+
+  // ---------- Cardápio ----------
+  $('#cardapio-lista').innerHTML = [
+    ...categorias.map((cat) => `<div class="cardapio-cat"><h3>${cat}<span>a partir de ${brl(Math.min(...D.combos.map((c) => c.precos[cat])))}</span></h3>
+      <ul>${D.pratos[cat].map((p) => `<li>${p}${D.observacoes[p] ? ` <span class="pequeno">(${D.observacoes[p].toLowerCase()})</span>` : ''}</li>`).join('')}</ul></div>`),
+    `<div class="cardapio-cat"><h3>${D.extras.categoria}<span>${brl(D.extras.preco)} cada</span></h3>
+      <ul>${D.extras.pratos.map((p) => `<li>${p}</li>`).join('')}</ul><p class="pequeno">Vendido avulso, fora dos combos.</p></div>`,
+  ].join('');
+
+  // ---------- Infos ----------
+  $('#lista-pagamentos').textContent = D.pagamentos.join(' · ');
+  $('#link-whats').href = `https://wa.me/${D.loja.whatsapp}`;
+  $('#link-insta').href = `https://instagram.com/${D.loja.instagram}`;
+
+  // ---------- Checkout ----------
+  const dlg = $('#checkout');
+  const form = $('#form-checkout');
+  $('#sel-pagamento').innerHTML = D.pagamentos.map((p) => `<option>${p}</option>`).join('');
+  const amanha = new Date(Date.now() + 864e5);
+  $('#inp-data').min = amanha.toISOString().slice(0, 10);
+
+  $('#btn-finalizar').addEventListener('click', () => dlg.showModal());
+  $('#btn-fechar').addEventListener('click', () => dlg.close());
+  form.addEventListener('change', () => {
+    const entrega = form.tipo.value === 'Entrega';
+    $('#campos-endereco').hidden = !entrega;
+    form.endereco.required = entrega;
+  });
+  form.endereco.required = true;
+  form.cep.addEventListener('input', () => {
+    const d = form.cep.value.replace(/\D/g, '').slice(0, 8);
+    form.cep.value = d.length > 5 ? d.slice(0, 5) + '-' + d.slice(5) : d;
+  });
+
+  form.addEventListener('submit', (e) => {
+    e.preventDefault();
+    const { c, linhas, extras, subtotal } = calcular();
+    const f = Object.fromEntries(new FormData(form));
+    const data = f.data ? f.data.split('-').reverse().join('/') : 'A combinar';
+    const msg = [
+      `Olá, Fit Premium! Quero fazer um pedido pelo site 💚`,
+      ``,
+      `*${c.nome} — ${c.marmitas} marmitas*`,
+      ...linhas.map((l) => `• ${l.qtd}× ${l.nome} (${brl(l.preco)})`),
+      ...(extras.length ? [``, `*Avulsos (camarão)*`, ...extras.map((l) => `• ${l.qtd}× ${l.nome} (${brl(l.preco)})`)] : []),
+      ``,
+      `*Subtotal: ${brl(subtotal)}*`,
+      ``,
+      `Nome: ${f.nome}`,
+      `Recebimento: ${f.tipo}`,
+      ...(f.tipo === 'Entrega' ? [`Endereço: ${f.endereco}`, `Bairro: ${f.bairro}`, `CEP: ${f.cep || '-'}`] : []),
+      `Pagamento: ${f.pagamento}`,
+      `Data desejada: ${data}`,
+      ...(f.obs ? [`Obs.: ${f.obs}`] : []),
+      ``,
+      `Aguardo a confirmação de disponibilidade, entrega e total.`,
+    ].join('\n');
+    window.open(`https://wa.me/${D.loja.whatsapp}?text=${encodeURIComponent(msg)}`, '_blank', 'noopener');
+    dlg.close();
+  });
+
+  desenharFiltros();
+  atualizar();
+})();

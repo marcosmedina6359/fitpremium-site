@@ -1,0 +1,163 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Fit Premium Marmitaria · Monte seu combo</title>
+  <meta name="description" content="Marmitas congeladas de 450 g em Jacarepaguá. Monte seu combo de 7, 15 ou 30 marmitas e peça pelo WhatsApp.">
+  <link rel="icon" href="logo-fit-premium.png">
+  <meta property="og:title" content="Fit Premium Marmitaria · Monte seu combo">
+  <meta property="og:description" content="Marmitas congeladas de 450 g em Jacarepaguá. Combos de 7, 15 ou 30 marmitas com frete grátis a partir de 15.">
+  <meta property="og:image" content="compartilhar.jpg">
+  <meta name="theme-color" content="#fff3df">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,700&family=DM+Sans:wght@400;500;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="estilo.css">
+</head>
+<body>
+  <header class="topo">
+    <a href="#inicio" class="marca" aria-label="Fit Premium — início">
+      <img src="logo-fit-premium.png" alt="" width="52" height="52">
+      <span>Fit Premium<small>Marmitaria</small></span>
+    </a>
+    <nav aria-label="Principal">
+      <a href="#combos">Combos</a>
+      <a href="#cardapio">Cardápio</a>
+      <a href="#entrega">Entrega</a>
+      <a href="#montar" class="btn btn-pequeno">Montar combo</a>
+    </nav>
+  </header>
+
+  <main>
+    <section id="inicio" class="hero">
+      <div class="hero-texto">
+        <p class="selo">Marmitas congeladas · Jacarepaguá</p>
+        <h1>Mais sabor.<br>Mais praticidade.</h1>
+        <p class="lead">Marmitas de <strong>450 g</strong> prontas para a sua rotina. Escolha o combo, monte com os seus pratos favoritos e finalize o pedido pelo WhatsApp.</p>
+        <div class="hero-acoes">
+          <a href="#montar" class="btn">Montar meu combo</a>
+          <a href="#cardapio" class="btn btn-contorno">Ver cardápio</a>
+        </div>
+        <ul class="hero-fatos">
+          <li><strong>450 g</strong><span>por marmita</span></li>
+          <li><strong>A partir de R$ 26</strong><span>por marmita</span></li>
+          <li><strong>Frete grátis</strong><span>a partir de 15 un.</span></li>
+        </ul>
+      </div>
+      <div class="hero-logo"><img src="logo-fit-premium.png" alt="Logo Fit Premium Marmitaria" width="420" height="420"></div>
+    </section>
+
+    <section id="combos" class="secao">
+      <div class="secao-cab">
+        <p class="selo">Escolha seu combo</p>
+        <h2>Quanto mais marmitas, menor o preço</h2>
+        <p>Valores por marmita. Frango, carne e peixe podem ser misturados no mesmo combo.</p>
+      </div>
+      <div id="lista-combos" class="combos"></div>
+    </section>
+
+    <section id="montar" class="secao montador">
+      <div class="secao-cab">
+        <p class="selo">Monte seu combo</p>
+        <h2>Escolha os pratos e as quantidades</h2>
+      </div>
+
+      <div class="passo-combo" role="radiogroup" aria-label="Tamanho do combo" id="seletor-combo"></div>
+
+      <div class="montador-grid">
+        <div class="pratos">
+          <div class="filtros" role="tablist" aria-label="Categorias" id="filtros"></div>
+          <div id="lista-pratos"></div>
+        </div>
+
+        <aside class="resumo" id="resumo" aria-labelledby="resumo-titulo">
+          <h3 id="resumo-titulo">Seu pedido</h3>
+          <div class="progresso">
+            <div class="progresso-info"><span id="prog-marmitas">0 de 7 marmitas</span><span id="prog-pratos">0 de 3 pratos</span></div>
+            <div class="barra"><div id="barra-fill"></div></div>
+          </div>
+          <ul id="resumo-itens" class="resumo-itens"></ul>
+          <div class="resumo-total">
+            <div><span>Subtotal</span><strong id="subtotal">R$ 0,00</strong></div>
+            <div class="frete"><span>Entrega</span><span id="frete-info">—</span></div>
+          </div>
+          <p id="aviso" class="aviso" aria-live="polite"></p>
+          <button id="btn-finalizar" class="btn btn-bloco" disabled>Finalizar pedido</button>
+          <button id="btn-limpar" class="link-limpar" type="button">Limpar escolhas</button>
+        </aside>
+      </div>
+    </section>
+
+    <section id="cardapio" class="secao">
+      <div class="secao-cab">
+        <p class="selo">Cardápio</p>
+        <h2>Nossos pratos</h2>
+        <p>Todos com aproximadamente 450 g e entregues congelados. A disponibilidade é confirmada no fechamento do pedido.</p>
+      </div>
+      <div id="cardapio-lista" class="cardapio"></div>
+    </section>
+
+    <section id="entrega" class="secao info">
+      <div class="info-card">
+        <h3>Entrega</h3>
+        <p>Entregamos em <strong>Jacarepaguá</strong>, conforme disponibilidade para o endereço.</p>
+        <p><strong>Frete grátis</strong> a partir de 15 marmitas. Para o combo de 7, a taxa é informada conforme o endereço.</p>
+      </div>
+      <div class="info-card">
+        <h3>Pagamento</h3>
+        <p id="lista-pagamentos"></p>
+      </div>
+      <div class="info-card">
+        <h3>Atendimento</h3>
+        <p>Todos os dias, das 8h às 20h.</p>
+        <p><a id="link-whats" href="#">WhatsApp (21) 99304-6464</a><br><a id="link-insta" href="#">Instagram @fitpremiumarmitaria</a></p>
+      </div>
+    </section>
+  </main>
+
+  <footer class="rodape">
+    <img src="logo-fit-premium.png" alt="" width="64" height="64">
+    <p>Fit Premium Marmitaria · Jacarepaguá, Rio de Janeiro</p>
+    <p class="pequeno">Preços e disponibilidade sujeitos à confirmação da equipe no WhatsApp.</p>
+  </footer>
+
+  <!-- Barra fixa no celular -->
+  <div class="barra-movel" id="barra-movel">
+    <div><strong id="bm-total">R$ 0,00</strong><span id="bm-info">0 de 7 marmitas</span></div>
+    <a href="#resumo" class="btn btn-pequeno" id="bm-btn">Ver pedido</a>
+  </div>
+
+  <dialog id="checkout" aria-labelledby="checkout-titulo">
+    <form id="form-checkout" method="dialog">
+      <div class="dlg-cab">
+        <h3 id="checkout-titulo">Finalizar pedido</h3>
+        <button type="button" class="fechar" id="btn-fechar" aria-label="Fechar">×</button>
+      </div>
+      <p class="pequeno">Ao enviar, abriremos o WhatsApp da Fit Premium com o seu pedido pronto. A equipe confirma disponibilidade, entrega e total antes de fechar.</p>
+      <label>Nome<input name="nome" required autocomplete="name"></label>
+      <fieldset class="opcoes">
+        <legend>Receber como?</legend>
+        <label><input type="radio" name="tipo" value="Entrega" checked> Entrega</label>
+        <label><input type="radio" name="tipo" value="Retirada"> Retirada</label>
+      </fieldset>
+      <div id="campos-endereco">
+        <label>Endereço completo<input name="endereco" autocomplete="street-address" placeholder="Rua, número, complemento"></label>
+        <div class="duas">
+          <label>Bairro<input name="bairro" value="Jacarepaguá"></label>
+          <label>CEP<input name="cep" inputmode="numeric" autocomplete="postal-code" placeholder="00000-000" maxlength="9"></label>
+        </div>
+      </div>
+      <div class="duas">
+        <label>Pagamento<select name="pagamento" id="sel-pagamento" required></select></label>
+        <label>Data desejada<input name="data" type="date" id="inp-data"></label>
+      </div>
+      <label>Observações<textarea name="obs" rows="2" placeholder="Opcional"></textarea></label>
+      <button class="btn btn-bloco btn-whats" type="submit">Enviar pedido pelo WhatsApp</button>
+    </form>
+  </dialog>
+
+  <script src="dados.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>

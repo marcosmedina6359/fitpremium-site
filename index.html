@@ -28,6 +28,7 @@
       <a href="#fotos">Fotos</a>
       <a href="#combos">Combos</a>
       <a href="#cardapio">Cardápio</a>
+      <a href="#doces">Doces</a>
       <a href="#entrega">Entrega</a>
       <a href="#montar" class="btn btn-pequeno">Montar combo</a>
     </nav>
@@ -93,12 +94,26 @@
           <ul id="resumo-itens" class="resumo-itens"></ul>
           <div class="resumo-total">
             <div><span>Subtotal</span><strong id="subtotal">R$ 0,00</strong></div>
+            <p class="pequeno" id="nota-doces" hidden>+ sobremesas: valor confirmado no WhatsApp</p>
             <div class="frete"><span>Entrega</span><span id="frete-info">—</span></div>
           </div>
           <p id="aviso" class="aviso" aria-live="polite"></p>
           <button id="btn-finalizar" class="btn btn-bloco" disabled>Finalizar pedido</button>
           <button id="btn-limpar" class="link-limpar" type="button">Limpar escolhas</button>
         </aside>
+      </div>
+    </section>
+
+    <section id="doces" class="secao doces">
+      <div class="doces-grid">
+        <img id="doces-foto" alt="Sobremesas Fit Premium no pote de 250 g: torta de limão, marido gelado, banoffee, brigadeirão, pudim e bombom de uva" width="400" height="600" loading="lazy">
+        <div>
+          <p class="selo">Para adoçar a semana</p>
+          <h2>Sobremesas no pote de <span id="doces-peso">250 g</span></h2>
+          <ul class="doces-lista" id="doces-lista"></ul>
+          <p class="pequeno" id="doces-preco"></p>
+          <button type="button" class="btn" id="btn-doces">Adicionar sobremesas ao pedido</button>
+        </div>
       </div>
     </section>
 

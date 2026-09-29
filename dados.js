@@ -52,6 +52,16 @@ window.FIT_DADOS = {
     pratos: ['Escondidinho de camarão', 'Estrogonofe de camarão', 'Bobó de camarão'],
   },
 
+  // Sobremesas no pote de 250 g (fonte: grupo Informes e Promoções, 29/09/2026).
+  // preco: null = valor confirmado pela equipe no WhatsApp. Quando tiver o preço, troque null pelo número (ex.: 15).
+  sobremesas: {
+    categoria: 'Sobremesas',
+    peso: '250 g',
+    preco: null,
+    imagem: 'fotos/sobremesas-250g.jpg',
+    itens: ['Torta de limão', 'Marido gelado', 'Banoffee', 'Brigadeirão', 'Pudim', 'Bombom de uva'],
+  },
+
   // Foto de cada prato (pasta fotos/). Pratos sem foto aparecem sem imagem.
   fotosPratos: {
     'Carne moída com purê e legumes': 'fotos/foto-02.jpg',

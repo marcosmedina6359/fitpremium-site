@@ -8,7 +8,7 @@
 
   // ---------- Estado ----------
   const CHAVE = 'fitpremium-pedido';
-  let estado = { combo: 15, itens: {}, extras: {}, filtro: 'Todos' };
+  let estado = { combo: 15, itens: {}, extras: {}, doces: {}, filtro: 'Todos' };
   try {
     const salvo = JSON.parse(localStorage.getItem(CHAVE));
     if (salvo && D.combos.some((c) => c.id === salvo.combo)) estado = { ...estado, ...salvo, filtro: 'Todos' };
@@ -17,12 +17,15 @@
   const filtrar = (obj, validos) => Object.fromEntries(Object.entries(obj || {}).filter(([p, q]) => validos.includes(p) && q > 0));
   estado.itens = filtrar(estado.itens, Object.keys(categoriaDe));
   estado.extras = filtrar(estado.extras, D.extras.pratos);
+  estado.doces = filtrar(estado.doces, D.sobremesas.itens);
   const salvar = () => { try { localStorage.setItem(CHAVE, JSON.stringify(estado)); } catch {} };
 
   const combo = () => D.combos.find((c) => c.id === estado.combo);
   const totalMarmitas = () => Object.values(estado.itens).reduce((a, b) => a + b, 0);
   const pratosDistintos = () => Object.values(estado.itens).filter((n) => n > 0).length;
-  const totalExtras = () => Object.values(estado.extras).reduce((a, b) => a + b, 0);
+  const totalExtras = () => [...Object.values(estado.extras), ...Object.values(estado.doces)].reduce((a, b) => a + b, 0);
+  const S = D.sobremesas;
+  const precoDoce = () => (S.preco == null ? 'valor a confirmar' : brl(S.preco));
   const menorPreco = (c) => Math.min(...Object.values(c.precos));
 
   // ---------- Cards de combos ----------
@@ -60,7 +63,7 @@
   }
 
   // ---------- Filtros ----------
-  const filtros = ['Todos', ...categorias, D.extras.categoria];
+  const filtros = ['Todos', ...categorias, D.extras.categoria, S.categoria];
   function desenharFiltros() {
     $('#filtros').innerHTML = filtros.map((f) =>
       `<button class="filtro" role="tab" aria-selected="${f === estado.filtro}" data-filtro="${f}">${f}</button>`).join('');
@@ -80,9 +83,9 @@
         ${foto ? `<img class="prato-foto" src="${foto}" alt="" loading="lazy" width="64" height="64">` : ''}
         <div class="prato-nome">${nome}${obs ? `<small>${obs}</small>` : ''}</div>
         <div class="contador">
-          <button type="button" data-menos="${nome}" data-extra="${extra}" ${qtd ? '' : 'disabled'} aria-label="Remover ${nome}">−</button>
+          <button type="button" data-menos="${nome}" data-grupo="${extra}" ${qtd ? '' : 'disabled'} aria-label="Remover ${nome}">−</button>
           <output aria-label="Quantidade de ${nome}">${qtd}</output>
-          <button type="button" data-mais="${nome}" data-extra="${extra}" ${podeMais ? '' : 'disabled'} aria-label="Adicionar ${nome}">+</button>
+          <button type="button" data-mais="${nome}" data-grupo="${extra}" ${podeMais ? '' : 'disabled'} aria-label="Adicionar ${nome}">+</button>
         </div>
       </div>`;
   }
@@ -97,13 +100,18 @@
       html += `<div class="grupo"><h4>${cat}<span>${brl(c.precos[cat])} cada no combo de ${c.marmitas}</span></h4>`;
       D.pratos[cat].forEach((p) => {
         const q = estado.itens[p] || 0;
-        html += linhaPrato(p, q, !cheio && (q > 0 || !limitePratos), false);
+        html += linhaPrato(p, q, !cheio && (q > 0 || !limitePratos), 'itens');
       });
       html += '</div>';
     });
     if (estado.filtro === 'Todos' || estado.filtro === D.extras.categoria) {
       html += `<div class="grupo"><h4>${D.extras.categoria}<span>${brl(D.extras.preco)} cada · fora dos combos</span></h4>`;
-      D.extras.pratos.forEach((p) => { html += linhaPrato(p, estado.extras[p] || 0, true, true); });
+      D.extras.pratos.forEach((p) => { html += linhaPrato(p, estado.extras[p] || 0, true, 'extras'); });
+      html += '</div>';
+    }
+    if (estado.filtro === 'Todos' || estado.filtro === S.categoria) {
+      html += `<div class="grupo" id="grupo-doces"><h4>${S.categoria}<span>pote de ${S.peso} · ${precoDoce()}</span></h4>`;
+      S.itens.forEach((p) => { html += linhaPrato(p, estado.doces[p] || 0, true, 'doces'); });
       html += '</div>';
     }
     $('#lista-pratos').innerHTML = html;
@@ -113,7 +121,7 @@
     const b = e.target.closest('button[data-mais], button[data-menos]');
     if (!b || b.disabled) return;
     const nome = b.dataset.mais || b.dataset.menos;
-    const alvo = b.dataset.extra === 'true' ? estado.extras : estado.itens;
+    const alvo = estado[b.dataset.grupo];
     const delta = b.dataset.mais ? 1 : -1;
     alvo[nome] = Math.max(0, (alvo[nome] || 0) + delta);
     if (!alvo[nome]) delete alvo[nome];
@@ -128,13 +136,14 @@
       return { nome: p, qtd: q, preco, total: preco * q };
     });
     const extras = Object.entries(estado.extras).map(([p, q]) => ({ nome: p, qtd: q, preco: D.extras.preco, total: D.extras.preco * q }));
-    const subtotal = [...linhas, ...extras].reduce((a, l) => a + l.total, 0);
-    return { c, linhas, extras, subtotal };
+    const doces = Object.entries(estado.doces).map(([p, q]) => ({ nome: p, qtd: q, preco: S.preco, total: (S.preco || 0) * q }));
+    const subtotal = [...linhas, ...extras, ...doces].reduce((a, l) => a + l.total, 0);
+    return { c, linhas, extras, doces, subtotal };
   }
 
   // ---------- Resumo ----------
   function desenharResumo() {
-    const { c, linhas, extras, subtotal } = calcular();
+    const { c, linhas, extras, doces, subtotal } = calcular();
     const total = totalMarmitas();
     const distintos = pratosDistintos();
 
@@ -149,8 +158,13 @@
       html += '<li class="extra-label">Avulsos</li>';
       html += extras.map((l) => `<li><span>${l.qtd}× ${l.nome}</span><span>${brl(l.total)}</span></li>`).join('');
     }
+    if (doces.length) {
+      html += '<li class="extra-label">Sobremesas</li>';
+      html += doces.map((l) => `<li><span>${l.qtd}× ${l.nome}</span><span>${l.preco == null ? 'a confirmar' : brl(l.total)}</span></li>`).join('');
+    }
     $('#resumo-itens').innerHTML = html || '<li class="vazio">Adicione pratos para montar seu combo</li>';
     $('#subtotal').textContent = brl(subtotal);
+    $('#nota-doces').hidden = !(doces.length && S.preco == null);
     $('#frete-info').innerHTML = c.freteGratis
       ? '<span class="gratis">Grátis</span> em Jacarepaguá'
       : 'Taxa conforme endereço';
@@ -181,7 +195,7 @@
     salvar();
   }
 
-  $('#btn-limpar').addEventListener('click', () => { estado.itens = {}; estado.extras = {}; atualizar(); });
+  $('#btn-limpar').addEventListener('click', () => { estado.itens = {}; estado.extras = {}; estado.doces = {}; atualizar(); });
 
   // ---------- Cardápio ----------
   $('#cardapio-lista').innerHTML = [
@@ -189,6 +203,8 @@
       <ul>${D.pratos[cat].map((p) => `<li>${p}${D.observacoes[p] ? ` <span class="pequeno">(${D.observacoes[p].toLowerCase()})</span>` : ''}</li>`).join('')}</ul></div>`),
     `<div class="cardapio-cat"><h3>${D.extras.categoria}<span>${brl(D.extras.preco)} cada</span></h3>
       <ul>${D.extras.pratos.map((p) => `<li>${p}</li>`).join('')}</ul><p class="pequeno">Vendido avulso, fora dos combos.</p></div>`,
+    `<div class="cardapio-cat"><h3>${S.categoria}<span>pote de ${S.peso}</span></h3>
+      <ul>${S.itens.map((p) => `<li>${p}</li>`).join('')}</ul><p class="pequeno">Vendidas avulsas · ${precoDoce()}.</p></div>`,
   ].join('');
 
   // ---------- Fotos ----------
@@ -197,6 +213,18 @@
     `<img src="${f}" alt="${nomeDaFoto[f] || 'Marmita Fit Premium'}" width="450" height="450">`).join('');
   $('#galeria').innerHTML = D.galeria.map((f) =>
     `<figure><img src="${f}" alt="Marmitas Fit Premium" loading="lazy" width="450" height="560"></figure>`).join('');
+
+  // ---------- Vitrine de sobremesas ----------
+  $('#doces-foto').src = S.imagem;
+  $('#doces-peso').textContent = S.peso;
+  $('#doces-lista').innerHTML = S.itens.map((p) => `<li>${p}</li>`).join('');
+  $('#doces-preco').textContent = S.preco == null ? 'Consulte o valor no WhatsApp.' : `${brl(S.preco)} cada.`;
+  $('#btn-doces').addEventListener('click', () => {
+    estado.filtro = S.categoria;
+    desenharFiltros();
+    desenharPratos();
+    $('#montar').scrollIntoView();
+  });
 
   // ---------- Infos ----------
   $('#lista-pagamentos').textContent = D.pagamentos.join(' · ');
@@ -230,7 +258,7 @@
 
   form.addEventListener('submit', (e) => {
     e.preventDefault();
-    const { c, linhas, extras, subtotal } = calcular();
+    const { c, linhas, extras, doces, subtotal } = calcular();
     const f = Object.fromEntries(new FormData(form));
     const data = f.data ? f.data.split('-').reverse().join('/') : 'A combinar';
     const msg = [
@@ -239,8 +267,9 @@
       `*${c.nome} — ${c.marmitas} marmitas*`,
       ...linhas.map((l) => `• ${l.qtd}× ${l.nome} (${brl(l.preco)})`),
       ...(extras.length ? [``, `*Avulsos (camarão)*`, ...extras.map((l) => `• ${l.qtd}× ${l.nome} (${brl(l.preco)})`)] : []),
+      ...(doces.length ? [``, `*Sobremesas (pote de ${S.peso})*`, ...doces.map((l) => `• ${l.qtd}× ${l.nome}${l.preco == null ? '' : ` (${brl(l.preco)})`}`)] : []),
       ``,
-      `*Subtotal: ${brl(subtotal)}*`,
+      `*Subtotal: ${brl(subtotal)}*${doces.length && S.preco == null ? ' + sobremesas (valor a confirmar)' : ''}`,
       ``,
       `Nome: ${f.nome}`,
       `Recebimento: ${f.tipo}`,

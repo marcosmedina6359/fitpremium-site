@@ -134,6 +134,18 @@ h3 { font-size: 1.3rem; }
 .aviso.ok { color: var(--verde); }
 .link-limpar { display: block; margin: 10px auto 0; background: none; border: 0; color: var(--suave); text-decoration: underline; cursor: pointer; font: inherit; font-size: .88rem; }
 
+/* Sobremesas */
+.doces { background: var(--marrom); }
+.doces h2 { color: var(--creme); }
+.doces .selo { color: #f08a4b; }
+.doces-grid { display: grid; grid-template-columns: minmax(0, 380px) minmax(0, 1fr); gap: 48px; align-items: center; max-width: 980px; margin: 0 auto; }
+.doces-grid img { width: 100%; border-radius: var(--raio); box-shadow: 0 24px 50px rgba(0, 0, 0, .35); }
+.doces-lista { list-style: none; padding: 0; margin: 18px 0; display: grid; grid-template-columns: 1fr 1fr; gap: 10px 20px; }
+.doces-lista li { color: #f3e4d4; font-size: 1.05rem; padding-left: 20px; position: relative; }
+.doces-lista li::before { content: ''; position: absolute; left: 0; top: .55em; width: 9px; height: 9px; border-radius: 50%; background: #f08a4b; }
+.doces .pequeno { color: #e3cdb9; margin-bottom: 20px; }
+#nota-doces { margin: 0; text-align: right; }
+
 /* Cardápio */
 .cardapio { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 22px; max-width: 1080px; margin: 0 auto; }
 .cardapio-cat { background: var(--branco); border: 1px solid var(--linha); border-radius: var(--raio); padding: 24px; }
@@ -179,6 +191,8 @@ dialog::backdrop { background: rgba(43, 28, 22, .6); }
   .combos { grid-template-columns: 1fr; max-width: 460px; }
   .galeria { grid-template-columns: repeat(3, 1fr); }
   .info { grid-template-columns: 1fr; }
+  .doces-grid { grid-template-columns: 1fr; gap: 28px; }
+  .doces-grid img { max-width: 360px; margin: 0 auto; }
   .barra-movel { position: fixed; left: 0; right: 0; bottom: 0; z-index: 30; display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 12px 16px calc(12px + env(safe-area-inset-bottom)); background: var(--marrom); color: #fff; box-shadow: 0 -8px 24px rgba(0, 0, 0, .15); transform: translateY(100%); transition: transform .25s; }
   .barra-movel.visivel { transform: none; }
   .barra-movel strong { display: block; font: 700 1.2rem var(--serif); }
@@ -214,4 +228,5 @@ dialog::backdrop { background: rgba(43, 28, 22, .6); }
   .hero-fatos { gap: 18px; }
   .prato { padding: 10px 10px 10px 14px; }
   .duas { grid-template-columns: 1fr; }
+  #btn-doces { width: 100%; }
 }

@@ -141,6 +141,8 @@ window.FIT_DADOS = {
     'Carne à parmegiana com purê e legumes': 'fotos/foto-12.jpg',
     'Filé de peixe com purê de batata e legumes': 'fotos/foto-13.jpg',
     'Lasanha de berinjela': 'fotos/foto-16.jpg',
+    'Empadão de frango 500 g': 'fotos/empadao.jpg',
+    'Empadão de frango 250 g': 'fotos/empadao.jpg',
   },
 
   // Fotos da galeria "Nossas marmitas" e do topo do site.

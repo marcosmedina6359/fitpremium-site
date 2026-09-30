@@ -54,7 +54,8 @@
         <tr><td>Frango</td><td>${AVULSA ? `<s>${brl(AVULSA.precos.Frango)}</s> ` : ''}${brl(c.precos.Frango)}</td></tr>
         <tr><td>Carne ou peixe</td><td>${AVULSA ? `<s>${brl(AVULSA.precos.Carne)}</s> ` : ''}${brl(c.precos.Carne)}</td></tr>
       </table>
-      ${economia(c) > 0 ? `<p class="economia">Economize ${brl(economia(c))}</p>` : ''}
+      <p class="sub">A partir de <strong>${brl(Math.min(c.precos.Frango, c.precos.Carne, c.precos.Peixe) * c.marmitas)}</strong> o kit</p>
+      ${economia(c) > 0 ? `<p class="economia">Economize até ${brl(economia(c))}</p>` : ''}
       <p class="beneficio${c.freteGratis ? '' : ' neutro'}">${c.freteGratis ? 'Frete grátis em Jacarepaguá' : 'Entrega a partir de R$ 10'}</p>
       <button class="btn${c.destaque ? '' : ' btn-contorno'}" data-escolher="${c.id}">Montar kit de ${c.marmitas}</button>
     </article>`).join('')
@@ -336,13 +337,13 @@
     const t = entrega ? taxaAtual() : { atendido: true, taxa: 0 };
     const el = $('#taxa-entrega');
     if (!entrega) el.textContent = '';
-    else if (!form.bairro.value.trim()) el.textContent = 'Informe o bairro (ou o CEP) para calcular a entrega.';
+    else if (!form.bairro.value.trim()) el.textContent = totalMarmitas() >= 15 ? 'Entrega grátis em Jacarepaguá: informe o bairro (ou o CEP) para confirmar.' : 'Entrega R$ 10 em Jacarepaguá: informe o bairro (ou o CEP) para confirmar.';
     else if (!t.atendido) el.textContent = '⚠️ Por enquanto entregamos só em Jacarepaguá (Taquara, Freguesia, Pechincha, Anil, Tanque, Curicica, Camorim, Colônia, Gardênia Azul, Cidade de Deus, Praça Seca e Vila Valqueire). Se for engano de digitação, a equipe confere pelo WhatsApp.';
     else el.textContent = t.gratis ? `🎉 Entrega grátis em ${t.bairro}!` : `🚚 Entrega em ${t.bairro}: ${brl(t.taxa)}`;
     el.classList.toggle('gratis', !!t.gratis);
     const total = subtotal + (t.atendido ? t.taxa : 0);
     $('#total-checkout').replaceChildren(
-      Object.assign(document.createElement('span'), { textContent: entrega && !t.atendido ? 'Total (+ entrega a combinar)' : 'Total' }),
+      Object.assign(document.createElement('span'), { textContent: entrega && !t.atendido ? (form.bairro.value.trim() ? 'Total (+ entrega a combinar)' : 'Total (sem a entrega: informe o bairro)') : 'Total' }),
       Object.assign(document.createElement('strong'), { textContent: brl(total) }));
   }
   listarBairros();
@@ -543,7 +544,7 @@
 
   // Faixa de ofertas no topo (troca a cada 5 s).
   const ofertasTopo = [
-    PC && `🎁 1ª compra a partir de ${PC.aPartirDe} marmitas: ${brlC(PC.valor)} de cashback`,
+    PC && `🎁 1ª compra a partir de ${PC.aPartirDe} marmitas: ${brlC(PC.valor)} de crédito para o próximo pedido`,
     '🚚 Frete grátis em Jacarepaguá a partir de 15 marmitas',
     `🍱 Marmitas de 450 g a partir de ${brlC(Math.min(...combosReais.map(menorPreco)))}`,
     D.indicacao && `🤝 Indique um amigo e ganhe ${brlC(D.indicacao.valor)} de crédito`,

@@ -60,69 +60,32 @@ window.FIT_DADOS = {
   },
 
   // Entrega: taxa por bairro (tabela baseada na da Marmitas da Lulu, 29/09/2026).
+  // Desde 30/09/2026 não entregamos na Zona Norte, em Niterói nem na Baixada.
   // freteGratisAPartirDe: nº de marmitas do combo a partir do qual a entrega nessa faixa sai grátis.
   entrega: {
     // Nomes alternativos que o cliente (ou o CEP) pode mandar.
     apelidos: { 'freguesia': 'Freguesia (Jacarepaguá)', 'freguesia jpa': 'Freguesia (Jacarepaguá)', 'colonia': 'Colônia',
-      'colonia (jacarepagua)': 'Colônia', 'barra': 'Barra da Tijuca', 'recreio': 'Recreio dos Bandeirantes', 'braz de pina': 'Brás de Pina' },
+      'colonia (jacarepagua)': 'Colônia', 'barra': 'Barra da Tijuca', 'recreio': 'Recreio dos Bandeirantes' },
     faixas: [
     { cidade: 'Rio de Janeiro', taxa: 10, freteGratisAPartirDe: 15, bairros: [
         'Anil', 'Camorim', 'Cidade de Deus', 'Colônia', 'Curicica', 'Freguesia (Jacarepaguá)',
         'Gardênia Azul', 'Jacarepaguá', 'Pechincha', 'Tanque', 'Taquara',
       ] },
     { cidade: 'Rio de Janeiro', taxa: 15, bairros: [
-        'Barra da Tijuca', 'Barra Olímpica', 'Encantado', 'Jardim Sulacap', 'Méier', 'Santa Cruz',
+        'Barra da Tijuca', 'Barra Olímpica', 'Jardim Sulacap', 'Santa Cruz',
         'São Cristóvão', 'Vargem Grande', 'Vargem Pequena', 'Vila Militar', 'Vila Valqueire',
       ] },
     { cidade: 'Rio de Janeiro', taxa: 20, bairros: [
-        'Abolição', 'Acari', 'Alto da Boa Vista', 'Anchieta', 'Andaraí', 'Bancários',
-        'Bangu', 'Barra de Guaratiba', 'Barros Filho', 'Benfica', 'Bento Ribeiro', 'Bonsucesso',
-        'Botafogo', 'Brás de Pina', 'Cachambi', 'Cacuia', 'Caju', 'Campinho',
-        'Campo Grande', 'Campo dos Afonsos', 'Cascadura', 'Catete', 'Catumbi', 'Cavalcanti',
-        'Centro', 'Cidade Nova', 'Cidade Universitária', 'Cocotá', 'Coelho Neto', 'Colégio',
-        'Copacabana', 'Cordovil', 'Cosme Velho', 'Cosmos', 'Costa Barros', 'Del Castilho',
-        'Dendê', 'Deodoro', 'Engenheiro Leal', 'Engenho Novo', 'Engenho da Rainha', 'Engenho de Dentro',
-        'Estácio', 'Flamengo', 'Freguesia (Ilha do Governador)', 'Galeão', 'Gamboa', 'Glória',
-        'Grajaú', 'Grumari', 'Guadalupe', 'Guarabu', 'Guaratiba', 'Gávea',
-        'Higienópolis', 'Honório Gurgel', 'Humaitá', 'Inhaúma', 'Inhoaíba', 'Ipanema',
-        'Irajá', 'Itacolomi', 'Itanhangá', 'Jacarezinho', 'Jacaré', 'Jardim América',
-        'Jardim Botânico', 'Jardim Carioca', 'Jardim Guanabara', 'Jardim da Posse', 'Joá', 'Lagoa',
-        'Laranjeiras', 'Leblon', 'Leme', 'Lins de Vasconcelos', 'Madureira', 'Magalhães Bastos',
-        'Mangueira', 'Manguinhos', 'Maracanã', 'Marechal Hermes', 'Maria da Graça', 'Maré',
-        'Moneró', 'Nossa Senhora das Graças', 'Olaria', 'Oswaldo Cruz', 'Paciência', 'Padre Miguel',
-        'Paquetá', 'Parada de Lucas', 'Parque Anchieta', 'Parque Colúmbia', 'Pavuna', 'Pedra de Guaratiba',
-        'Penha', 'Penha Circular', 'Piedade', 'Pilares', 'Pitangueiras', 'Portuguesa',
-        'Praia da Bandeira', 'Praça Seca', 'Praça da Bandeira', 'Quintino Bocaiúva', 'Ramos', 'Realengo',
-        'Recreio dos Bandeirantes', 'Riachuelo', 'Ribeira', 'Ricardo de Albuquerque', 'Rio Comprido', 'Rocha',
-        'Rocha Miranda', 'Rocinha', 'Sampaio', 'Santa Teresa', 'Santo Cristo', 'Santíssimo',
-        'Saúde', 'Senador Camará', 'Senador Vasconcelos', 'Sepetiba', 'São Conrado', 'São Francisco Xavier',
-        'Tauá', 'Tijuca', 'Todos os Santos', 'Tomás Coelho', 'Tubiacanga', 'Turiaçu',
-        'Urca', 'Vasco da Gama', 'Vaz Lobo', 'Vicente de Carvalho', 'Vidigal', 'Vigário Geral',
-        'Vila Isabel', 'Vila Kosmos', 'Vila da Penha', 'Vista Alegre', 'Zumbi', 'Água Santa',
-      ] },
-    { cidade: 'Niterói', taxa: 20, bairros: [
-        'Badu', 'Bairro de Fátima', 'Baldeador', 'Barreto', 'Boa Viagem', 'Cachoeiras',
-        'Cafubá', 'Camboinhas', 'Cantagalo', 'Caramujo', 'Centro', 'Charitas',
-        'Cubango', 'Engenho do Mato', 'Engenhoca', 'Fonseca', 'Gragoatá', 'Icaraí',
-        'Ilha da Conceição', 'Ingá', 'Itacoatiara', 'Itaipu', 'Jacaré', 'Jardim Imbuí',
-        'Jurujuba', 'Largo da Batalha', 'Maceió', 'Maravista', 'Maria Paula', 'Matapaca',
-        'Morro do Estado', 'Piratininga', "Ponta d'Areia", 'Pé Pequeno', 'Rio do Ouro', 'Santa Bárbara',
-        'Santa Rosa', 'Santana', 'Santo Antônio', 'Sapê', 'Serra Grande', 'São Domingos',
-        'São Francisco', 'São Lourenço', 'Tenente Jardim', 'Vila Progresso', 'Viradouro', 'Vital Brazil',
-        'Viçoso Jardim', 'Várzea das Moças',
-      ] },
-    { cidade: 'Nova Iguaçu', taxa: 20, bairros: [
-        'Centro', 'Cerâmica', 'Comendador Soares', 'Posse',
-      ] },
-    { cidade: 'Duque de Caxias', taxa: 20, bairros: [
-        'Centro', 'Jardim Vinte e Cinco de Agosto',
-      ] },
-    { cidade: 'Nilópolis', taxa: 20, bairros: [
-        'Centro', 'Olinda',
-      ] },
-    { cidade: 'São João de Meriti', taxa: 20, bairros: [
-        'Centro', 'Coelho da Rocha', 'Jardim Meriti', 'Vilar dos Teles',
-      ] },
+        'Bangu', 'Barra de Guaratiba', 'Benfica', 'Botafogo', 'Caju', 'Campo Grande', 'Campo dos Afonsos', 'Catete', 'Catumbi', 'Centro', 'Cidade Nova', 'Cidade Universitária', 'Copacabana', 'Cosme Velho', 'Cosmos', 'Deodoro', 'Estácio', 'Flamengo', 'Gamboa', 'Glória',
+        'Grumari', 'Guaratiba', 'Gávea',
+        'Humaitá', 'Inhoaíba', 'Ipanema',
+        'Itanhangá', 'Jardim Botânico', 'Jardim da Posse', 'Joá', 'Lagoa',
+        'Laranjeiras', 'Leblon', 'Leme', 'Magalhães Bastos',
+        'Mangueira', 'Nossa Senhora das Graças', 'Paciência', 'Padre Miguel',
+        'Paquetá', 'Pedra de Guaratiba',
+        'Praça Seca', 'Realengo',
+        'Recreio dos Bandeirantes', 'Rio Comprido', 'Rocinha', 'Santa Teresa', 'Santo Cristo', 'Santíssimo',
+        'Saúde', 'Senador Camará', 'Senador Vasconcelos', 'Sepetiba', 'São Conrado', 'Tubiacanga', 'Urca', 'Vasco da Gama', 'Vidigal', ] },
     ],
   },
 

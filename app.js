@@ -304,8 +304,10 @@
   const dlg = $('#checkout');
   const form = $('#form-checkout');
   $('#sel-pagamento').innerHTML = D.pagamentos.map((p) => `<option>${p}</option>`).join('');
-  const amanha = new Date(Date.now() + 864e5);
-  $('#inp-data').min = amanha.toISOString().slice(0, 10);
+  // Datas no fuso de Brasília (toISOString usa UTC e pulava um dia depois das 21h). O servidor aceita até 60 dias.
+  const diaSP = (dias) => new Date(Date.now() + dias * 864e5).toLocaleDateString('en-CA', { timeZone: 'America/Sao_Paulo' });
+  $('#inp-data').min = diaSP(1);
+  $('#inp-data').max = diaSP(60);
 
   // ---------- Entrega: cidades, bairros e taxa ----------
   const E = D.entrega;

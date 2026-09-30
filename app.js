@@ -182,7 +182,7 @@
       html += extras.map((l) => `<li><span>${l.qtd}× ${l.nome}</span><span>${brl(l.total)}</span></li>`).join('');
     }
     if (avulsos.length) {
-      html += '<li class="extra-label">Caldos, feijões e empadão</li>';
+      html += '<li class="extra-label">Caldos, feijões, empadão e bolos</li>';
       html += avulsos.map((l) => `<li><span>${l.qtd}× ${l.nome}</span><span>${brl(l.total)}</span></li>`).join('');
     }
     if (doces.length) {
@@ -211,7 +211,7 @@
     else if (total > c.marmitas) aviso.textContent = `Você escolheu ${total} marmitas. Remova ${total - c.marmitas} para o ${c.nome}.`;
     else if (distintos > c.maxPratos) aviso.textContent = `O ${c.nome} permite até ${c.maxPratos} pratos diferentes. Remova ${distintos - c.maxPratos}.`;
     else if (total === 0 && totalExtras() > 0 && c.avulso) { aviso.textContent = 'Pronto! Pedido só de adicionais. É só finalizar.'; ok = true; }
-    else if (total === 0) aviso.textContent = totalExtras() > 0 ? 'Para pedir só caldos, feijões, empadão, camarão ou sobremesas, escolha "Avulsas" acima.' : '';
+    else if (total === 0) aviso.textContent = totalExtras() > 0 ? 'Para pedir só caldos, feijões, empadão, bolos, camarão ou sobremesas, escolha "Avulsas" acima.' : '';
     else if (total < c.marmitas) aviso.textContent = `Faltam ${c.marmitas - total} marmita${c.marmitas - total > 1 ? 's' : ''} para completar o kit.`;
     else { aviso.textContent = 'Kit completo! É só finalizar.'; ok = true; }
     aviso.classList.toggle('ok', ok);
@@ -475,7 +475,7 @@
       ``,
       c.avulso ? `*${c.nome} — ${totalMarmitas()} un.*` : `*${c.nome} — ${c.marmitas} marmitas*`,
       ...linhas.map((l) => `• ${l.qtd}× ${l.nome} (${brl(l.preco)})`),
-      ...(avulsos.length ? [``, `*Caldos, feijões e empadão*`, ...avulsos.map((l) => `• ${l.qtd}× ${l.nome} (${brl(l.preco)})`)] : []),
+      ...(avulsos.length ? [``, `*Caldos, feijões, empadão e bolos*`, ...avulsos.map((l) => `• ${l.qtd}× ${l.nome} (${brl(l.preco)})`)] : []),
       ...(extras.length ? [``, `*Avulsos (camarão)*`, ...extras.map((l) => `• ${l.qtd}× ${l.nome} (${brl(l.preco)})`)] : []),
       ...(doces.length ? [``, `*Sobremesas (pote de ${S.peso})*`, ...doces.map((l) => `• ${l.qtd}× ${l.nome}${l.preco == null ? '' : ` (${brl(l.preco)})`}`),
         ...(descontoDoces > 0 ? [`Desconto nas sobremesas: − ${brl(descontoDoces)}`] : [])] : []),

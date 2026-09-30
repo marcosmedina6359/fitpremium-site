@@ -104,6 +104,13 @@ window.FIT_DADOS = {
         { nome: 'Empadão de frango 250 g', preco: 16.5 },
       ],
     },
+    {
+      categoria: 'Bolos',
+      itens: [
+        { nome: 'Bolo vulcão de cenoura com chocolate', preco: 20.9 },
+        { nome: 'Bolo vulcão de chocolate com cobertura de prestígio', preco: 20.9 },
+      ],
+    },
   ],
 
   // Sobremesas no pote de 250 g (fonte: grupo Informes e Promoções, 29/09/2026).

@@ -73,7 +73,7 @@ window.FIT_DADOS = {
       ] },
     { cidade: 'Rio de Janeiro', taxa: 15, bairros: [
         'Barra da Tijuca', 'Barra Olímpica', 'Jardim Sulacap', 'Santa Cruz',
-        'São Cristóvão', 'Vargem Grande', 'Vargem Pequena', 'Vila Militar', 'Vila Valqueire',
+        'Vargem Grande', 'Vargem Pequena', 'Vila Militar', 'Vila Valqueire',
       ] },
     { cidade: 'Rio de Janeiro', taxa: 20, bairros: [
         'Bangu', 'Barra de Guaratiba', 'Benfica', 'Botafogo', 'Caju', 'Campo Grande', 'Campo dos Afonsos', 'Catete', 'Catumbi', 'Centro', 'Cidade Nova', 'Cidade Universitária', 'Copacabana', 'Cosme Velho', 'Cosmos', 'Deodoro', 'Estácio', 'Flamengo', 'Gamboa', 'Glória',

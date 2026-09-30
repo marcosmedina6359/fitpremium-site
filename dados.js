@@ -161,10 +161,10 @@ window.FIT_DADOS = {
     categoria: 'Sobremesas',
     peso: '250 g',
     preco: 20.9,
-    // Descontos por quantidade: o site monta a melhor combinação de pacotes para o cliente.
-    pacotes: [{ qtd: 3, preco: 45 }, { qtd: 2, preco: 32 }],
-    // Nos combos a partir de 15 marmitas, cada pote sai por este valor.
-    precoNoCombo: { aPartirDe: 15, preco: 15 },
+    // Descontos por quantidade (ex.: [{ qtd: 3, preco: 45 }]) e preço especial nos kits ({ aPartirDe: 15, preco: 15 }).
+    // Sem desconto desde 30/09/2026: preço único por pote.
+    pacotes: [],
+    precoNoCombo: null,
     imagem: 'fotos/sobremesas-250g.jpg',
     itens: ['Torta de limão', 'Marido gelado', 'Banoffee', 'Brigadeirão', 'Pudim', 'Bombom de uva'],
   },

@@ -31,8 +31,10 @@
   const totalExtras = () => [...Object.values(estado.extras), ...Object.values(estado.doces), ...Object.values(estado.avulsos)].reduce((a, b) => a + b, 0);
   const S = D.sobremesas;
   const precoDoce = () => (S.preco == null ? 'valor a confirmar' : brl(S.preco));
-  // Texto das ofertas, ex.: "1 por R$ 20,90 · 2 por R$ 32 · 3 por R$ 45"
-  const listaOfertas = () => [`1 por ${brl(S.preco)}`, ...[...(S.pacotes || [])].sort((a, b) => a.qtd - b.qtd).map((p) => `${p.qtd} por ${brl(p.preco)}`)];
+  // Texto das ofertas, ex.: "R$ 20,90 cada" ou "1 por R$ 20,90 · 2 por R$ 32 · 3 por R$ 45"
+  const listaOfertas = () => (S.pacotes || []).length
+    ? [`1 por ${brl(S.preco)}`, ...[...S.pacotes].sort((a, b) => a.qtd - b.qtd).map((p) => `${p.qtd} por ${brl(p.preco)}`)]
+    : [`${brl(S.preco)} cada`];
   const ofertasDoces = () => S.preco == null ? 'valor a confirmar' : listaOfertas().join(' · ');
   const ofertaCombo = () => S.precoNoCombo ? `${brl(S.precoNoCombo.preco)} cada nos kits de ${S.precoNoCombo.aPartirDe} ou mais marmitas` : '';
   const menorPreco = (c) => Math.min(...Object.values(c.precos));
@@ -242,7 +244,7 @@
     ...D.avulsos.map((g) => `<div class="cardapio-cat"><h3>${g.categoria}<span>avulso</span></h3>
       <ul>${g.itens.map((i) => `<li>${i.nome} <span class="pequeno">· ${brl(i.preco)}</span></li>`).join('')}</ul></div>`),
     `<div class="cardapio-cat"><h3>${S.categoria}<span>pote de ${S.peso}</span></h3>
-      <ul>${S.itens.map((p) => `<li>${p}</li>`).join('')}</ul><p class="pequeno">Pote de ${S.peso}: ${ofertasDoces()}. ${ofertaCombo()}.</p></div>`,
+      <ul>${S.itens.map((p) => `<li>${p}</li>`).join('')}</ul><p class="pequeno">Pote de ${S.peso}: ${ofertasDoces()}.${ofertaCombo() ? ` ${ofertaCombo()}.` : ''}</p></div>`,
   ].join('');
 
   // ---------- Fotos ----------

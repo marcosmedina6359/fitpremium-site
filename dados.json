@@ -454,20 +454,8 @@
     "categoria": "Sobremesas",
     "peso": "250 g",
     "preco": 20.9,
-    "pacotes": [
-      {
-        "qtd": 3,
-        "preco": 45
-      },
-      {
-        "qtd": 2,
-        "preco": 32
-      }
-    ],
-    "precoNoCombo": {
-      "aPartirDe": 15,
-      "preco": 15
-    },
+    "pacotes": [],
+    "precoNoCombo": null,
     "imagem": "fotos/sobremesas-250g.jpg",
     "itens": [
       "Torta de limão",

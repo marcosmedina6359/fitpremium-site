@@ -129,6 +129,18 @@ window.FIT_DADOS = {
     'Espaguete à bolonhesa': 'fotos/foto-19.jpg',
     'Carne moída com purê de abóbora': 'fotos/foto-20.jpg',
     'Moqueca de peixe com arroz': 'fotos/foto-09.jpg',
+    // Identificadas pelas fotos em 30/09/2026 (conferir com a cozinha):
+    'Panqueca de carne': 'fotos/foto-01.jpg',
+    'Panqueca de frango': 'fotos/foto-17.jpg',
+    'Sobrecoxa assada com arroz e legumes': 'fotos/foto-03.jpg',
+    'Escondidinho de frango': 'fotos/foto-04.jpg',
+    'Escondidinho de carne': 'fotos/foto-04.jpg',
+    'Lasanha à bolonhesa': 'fotos/foto-06.jpg',
+    'Frango grelhado com cebola caramelizada e batata gratinada': 'fotos/foto-07.jpg',
+    'Frango à parmegiana com batata gratinada': 'fotos/foto-11.jpg',
+    'Carne à parmegiana com purê e legumes': 'fotos/foto-12.jpg',
+    'Filé de peixe com purê de batata e legumes': 'fotos/foto-13.jpg',
+    'Lasanha de berinjela': 'fotos/foto-16.jpg',
   },
 
   // Fotos da galeria "Nossas marmitas" e do topo do site.

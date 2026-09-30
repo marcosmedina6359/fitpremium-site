@@ -194,8 +194,8 @@
     $('#subtotal').textContent = brl(subtotal);
     $('#nota-doces').hidden = !(doces.length && S.preco == null);
     $('#frete-info').innerHTML = c.freteGratis
-      ? '<span class="gratis">Grátis</span> em Jacarepaguá · outros R$ 15–20'
-      : 'R$ 10 em Jacarepaguá · outros bairros R$ 15–20';
+      ? '<span class="gratis">Grátis</span> em Jacarepaguá'
+      : 'R$ 10 em Jacarepaguá · grátis a partir de 15 marmitas';
 
     const aviso = $('#aviso');
     let ok = false;
@@ -337,7 +337,7 @@
     const el = $('#taxa-entrega');
     if (!entrega) el.textContent = '';
     else if (!form.bairro.value.trim()) el.textContent = 'Informe o bairro (ou o CEP) para calcular a entrega.';
-    else if (!t.atendido) el.textContent = '⚠️ Por enquanto entregamos só em Jacarepaguá (Taquara, Freguesia, Pechincha, Anil, Tanque, Curicica, Camorim, Gardênia Azul, Cidade de Deus, Praça Seca e Vila Valqueire). Se for engano de digitação, a equipe confere pelo WhatsApp.';
+    else if (!t.atendido) el.textContent = '⚠️ Por enquanto entregamos só em Jacarepaguá (Taquara, Freguesia, Pechincha, Anil, Tanque, Curicica, Camorim, Colônia, Gardênia Azul, Cidade de Deus, Praça Seca e Vila Valqueire). Se for engano de digitação, a equipe confere pelo WhatsApp.';
     else el.textContent = t.gratis ? `🎉 Entrega grátis em ${t.bairro}!` : `🚚 Entrega em ${t.bairro}: ${brl(t.taxa)}`;
     el.classList.toggle('gratis', !!t.gratis);
     const total = subtotal + (t.atendido ? t.taxa : 0);
@@ -392,7 +392,7 @@
     const livre = E.faixas.find((f) => f.freteGratisAPartirDe && f.bairros.includes(t.bairro));
     res.textContent = t.atendido
       ? `✅ Entregamos em ${t.bairro}${t.cidade !== 'Rio de Janeiro' ? ` (${t.cidade})` : ''}: ${brl(t.taxaCheia)}${livre ? ` · grátis a partir de ${livre.freteGratisAPartirDe} marmitas` : ''}.`
-      : `${bairro || v}: esse bairro ainda não está na nossa área. Por enquanto entregamos só em Jacarepaguá (Taquara, Freguesia, Pechincha, Anil, Tanque, Curicica, Camorim, Gardênia Azul, Cidade de Deus, Praça Seca e Vila Valqueire).`;
+      : `${bairro || v}: esse bairro ainda não está na nossa área. Por enquanto entregamos só em Jacarepaguá (Taquara, Freguesia, Pechincha, Anil, Tanque, Curicica, Camorim, Colônia, Gardênia Azul, Cidade de Deus, Praça Seca e Vila Valqueire).`;
   });
 
   $('#btn-finalizar').addEventListener('click', () => { dlg.showModal(); atualizarTaxa(); });
@@ -435,7 +435,7 @@
 
     const { c, linhas, extras, avulsos, doces, descontoDoces, subtotal } = calcular();
     const f = Object.fromEntries(new FormData(form));
-    let codigo = null, srv = null;
+    let codigo = null, srv = null, recusa = null;
     if (D.loja.api) {
       try {
         const r = await fetch(`${D.loja.api}/api/pedidos`, {
@@ -447,8 +447,21 @@
           signal: AbortSignal.timeout(12000),
         });
         if (r.ok) { srv = await r.json(); codigo = srv.codigo; }
+        else if (r.status === 400 || r.status === 422) {
+          const j = await r.json().catch(() => ({}));
+          recusa = [j.erro || 'Confira os dados do pedido.', ...(j.detalhes || [])].join(' ');
+        }
       } catch {}
     }
+    // Dados recusados pelo servidor (ex.: WhatsApp inválido): mostra o motivo e não abre o WhatsApp.
+    if (recusa) {
+      if (janela) janela.close();
+      $('#erro-checkout').textContent = `⚠️ ${recusa}`;
+      $('#erro-checkout').scrollIntoView({ block: 'center' });
+      enviando = false; btn.disabled = false; btn.textContent = 'Enviar pedido pelo WhatsApp';
+      return;
+    }
+    $('#erro-checkout').textContent = '';
     // Sem servidor: calcula a entrega aqui mesmo (a equipe confere no WhatsApp).
     const tLocal = f.tipo === 'Entrega' ? taxaAtual() : { atendido: true, taxa: 0 };
     const taxa = srv ? srv.taxa : (tLocal.atendido ? tLocal.taxa : null);
@@ -524,7 +537,8 @@
   });
 
   // Data real da próxima entrega (2 dias após a confirmação).
-  const entregaEm = new Date(Date.now() + 2 * 864e5).toLocaleDateString('pt-BR', { timeZone: 'America/Sao_Paulo', weekday: 'long', day: '2-digit', month: '2-digit' });
+  const horaSP = Number(new Date().toLocaleString('en-US', { timeZone: 'America/Sao_Paulo', hour: 'numeric', hour12: false })) % 24;
+  const entregaEm = new Date(Date.now() + (horaSP >= 20 ? 3 : 2) * 864e5).toLocaleDateString('pt-BR', { timeZone: 'America/Sao_Paulo', weekday: 'long', day: '2-digit', month: '2-digit' });
   $('#hero-entrega').textContent = `🚚 Pedindo hoje, você recebe a partir de ${entregaEm}.`;
 
   // Faixa de ofertas no topo (troca a cada 5 s).

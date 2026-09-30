@@ -1,5 +1,5 @@
-// Banco de dados da Fit Premium — fonte: catálogo do WhatsApp Business (23/09/2026)
-// e respostas rápidas da loja. Para alterar preços, pratos ou combos, edite apenas este arquivo.
+// Banco de dados da Fit Premium — preços e regras de 29/09/2026.
+// Para alterar preços, pratos ou kits, edite apenas este arquivo.
 window.FIT_DADOS = {
   loja: {
     nome: 'Fit Premium Marmitaria',

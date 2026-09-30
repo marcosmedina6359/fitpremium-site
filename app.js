@@ -29,10 +29,10 @@
   const totalExtras = () => [...Object.values(estado.extras), ...Object.values(estado.doces), ...Object.values(estado.avulsos)].reduce((a, b) => a + b, 0);
   const S = D.sobremesas;
   const precoDoce = () => (S.preco == null ? 'valor a confirmar' : brl(S.preco));
-  // Texto das ofertas, ex.: "1 por R$ 18 · 2 por R$ 32 · 3 por R$ 45"
+  // Texto das ofertas, ex.: "1 por R$ 20,90 · 2 por R$ 32 · 3 por R$ 45"
   const listaOfertas = () => [`1 por ${brl(S.preco)}`, ...[...(S.pacotes || [])].sort((a, b) => a.qtd - b.qtd).map((p) => `${p.qtd} por ${brl(p.preco)}`)];
   const ofertasDoces = () => S.preco == null ? 'valor a confirmar' : listaOfertas().join(' · ');
-  const ofertaCombo = () => S.precoNoCombo ? `${brl(S.precoNoCombo.preco)} cada nos combos de ${S.precoNoCombo.aPartirDe} ou mais` : '';
+  const ofertaCombo = () => S.precoNoCombo ? `${brl(S.precoNoCombo.preco)} cada nos kits de ${S.precoNoCombo.aPartirDe} ou mais marmitas` : '';
   const menorPreco = (c) => Math.min(...Object.values(c.precos));
 
   // ---------- Cards de combos ----------
@@ -52,7 +52,7 @@
       </table>
       ${economia(c) > 0 ? `<p class="economia">Economize ${brl(economia(c))}</p>` : ''}
       <p class="beneficio${c.freteGratis ? '' : ' neutro'}">${c.freteGratis ? 'Frete grátis em Jacarepaguá' : 'Entrega a partir de R$ 10'}</p>
-      <button class="btn${c.destaque ? '' : ' btn-contorno'}" data-escolher="${c.id}">Montar combo de ${c.marmitas}</button>
+      <button class="btn${c.destaque ? '' : ' btn-contorno'}" data-escolher="${c.id}">Montar kit de ${c.marmitas}</button>
     </article>`).join('')
     + (AVULSA ? `<p class="avulsa-nota">Quer só algumas? Marmitas avulsas (de ${AVULSA.minimo} a ${AVULSA.marmitas}): frango ${brl(AVULSA.precos.Frango)} · carne ou peixe ${brl(AVULSA.precos.Carne)}. <button class="link-limpar" data-escolher="${AVULSA.id}">Pedir avulsas</button></p>` : '');
 
@@ -67,7 +67,7 @@
       <button class="opcao-combo" role="radio" aria-checked="${c.id === estado.combo}" data-combo="${c.id}">
         ${c.avulso
     ? `<strong>Avulsas</strong>${c.minimo} a ${c.marmitas} un. · ${brl(menorPreco(c))}`
-    : `<strong>${c.marmitas} marmitas</strong>até ${c.maxPratos} pratos · desde ${brl(menorPreco(c))}`}
+    : `<strong>${c.marmitas} marmitas</strong>${c.nome} · até ${c.maxPratos} pratos diferentes`}
       </button>`).join('');
     document.querySelectorAll('[data-combo]').forEach((b) =>
       b.addEventListener('click', () => escolherCombo(Number(b.dataset.combo))));
@@ -114,7 +114,7 @@
     let html = '';
     categorias.forEach((cat) => {
       if (estado.filtro !== 'Todos' && estado.filtro !== cat) return;
-      html += `<div class="grupo"><h4>${cat}<span>${brl(c.precos[cat])} cada ${c.avulso ? '(avulsa)' : `no combo de ${c.marmitas}`}</span></h4>`;
+      html += `<div class="grupo"><h4>${cat}<span>${brl(c.precos[cat])} cada ${c.avulso ? '(avulsa)' : `no ${c.nome}`}</span></h4>`;
       D.pratos[cat].forEach((p) => {
         const q = estado.itens[p] || 0;
         html += linhaPrato(p, q, !cheio && (q > 0 || !limitePratos), 'itens');
@@ -122,13 +122,13 @@
       html += '</div>';
     });
     if (estado.filtro === 'Todos' || estado.filtro === D.extras.categoria) {
-      html += `<div class="grupo"><h4>${D.extras.categoria}<span>${brl(D.extras.preco)} cada · fora dos combos</span></h4>`;
+      html += `<div class="grupo"><h4>${D.extras.categoria}<span>${brl(D.extras.preco)} cada · adicional ao pedido de marmitas</span></h4>`;
       D.extras.pratos.forEach((p) => { html += linhaPrato(p, estado.extras[p] || 0, true, 'extras'); });
       html += '</div>';
     }
     D.avulsos.forEach((g) => {
       if (estado.filtro !== 'Todos' && estado.filtro !== g.categoria) return;
-      html += `<div class="grupo"><h4>${g.categoria}<span>avulso · fora dos combos</span></h4>`;
+      html += `<div class="grupo"><h4>${g.categoria}<span>adicional ao pedido de marmitas</span></h4>`;
       g.itens.forEach((i) => { html += linhaPrato(i.nome, estado.avulsos[i.nome] || 0, true, 'avulsos', brl(i.preco)); });
       html += '</div>';
     });
@@ -167,7 +167,7 @@
     const distintos = pratosDistintos();
 
     $('#prog-marmitas').textContent = c.avulso ? `${total} marmita${total === 1 ? '' : 's'} avulsa${total === 1 ? '' : 's'}` : `${total} de ${c.marmitas} marmitas`;
-    $('#prog-pratos').textContent = c.avulso ? `até ${c.marmitas}` : `${distintos} de ${c.maxPratos} pratos`;
+    $('#prog-pratos').textContent = c.avulso ? `até ${c.marmitas}` : `${distintos} de ${c.maxPratos} pratos diferentes`;
     const fill = $('#barra-fill');
     fill.style.width = Math.min(100, (total / c.marmitas) * 100) + '%';
     fill.classList.toggle('completo', total === c.marmitas);
@@ -186,7 +186,7 @@
       html += doces.map((l) => `<li><span>${l.qtd}× ${l.nome}</span><span>${l.preco == null ? 'a confirmar' : brl(l.total)}</span></li>`).join('');
       if (descontoDoces > 0) html += `<li class="desconto"><span>Desconto nas sobremesas</span><span>− ${brl(descontoDoces)}</span></li>`;
     }
-    $('#resumo-itens').innerHTML = html || '<li class="vazio">Adicione pratos para montar seu combo</li>';
+    $('#resumo-itens').innerHTML = html || '<li class="vazio">Adicione pratos para montar seu kit</li>';
     $('#subtotal').textContent = brl(subtotal);
     $('#nota-doces').hidden = !(doces.length && S.preco == null);
     $('#frete-info').innerHTML = c.freteGratis
@@ -196,19 +196,19 @@
     const aviso = $('#aviso');
     let ok = false;
     const proximo = combosReais[0];
-    if (c.avulso && total >= proximo.marmitas) aviso.textContent = `Com ${total} marmitas vale mais o combo de ${proximo.marmitas}: escolha o combo acima e economize.`;
+    if (c.avulso && total >= proximo.marmitas) aviso.textContent = `Com ${total} marmitas vale mais o ${proximo.nome} (${proximo.marmitas} marmitas): escolha o kit acima e economize.`;
     else if (c.avulso && total > 0) {
       const falta = proximo.marmitas - total;
       aviso.textContent = total >= proximo.marmitas - 3
-        ? `Faltam só ${falta} para o combo de ${proximo.marmitas}, que sai ${brl(c.precos.Frango - proximo.precos.Frango)} mais barato por marmita.`
+        ? `Faltam só ${falta} para o ${proximo.nome} (${proximo.marmitas} marmitas), que sai ${brl(c.precos.Frango - proximo.precos.Frango)} mais barato por marmita.`
         : 'Pronto! É só finalizar.';
       ok = true;
     }
-    else if (total > c.marmitas) aviso.textContent = `Você escolheu ${total} marmitas. Remova ${total - c.marmitas} para o combo de ${c.marmitas}.`;
-    else if (distintos > c.maxPratos) aviso.textContent = `O combo de ${c.marmitas} permite até ${c.maxPratos} pratos diferentes. Remova ${distintos - c.maxPratos}.`;
-    else if (total === 0) aviso.textContent = '';
-    else if (total < c.marmitas) aviso.textContent = `Faltam ${c.marmitas - total} marmita${c.marmitas - total > 1 ? 's' : ''} para completar o combo.`;
-    else { aviso.textContent = 'Combo completo! É só finalizar.'; ok = true; }
+    else if (total > c.marmitas) aviso.textContent = `Você escolheu ${total} marmitas. Remova ${total - c.marmitas} para o ${c.nome}.`;
+    else if (distintos > c.maxPratos) aviso.textContent = `O ${c.nome} permite até ${c.maxPratos} pratos diferentes. Remova ${distintos - c.maxPratos}.`;
+    else if (total === 0) aviso.textContent = totalExtras() > 0 ? 'Caldos, feijões, empadão, camarão e sobremesas são adicionais: escolha também as marmitas.' : '';
+    else if (total < c.marmitas) aviso.textContent = `Faltam ${c.marmitas - total} marmita${c.marmitas - total > 1 ? 's' : ''} para completar o kit.`;
+    else { aviso.textContent = 'Kit completo! É só finalizar.'; ok = true; }
     aviso.classList.toggle('ok', ok);
     $('#btn-finalizar').disabled = !ok;
 
@@ -235,7 +235,7 @@
     ...categorias.map((cat) => `<div class="cardapio-cat"><h3>${cat}<span>a partir de ${brl(Math.min(...D.combos.map((c) => c.precos[cat])))}</span></h3>
       <ul>${D.pratos[cat].map((p) => `<li>${p}${D.observacoes[p] ? ` <span class="pequeno">(${D.observacoes[p].toLowerCase()})</span>` : ''}</li>`).join('')}</ul></div>`),
     `<div class="cardapio-cat"><h3>${D.extras.categoria}<span>${brl(D.extras.preco)} cada</span></h3>
-      <ul>${D.extras.pratos.map((p) => `<li>${p}</li>`).join('')}</ul><p class="pequeno">Vendido avulso, fora dos combos.</p></div>`,
+      <ul>${D.extras.pratos.map((p) => `<li>${p}</li>`).join('')}</ul><p class="pequeno">Adicional ao pedido de marmitas.</p></div>`,
     ...D.avulsos.map((g) => `<div class="cardapio-cat"><h3>${g.categoria}<span>avulso</span></h3>
       <ul>${g.itens.map((i) => `<li>${i.nome} <span class="pequeno">· ${brl(i.preco)}</span></li>`).join('')}</ul></div>`),
     `<div class="cardapio-cat"><h3>${S.categoria}<span>pote de ${S.peso}</span></h3>

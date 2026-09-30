@@ -6,7 +6,7 @@
   <meta name="referrer" content="strict-origin-when-cross-origin">
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
   <title>Marmitas Congeladas em Jacarepaguá | Fit Premium Marmitaria</title>
-  <meta name="description" content="Marmitas fit congeladas de 450 g com entrega em Jacarepaguá, Taquara, Freguesia, Pechincha, Barra e região. Combos de 10, 15 e 30 marmitas a partir de R$ 26, com frete grátis em Jacarepaguá a partir de 15.">
+  <meta name="description" content="Marmitas fit congeladas de 450 g com entrega em Jacarepaguá, Taquara, Freguesia, Pechincha, Barra e região. Kits de 10, 15 e 30 marmitas a partir de R$ 26, com frete grátis em Jacarepaguá a partir de 15.">
   <link rel="canonical" href="https://fitpremium.onrender.com/">
   <meta name="robots" content="index, follow, max-image-preview:large">
   <meta name="geo.region" content="BR-RJ">
@@ -23,7 +23,7 @@
     "@id": "https://fitpremium.onrender.com/#empresa",
     "name": "Fit Premium Marmitaria",
     "alternateName": "Fit Premium",
-    "description": "Marmitas fit congeladas de 450 g com frango, carne e peixe. Combos de 10, 15 e 30 marmitas com entrega em Jacarepaguá e região.",
+    "description": "Marmitas fit congeladas de 450 g com frango, carne e peixe. Kits de 10, 15 e 30 marmitas com entrega em Jacarepaguá e região.",
     "url": "https://fitpremium.onrender.com/",
     "image": ["https://fitpremium.onrender.com/fotos/foto-08.jpg", "https://fitpremium.onrender.com/fotos/foto-15.jpg", "https://fitpremium.onrender.com/fotos/foto-20.jpg"],
     "logo": "https://fitpremium.onrender.com/logo-fit-premium.png",
@@ -39,14 +39,14 @@
     "openingHoursSpecification": [{ "@type": "OpeningHoursSpecification", "dayOfWeek": ["Monday","Tuesday","Wednesday","Thursday","Friday","Saturday","Sunday"], "opens": "08:00", "closes": "20:00" }],
     "sameAs": ["https://instagram.com/fitpremiumarmitaria", "https://wa.me/5521993046464"],
     "makesOffer": [
-      { "@type": "Offer", "name": "Kit Experimente - 10 marmitas", "price": "300.00", "priceCurrency": "BRL" },
-      { "@type": "Offer", "name": "Kit Rotina Fit - 15 marmitas", "price": "420.00", "priceCurrency": "BRL" },
-      { "@type": "Offer", "name": "Kit Premium - 30 marmitas", "price": "780.00", "priceCurrency": "BRL" }
+      { "@type": "AggregateOffer", "name": "Kit Experimente - 10 marmitas", "lowPrice": "300.00", "highPrice": "330.00", "priceCurrency": "BRL" },
+      { "@type": "AggregateOffer", "name": "Kit Rotina Fit - 15 marmitas", "lowPrice": "420.00", "highPrice": "480.00", "priceCurrency": "BRL" },
+      { "@type": "AggregateOffer", "name": "Kit Premium - 30 marmitas", "lowPrice": "780.00", "highPrice": "900.00", "priceCurrency": "BRL" }
     ]
   }
   </script>
-  <meta property="og:title" content="Fit Premium Marmitaria · Monte seu combo">
-  <meta property="og:description" content="Marmitas congeladas de 450 g em Jacarepaguá. Combos de 10, 15 ou 30 marmitas com frete grátis a partir de 15.">
+  <meta property="og:title" content="Fit Premium Marmitaria · Monte seu kit">
+  <meta property="og:description" content="Marmitas congeladas de 450 g em Jacarepaguá. Kits de 10, 15 ou 30 marmitas, com frete grátis em Jacarepaguá a partir de 15.">
   <meta property="og:image" content="https://fitpremium.onrender.com/compartilhar.jpg">
   <meta property="og:url" content="https://fitpremium.onrender.com/">
   <meta name="theme-color" content="#fff3df">
@@ -63,11 +63,11 @@
     </a>
     <nav aria-label="Principal">
       <a href="#fotos">Fotos</a>
-      <a href="#combos">Combos</a>
+      <a href="#combos">Kits</a>
       <a href="#cardapio">Cardápio</a>
       <a href="#doces">Doces</a>
       <a href="#entrega">Entrega</a>
-      <a href="#montar" class="btn btn-pequeno">Montar combo</a>
+      <a href="#montar" class="btn btn-pequeno">Montar kit</a>
     </nav>
   </header>
 
@@ -75,15 +75,15 @@
     <section id="inicio" class="hero">
       <div class="hero-texto">
         <h1><span class="selo">Marmitas fit congeladas em Jacarepaguá</span>Mais sabor.<br>Mais praticidade.</h1>
-        <p class="lead">Marmitas de <strong>450 g</strong> prontas para a sua rotina. Escolha o combo, monte com os seus pratos favoritos e finalize o pedido pelo WhatsApp.</p>
+        <p class="lead">Marmitas de <strong>450 g</strong> prontas para a sua rotina. Escolha o kit, monte com os seus pratos favoritos e finalize o pedido pelo WhatsApp.</p>
         <div class="hero-acoes">
-          <a href="#montar" class="btn">Montar meu combo</a>
+          <a href="#montar" class="btn">Montar meu kit</a>
           <a href="#cardapio" class="btn btn-contorno">Ver cardápio</a>
         </div>
         <ul class="hero-fatos">
           <li><strong>450 g</strong><span>por marmita</span></li>
           <li><strong>A partir de R$ 26</strong><span>por marmita</span></li>
-          <li><strong>Frete grátis</strong><span>a partir de 15 un.</span></li>
+          <li><strong>Frete grátis</strong><span>em Jacarepaguá, a partir de 15</span></li>
         </ul>
       </div>
       <div class="hero-fotos" id="hero-fotos" aria-label="Fotos das marmitas Fit Premium"></div>
@@ -100,20 +100,20 @@
 
     <section id="combos" class="secao">
       <div class="secao-cab">
-        <p class="selo">Escolha seu combo</p>
+        <p class="selo">Escolha seu kit</p>
         <h2>Quanto mais marmitas, menor o preço</h2>
-        <p>Valores por marmita. Frango, carne e peixe podem ser misturados no mesmo combo.</p>
+        <p>Valores por marmita. Frango, carne e peixe podem ser misturados no mesmo kit.</p>
       </div>
       <div id="lista-combos" class="combos"></div>
     </section>
 
     <section id="montar" class="secao montador">
       <div class="secao-cab">
-        <p class="selo">Monte seu combo</p>
+        <p class="selo">Monte seu kit</p>
         <h2>Escolha os pratos e as quantidades</h2>
       </div>
 
-      <div class="passo-combo" role="radiogroup" aria-label="Tamanho do combo" id="seletor-combo"></div>
+      <div class="passo-combo" role="radiogroup" aria-label="Tamanho do kit" id="seletor-combo"></div>
 
       <div class="montador-grid">
         <div class="pratos">
@@ -124,7 +124,7 @@
         <aside class="resumo" id="resumo" aria-labelledby="resumo-titulo">
           <h3 id="resumo-titulo">Seu pedido</h3>
           <div class="progresso">
-            <div class="progresso-info"><span id="prog-marmitas">0 de 10 marmitas</span><span id="prog-pratos">0 de 4 pratos</span></div>
+            <div class="progresso-info"><span id="prog-marmitas">0 de 10 marmitas</span><span id="prog-pratos">0 de 4 pratos diferentes</span></div>
             <div class="barra"><div id="barra-fill"></div></div>
           </div>
           <ul id="resumo-itens" class="resumo-itens"></ul>
@@ -175,7 +175,7 @@
     <section id="entrega" class="secao info">
       <div class="info-card">
         <h3>Entrega</h3>
-        <p><strong>Jacarepaguá: R$ 10</strong> · grátis a partir de 15 marmitas.<br>Barra e região: R$ 15 · demais bairros do Rio, Niterói e Baixada: R$ 20.</p>
+        <p><strong>Jacarepaguá: R$ 10</strong> · grátis a partir de 15 marmitas.<br>Barra, Vargens, Valqueire, Sulacap, Méier e outros: R$ 15 · Recreio, demais bairros do Rio, Niterói e Baixada: R$ 20. Digite seu bairro abaixo para ver a taxa exata.</p>
         <form class="sera-entrega" id="form-sera" novalidate>
           <label for="inp-sera">Será que entrega?</label>
           <div><input id="inp-sera" list="lista-bairros" placeholder="Seu bairro ou CEP" autocomplete="off" maxlength="60"><button class="btn btn-pequeno">Ver</button></div>
@@ -184,8 +184,8 @@
       </div>
       <div class="info-card">
         <h3>Indique e ganhe R$ 30</h3>
-        <p>Indicou um amigo e ele fez o primeiro pedido? Você ganha <strong>R$ 30 de crédito</strong> para usar em até 30 dias. O amigo só precisa informar o seu WhatsApp no pedido.</p>
-        <p>E na <strong>primeira compra do combo de 30</strong>, a sobremesa é por nossa conta. 🎁</p>
+        <p>Já é cliente? Indique um amigo: quando o primeiro pedido dele for entregue, você ganha <strong>R$ 30 de crédito</strong> para usar em até 30 dias. O amigo só precisa informar o seu WhatsApp no pedido.</p>
+        <p>E na <strong>primeira compra do Kit Premium (30 marmitas)</strong>, a sobremesa é por nossa conta. 🎁</p>
       </div>
       <div class="info-card">
         <h3>Pagamento</h3>
@@ -255,11 +255,11 @@
       <label>Observações<textarea name="obs" rows="2" placeholder="Opcional" maxlength="300"></textarea></label>
       <details class="extras-checkout">
         <summary>🎁 Primeira compra? Indicação de amigo?</summary>
-        <label id="campo-brinde">Primeira compra no combo de 30 ganha uma sobremesa de 250 g. Escolha o sabor:
+        <label id="campo-brinde">Primeira compra no Kit Premium (30 marmitas) ganha uma sobremesa de 250 g. Escolha o sabor:
           <select name="brinde" id="sel-brinde"><option value="">Não é minha primeira compra</option></select></label>
-        <p class="pequeno" id="aviso-brinde" hidden>🎁 Na primeira compra do combo de 30, a sobremesa é por nossa conta.</p>
+        <p class="pequeno" id="aviso-brinde" hidden>🎁 Na primeira compra do Kit Premium (30 marmitas), a sobremesa é por nossa conta.</p>
         <label>Quem te indicou? (WhatsApp)<input name="indicadoPor" inputmode="tel" placeholder="(21) 99999-9999" maxlength="16"></label>
-        <p class="pequeno">Conferimos pelo seu WhatsApp se é a primeira compra. Créditos de indicação que você tiver entram sozinhos no total.</p>
+        <p class="pequeno">Conferimos pelo seu WhatsApp se é a primeira compra. Créditos de indicação que você tiver entram sozinhos no total. Quem indica precisa já ter recebido um pedido.</p>
       </details>
       <div class="total-checkout" id="total-checkout"></div>
       <p class="pequeno">Vale-refeição e vale-alimentação são pagos na maquininha, na entrega.</p>

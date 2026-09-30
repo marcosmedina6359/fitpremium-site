@@ -17,9 +17,9 @@ window.FIT_DADOS = {
 
   // Preço por marmita em cada combo, por categoria.
   combos: [
-    { id: 10, nome: 'Plano Semanal',   marmitas: 10, maxPratos: 4,  precos: { Frango: 30, Carne: 33, Peixe: 33 }, freteGratis: false },
-    { id: 15, nome: 'Plano Quinzenal', marmitas: 15, maxPratos: 5,  precos: { Frango: 28, Carne: 32, Peixe: 32 }, freteGratis: true, destaque: 'Mais pedido' },
-    { id: 30, nome: 'Plano Mensal',    marmitas: 30, maxPratos: 10, precos: { Frango: 26, Carne: 30, Peixe: 30 }, freteGratis: true, destaque: 'Melhor preço' },
+    { id: 10, nome: 'Kit Experimente', marmitas: 10, maxPratos: 4,  precos: { Frango: 30, Carne: 33, Peixe: 33 }, freteGratis: false },
+    { id: 15, nome: 'Kit Rotina Fit',  marmitas: 15, maxPratos: 5,  precos: { Frango: 28, Carne: 32, Peixe: 32 }, freteGratis: true, destaque: 'Mais pedido' },
+    { id: 30, nome: 'Kit Premium',     marmitas: 30, maxPratos: 10, precos: { Frango: 26, Carne: 30, Peixe: 30 }, freteGratis: true, destaque: 'Melhor preço' },
     // Avulsas: de 1 a 9 marmitas, sem combo. Serve também de referência para mostrar a economia dos combos.
     { id: 1, nome: 'Marmitas avulsas', avulso: true, minimo: 1, marmitas: 9, maxPratos: 9, precos: { Frango: 35, Carne: 38, Peixe: 38 }, freteGratis: false },
   ],

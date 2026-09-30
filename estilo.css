@@ -223,7 +223,7 @@ dialog::backdrop { background: rgba(43, 28, 22, .6); }
 .dlg-cab h3 { margin: 0; }
 .fechar { background: none; border: 0; font-size: 1.8rem; line-height: 1; cursor: pointer; color: var(--suave); }
 #form-checkout label { display: flex; flex-direction: column; gap: 4px; font-size: .88rem; font-weight: 500; color: var(--marrom); }
-#form-checkout input:not([type=radio]), #form-checkout select, #form-checkout textarea { font: 1rem var(--sans); padding: 11px 12px; border: 1px solid var(--linha); border-radius: 10px; background: var(--creme-claro); color: var(--texto); width: 100%; }
+#form-checkout input:not([type=radio]):not([type=checkbox]), #form-checkout select, #form-checkout textarea { font: 1rem var(--sans); padding: 11px 12px; border: 1px solid var(--linha); border-radius: 10px; background: var(--creme-claro); color: var(--texto); width: 100%; }
 .duas { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
 #campos-endereco { display: flex; flex-direction: column; gap: 12px; }
 .opcoes { border: 0; padding: 0; margin: 0; display: flex; gap: 20px; }

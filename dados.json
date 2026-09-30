@@ -512,11 +512,7 @@
   },
   "pagamentos": [
     "Pix",
-    "Cartão de crédito",
-    "Cartão de débito",
-    "Alelo Refeição",
-    "Ticket Flex",
-    "VR Alimentação",
-    "VR Refeição"
+    "Cartão de crédito (link de pagamento)",
+    "Cartão de débito (link de pagamento)"
   ]
 }

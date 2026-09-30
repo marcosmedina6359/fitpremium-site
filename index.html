@@ -32,7 +32,7 @@
     "servesCuisine": ["Marmitas", "Comida saudável", "Comida caseira", "Marmita fit"],
     "hasMenu": "https://fitpremium.onrender.com/#cardapio",
     "acceptsReservations": false,
-    "paymentAccepted": "Pix, Cartão de crédito, Cartão de débito, Vale-refeição, Vale-alimentação",
+    "paymentAccepted": "Pix, Cartão de crédito, Cartão de débito",
     "currenciesAccepted": "BRL",
     "address": { "@type": "PostalAddress", "addressLocality": "Rio de Janeiro", "addressRegion": "RJ", "addressCountry": "BR" },
     "areaServed": ["Jacarepaguá", "Taquara", "Freguesia (Jacarepaguá)", "Pechincha", "Anil", "Tanque", "Curicica", "Camorim", "Gardênia Azul", "Cidade de Deus", "Barra da Tijuca", "Recreio dos Bandeirantes", "Vargem Grande", "Vargem Pequena", "Vila Valqueire", "Praça Seca", "Méier", "Rio de Janeiro", "Niterói"],
@@ -55,7 +55,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,700&family=DM+Sans:wght@400;500;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="estilo.css?v=20260930f">
+  <link rel="stylesheet" href="estilo.css?v=20260930g">
 </head>
 <body>
   <div class="aviso-topo" id="aviso-topo" role="status" aria-live="polite"></div>
@@ -247,7 +247,7 @@
         <p class="selo">Dúvidas</p>
         <h2>Perguntas frequentes</h2>
       </div>
-      <details><summary>Como funciona o pedido?</summary><p>Você escolhe o kit e os pratos aqui no site e toca em "Enviar pedido pelo WhatsApp". A equipe confirma disponibilidade, data e total por lá. Pagamento por Pix, cartão ou vale-refeição/alimentação.</p></details>
+      <details><summary>Como funciona o pedido?</summary><p>Você escolhe o kit e os pratos aqui no site e toca em "Enviar pedido pelo WhatsApp". A equipe confirma disponibilidade, data e total por lá. Pagamento por Pix ou cartão (enviamos um link de pagamento pelo WhatsApp). O pedido sai depois do pagamento confirmado.</p></details>
       <details><summary>Quando chega?</summary><p>Entregamos em 2 dias após a confirmação do pedido. Se preferir uma data específica, é só escolher no pedido.</p></details>
       <details><summary>Quanto tempo a marmita dura?</summary><p>Até 3 meses no freezer. Depois de descongelada, consuma em até 3 dias (na geladeira).</p></details>
       <details><summary>Como esquento?</summary><p>No micro-ondas, por 5 a 7 minutos, mexendo na metade do tempo.</p></details>
@@ -311,7 +311,7 @@
         <p class="pequeno">Conferimos pelo seu WhatsApp se é a primeira compra. Créditos de indicação que você tiver entram sozinhos no total. Quem indica precisa já ter recebido um pedido.</p>
       </details>
       <div class="total-checkout" id="total-checkout"></div>
-      <p class="pequeno">Vale-refeição e vale-alimentação são pagos na maquininha, na entrega.</p>
+      <p class="pequeno">Cartão: enviamos um link de pagamento seguro pelo WhatsApp. O pedido sai para entrega depois do pagamento confirmado.</p>
       <button class="btn btn-bloco btn-whats" type="submit">Enviar pedido pelo WhatsApp</button>
     </form>
     <div class="pedido-ok" id="pedido-ok" hidden>
@@ -329,8 +329,8 @@
     </div>
   </dialog>
 
-  <script src="dados.js?v=20260930f"></script>
-  <script src="preco.js?v=20260930f"></script>
-  <script src="app.js?v=20260930f"></script>
+  <script src="dados.js?v=20260930g"></script>
+  <script src="preco.js?v=20260930g"></script>
+  <script src="app.js?v=20260930g"></script>
 </body>
 </html>

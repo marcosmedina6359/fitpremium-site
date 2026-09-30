@@ -202,5 +202,7 @@ window.FIT_DADOS = {
   // Indique e ganhe: quem indica ganha crédito quando o indicado recebe o 1º pedido.
   indicacao: { valor: 30, validadeDias: 30 },
 
-  pagamentos: ['Pix', 'Cartão de crédito', 'Cartão de débito', 'Alelo Refeição', 'Ticket Flex', 'VR Alimentação', 'VR Refeição'],
+  // Entrega por motoboy de aplicativo (sem maquininha): cartão é pago por link antes do envio.
+  // Vales (Alelo, Ticket, VR) voltam aqui quando o recebimento a distância for confirmado.
+  pagamentos: ['Pix', 'Cartão de crédito (link de pagamento)', 'Cartão de débito (link de pagamento)'],
 };

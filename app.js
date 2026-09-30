@@ -309,6 +309,7 @@
   const dlg = $('#checkout');
   const form = $('#form-checkout');
   $('#sel-pagamento').innerHTML = D.pagamentos.map((p) => `<option>${p}</option>`).join('');
+  $('#sel-periodo').innerHTML = (D.entrega.periodos || []).map((p) => `<option>${p}</option>`).join('');
   // Datas no fuso de Brasília (toISOString usa UTC e pulava um dia depois das 21h). O servidor aceita até 60 dias.
   const diaSP = (dias) => new Date(Date.now() + dias * 864e5).toLocaleDateString('en-CA', { timeZone: 'America/Sao_Paulo' });
   $('#inp-data').min = diaSP(2); // entregamos em 2 dias
@@ -442,7 +443,7 @@
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ selecao: selecao(), cliente: {
             nome: f.nome, telefone: tel, tipo: f.tipo, endereco: f.endereco, bairro: f.bairro, cidade: f.cidade,
-            cep: f.cep, pagamento: f.pagamento, data: f.data, obs: f.obs, indicadoPor: f.indicadoPor, site: f.site } }),
+            cep: f.cep, pagamento: f.pagamento, data: f.data, periodo: f.periodo, porteiro: f.porteiro === 'sim', obs: f.obs, indicadoPor: f.indicadoPor, site: f.site } }),
           signal: AbortSignal.timeout(12000),
         });
         if (r.ok) { srv = await r.json(); codigo = srv.codigo; }
@@ -479,6 +480,8 @@
       ...(f.indicadoPor && !srv ? [`Indicado por: ${f.indicadoPor}`] : []),
       `Pagamento: ${f.pagamento}`,
       `Data desejada: ${data}`,
+      ...(f.periodo ? [`Período: ${f.periodo}`] : []),
+      `Portaria pode receber: ${f.porteiro === 'sim' ? 'sim' : 'não'}`,
       ...(f.obs ? [`Obs.: ${f.obs}`] : []),
       ``,
       `Aguardo a confirmação de disponibilidade, entrega e total.`,

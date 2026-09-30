@@ -55,7 +55,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,700&family=DM+Sans:wght@400;500;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="estilo.css?v=20260930j">
+  <link rel="stylesheet" href="estilo.css?v=20260930k">
 </head>
 <body>
   <div class="aviso-topo" id="aviso-topo" role="status" aria-live="polite"></div>
@@ -250,6 +250,8 @@
       </div>
       <details><summary>Como funciona o pedido?</summary><p>Você escolhe o kit e os pratos aqui no site e toca em "Enviar pedido pelo WhatsApp". A equipe confirma disponibilidade, data e total por lá. Pagamento por Pix ou cartão (enviamos um link de pagamento pelo WhatsApp). O pedido sai depois do pagamento confirmado.</p></details>
       <details><summary>Quando chega?</summary><p>Entregamos em 2 dias após a confirmação do pedido. Se preferir uma data específica, é só escolher no pedido.</p></details>
+      <details><summary>Como as marmitas chegam?</summary><p>Congeladas, em caixa térmica com gelo, lacrada com o número do seu pedido. Você escolhe o período (manhã ou tarde) e avisamos pelo WhatsApp quando o pedido sair. Ao receber, guarde logo no freezer.</p></details>
+      <details><summary>E se eu não estiver em casa?</summary><p>A portaria ou outra pessoa pode receber, se você autorizar no pedido. Se não houver ninguém e o pedido voltar, combinamos uma nova entrega pelo WhatsApp, com nova taxa de entrega.</p></details>
       <details><summary>Quanto tempo a marmita dura?</summary><p>Até 3 meses no freezer. Depois de descongelada, consuma em até 3 dias (na geladeira).</p></details>
       <details><summary>Como esquento?</summary><p>No micro-ondas, por 5 a 7 minutos, mexendo na metade do tempo.</p></details>
       <details><summary>Posso misturar frango, carne e peixe?</summary><p>Pode! Cada kit aceita um número de pratos diferentes (4, 5 ou 10) e você escolhe quantas marmitas de cada.</p></details>
@@ -303,7 +305,9 @@
         <label>Pagamento<select name="pagamento" id="sel-pagamento" required></select></label>
         <label>Data desejada<input name="data" type="date" id="inp-data"></label>
       </div>
-      <p class="pequeno">🚚 Entregamos em 2 dias após a confirmação do pedido. Deixe a data em branco para receber o quanto antes.</p>
+      <label>Período de entrega<select name="periodo" id="sel-periodo" required></select></label>
+      <label class="check"><input type="checkbox" name="porteiro" value="sim" checked> A portaria (ou outra pessoa) pode receber</label>
+      <p class="pequeno">🚚 Entregamos em 2 dias após a confirmação do pedido. Deixe a data em branco para receber o quanto antes. As marmitas vão congeladas, em caixa térmica com gelo e lacrada.</p>
       <label>Observações<textarea name="obs" rows="2" placeholder="Opcional" maxlength="300"></textarea></label>
       <details class="extras-checkout">
         <summary>🎁 Primeira compra? Indicação de amigo?</summary>
@@ -330,8 +334,8 @@
     </div>
   </dialog>
 
-  <script src="dados.js?v=20260930j"></script>
-  <script src="preco.js?v=20260930j"></script>
-  <script src="app.js?v=20260930j"></script>
+  <script src="dados.js?v=20260930k"></script>
+  <script src="preco.js?v=20260930k"></script>
+  <script src="app.js?v=20260930k"></script>
 </body>
 </html>

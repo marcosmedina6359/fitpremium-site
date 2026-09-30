@@ -104,6 +104,10 @@
     ]
   },
   "entrega": {
+    "periodos": [
+      "Manhã (9h às 12h)",
+      "Tarde (14h às 18h)"
+    ],
     "apelidos": {
       "freguesia": "Freguesia (Jacarepaguá)",
       "freguesia jpa": "Freguesia (Jacarepaguá)",

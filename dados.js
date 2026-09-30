@@ -63,6 +63,8 @@ window.FIT_DADOS = {
   // Desde 30/09/2026 não entregamos na Zona Norte, em Niterói nem na Baixada.
   // freteGratisAPartirDe: nº de marmitas do combo a partir do qual a entrega nessa faixa sai grátis.
   entrega: {
+    // Janelas de entrega que o cliente escolhe no pedido (motoboy de aplicativo, rotas agrupadas por região).
+    periodos: ['Manhã (9h às 12h)', 'Tarde (14h às 18h)'],
     // Nomes alternativos que o cliente (ou o CEP) pode mandar.
     apelidos: { 'freguesia': 'Freguesia (Jacarepaguá)', 'freguesia jpa': 'Freguesia (Jacarepaguá)', 'colonia': 'Colônia',
       'colonia (jacarepagua)': 'Colônia', 'barra': 'Barra da Tijuca', 'recreio': 'Recreio dos Bandeirantes' },

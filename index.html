@@ -45,17 +45,20 @@
     ]
   }
   </script>
-  <meta property="og:title" content="Fit Premium Marmitaria · Monte seu kit">
-  <meta property="og:description" content="Marmitas congeladas de 450 g em Jacarepaguá. Kits de 10, 15 ou 30 marmitas, com frete grátis em Jacarepaguá a partir de 15.">
-  <meta property="og:image" content="https://fitpremium.onrender.com/compartilhar.jpg">
+  <meta property="og:title" content="Marmitas fit de 450 g a partir de R$ 26 · Fit Premium">
+  <meta property="og:description" content="Monte seu kit em 2 minutos. Frete grátis em Jacarepaguá a partir de 15 marmitas e R$ 30 de cashback na 1ª compra.">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="630">
+  <meta property="og:image" content="https://fitpremium.onrender.com/compartilhar.jpg?v=2">
   <meta property="og:url" content="https://fitpremium.onrender.com/">
   <meta name="theme-color" content="#fff3df">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,700&family=DM+Sans:wght@400;500;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="estilo.css?v=20260930c">
+  <link rel="stylesheet" href="estilo.css?v=20260930e">
 </head>
 <body>
+  <div class="aviso-topo" id="aviso-topo" role="status" aria-live="polite"></div>
   <header class="topo">
     <a href="#inicio" class="marca" aria-label="Fit Premium — início">
       <img src="logo-fit-premium.png" alt="" width="52" height="52">
@@ -76,9 +79,10 @@
       <div class="hero-texto">
         <h1><span class="selo">Marmitas fit congeladas em Jacarepaguá</span>Mais sabor.<br>Mais praticidade.</h1>
         <p class="lead">Marmitas de <strong>450 g</strong> prontas para a sua rotina. Escolha o kit, monte com os seus pratos favoritos e finalize o pedido pelo WhatsApp.</p>
+        <p class="hero-entrega" id="hero-entrega"></p>
         <div class="hero-acoes">
-          <a href="#montar" class="btn">Montar meu kit</a>
-          <a href="#cardapio" class="btn btn-contorno">Ver cardápio</a>
+          <a href="#montar" class="btn">Montar meu kit em 2 minutos</a>
+          <a href="#quiz" class="btn btn-contorno">Qual kit é para mim?</a>
         </div>
         <ul class="hero-fatos">
           <li><strong>450 g</strong><span>por marmita</span></li>
@@ -105,6 +109,25 @@
         <p>Valores por marmita. Frango, carne e peixe podem ser misturados no mesmo kit.</p>
       </div>
       <div id="lista-combos" class="combos"></div>
+      <div class="quiz" id="quiz">
+        <h3>Não sabe qual kit escolher?</h3>
+        <p>Responda 2 perguntas e a gente monta uma sugestão para você.</p>
+        <div class="duas">
+          <label>Quantas refeições por semana?<select id="quiz-refeicoes">
+            <option value="3">Umas 3 (só para garantir)</option>
+            <option value="5" selected>5 (almoço nos dias úteis)</option>
+            <option value="7">7 (uma por dia)</option>
+            <option value="14">10 ou mais (almoço e jantar)</option>
+          </select></label>
+          <label>Para quantas pessoas?<select id="quiz-pessoas">
+            <option value="1" selected>Só para mim</option>
+            <option value="2">2 pessoas</option>
+            <option value="3">3 ou mais</option>
+          </select></label>
+        </div>
+        <p class="quiz-resultado" id="quiz-resultado" aria-live="polite"></p>
+        <button type="button" class="btn" id="quiz-montar">Montar esse kit pra mim</button>
+      </div>
     </section>
 
     <section id="montar" class="secao montador">
@@ -114,6 +137,7 @@
       </div>
 
       <div class="passo-combo" role="radiogroup" aria-label="Tamanho do kit" id="seletor-combo"></div>
+      <p class="monte-pra-mim"><button type="button" class="btn btn-contorno btn-pequeno" id="btn-sugestao">✨ Monte pra mim (sugestão variada)</button> <span>Depois é só trocar o que quiser.</span></p>
 
       <div class="montador-grid">
         <div class="pratos">
@@ -186,6 +210,15 @@
         <h3>Indique e ganhe R$ 30</h3>
         <p>Já é cliente? Indique um amigo: quando o primeiro pedido dele for entregue, você ganha <strong>R$ 30 de crédito</strong> para usar em até 30 dias. O amigo só precisa informar o seu WhatsApp no pedido.</p>
         <p>E na <strong>primeira compra a partir de 15 marmitas</strong>, você ganha <strong>R$ 30 de cashback</strong> para usar em até 30 dias. 🎁</p>
+        <p><a class="btn btn-pequeno btn-whats" id="btn-indicar" href="#" target="_blank" rel="noopener">Indicar um amigo pelo WhatsApp</a></p>
+      </div>
+      <div class="info-card">
+        <h3>Meu saldo de cashback</h3>
+        <form class="sera-entrega" id="form-saldo" novalidate>
+          <label for="inp-saldo">Digite o seu WhatsApp</label>
+          <div><input id="inp-saldo" inputmode="tel" placeholder="(21) 99999-9999" maxlength="16" autocomplete="tel-national"><button class="btn btn-pequeno">Ver</button></div>
+          <p id="res-saldo" aria-live="polite"></p>
+        </form>
       </div>
       <div class="info-card">
         <h3>Pagamento</h3>
@@ -209,7 +242,26 @@
         <li><strong>R$ 20:</strong> Recreio dos Bandeirantes, Praça Seca, Itanhangá, Tijuca, Zona Sul, Zona Norte, Zona Oeste, Niterói, Nova Iguaçu, Duque de Caxias, Nilópolis e São João de Meriti</li>
       </ul>
     </section>
+    <section id="duvidas" class="secao duvidas">
+      <div class="secao-cab">
+        <p class="selo">Dúvidas</p>
+        <h2>Perguntas frequentes</h2>
+      </div>
+      <details><summary>Como funciona o pedido?</summary><p>Você escolhe o kit e os pratos aqui no site e toca em "Enviar pedido pelo WhatsApp". A equipe confirma disponibilidade, data e total por lá. Pagamento por Pix, cartão ou vale-refeição/alimentação.</p></details>
+      <details><summary>Quando chega?</summary><p>Entregamos em 2 dias após a confirmação do pedido. Se preferir uma data específica, é só escolher no pedido.</p></details>
+      <details><summary>Quanto tempo a marmita dura?</summary><p>Até 3 meses no freezer. Depois de descongelada, consuma em até 3 dias (na geladeira).</p></details>
+      <details><summary>Como esquento?</summary><p>No micro-ondas, por 5 a 7 minutos, mexendo na metade do tempo.</p></details>
+      <details><summary>Posso misturar frango, carne e peixe?</summary><p>Pode! Cada kit aceita um número de pratos diferentes (4, 5 ou 10) e você escolhe quantas marmitas de cada.</p></details>
+      <details><summary>Como funciona o cashback da 1ª compra?</summary><p>Na primeira compra a partir de 15 marmitas, você ganha R$ 30 de crédito quando o pedido é entregue. Ele vale por 30 dias e entra sozinho no total do próximo pedido feito com o mesmo WhatsApp. Consulte seu saldo aqui no site, na seção Entrega.</p></details>
+      <details><summary>Posso pedir só caldo, empadão ou sobremesa?</summary><p>Pode. Escolha "Avulsas" no montador e adicione só os itens que quiser.</p></details>
+    </section>
   </main>
+
+  <aside class="lembrete" id="lembrete" hidden>
+    <button type="button" class="fechar" id="lembrete-fechar" aria-label="Fechar">×</button>
+    <p><strong>🎁 R$ 30 de cashback</strong> na sua 1ª compra a partir de 15 marmitas.</p>
+    <a href="#montar" class="btn btn-pequeno" id="lembrete-btn">Montar meu kit</a>
+  </aside>
 
   <footer class="rodape">
     <img src="logo-fit-premium.png" alt="" width="64" height="64">
@@ -277,8 +329,8 @@
     </div>
   </dialog>
 
-  <script src="dados.js?v=20260930c"></script>
-  <script src="preco.js?v=20260930c"></script>
-  <script src="app.js?v=20260930c"></script>
+  <script src="dados.js?v=20260930e"></script>
+  <script src="preco.js?v=20260930e"></script>
+  <script src="app.js?v=20260930e"></script>
 </body>
 </html>

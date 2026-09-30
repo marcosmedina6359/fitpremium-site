@@ -2,6 +2,8 @@
   const D = window.FIT_DADOS;
   const $ = (s) => document.querySelector(s);
   const brl = (v) => v.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
+  // Valor curto para chamadas de marketing: "R$ 30" em vez de "R$ 30,00".
+  const brlC = (v) => (Number.isInteger(v) ? `R$ ${v}` : brl(v));
   const categorias = Object.keys(D.pratos);
   const categoriaDe = {};
   categorias.forEach((c) => D.pratos[c].forEach((p) => (categoriaDe[p] = c)));
@@ -324,8 +326,8 @@
     // Cashback da 1ª compra: só nos kits que dão direito (ex.: a partir de 15 marmitas).
     const PC = D.primeiraCompra;
     if (PC) $('#aviso-cashback').textContent = totalMarmitas() >= PC.aPartirDe
-      ? `🎁 Se for sua primeira compra, você ganha ${brl(PC.valor)} de cashback para usar em até ${PC.validadeDias} dias. O crédito é liberado quando o pedido é entregue.`
-      : `🎁 Primeira compra a partir de ${PC.aPartirDe} marmitas ganha ${brl(PC.valor)} de cashback para a próxima compra.`;
+      ? `🎁 Se for sua primeira compra, você ganha ${brlC(PC.valor)} de cashback para usar em até ${PC.validadeDias} dias. O crédito é liberado quando o pedido é entregue.`
+      : `🎁 Primeira compra a partir de ${PC.aPartirDe} marmitas ganha ${brlC(PC.valor)} de cashback para a próxima compra.`;
     const entrega = form.tipo.value === 'Entrega';
     const { subtotal } = calcular();
     const t = entrega ? taxaAtual() : { atendido: true, taxa: 0 };
@@ -508,6 +510,103 @@
   });
   const fecharDialogo = () => { dlg.close(); form.hidden = false; $('#pedido-ok').hidden = true; };
   $('#ok-fechar').addEventListener('click', fecharDialogo);
+
+  // ---------- Marketing: chamadas e atalhos ----------
+  const PC = D.primeiraCompra;
+  const mascaraTel = (el) => el.addEventListener('input', () => {
+    const d = el.value.replace(/\D/g, '').slice(0, 11);
+    el.value = d.length > 7 ? `(${d.slice(0, 2)}) ${d.slice(2, d.length - 4)}-${d.slice(-4)}` : d.length > 2 ? `(${d.slice(0, 2)}) ${d.slice(2)}` : d;
+  });
+
+  // Data real da próxima entrega (2 dias após a confirmação).
+  const entregaEm = new Date(Date.now() + 2 * 864e5).toLocaleDateString('pt-BR', { timeZone: 'America/Sao_Paulo', weekday: 'long', day: '2-digit', month: '2-digit' });
+  $('#hero-entrega').textContent = `🚚 Pedindo hoje, você recebe a partir de ${entregaEm}.`;
+
+  // Faixa de ofertas no topo (troca a cada 5 s).
+  const ofertasTopo = [
+    PC && `🎁 1ª compra a partir de ${PC.aPartirDe} marmitas: ${brlC(PC.valor)} de cashback`,
+    '🚚 Frete grátis em Jacarepaguá a partir de 15 marmitas',
+    `🍱 Marmitas de 450 g a partir de ${brlC(Math.min(...combosReais.map(menorPreco)))}`,
+    D.indicacao && `🤝 Indique um amigo e ganhe ${brlC(D.indicacao.valor)} de crédito`,
+  ].filter(Boolean);
+  let iOferta = 0;
+  const trocarOferta = () => { $('#aviso-topo').textContent = ofertasTopo[iOferta++ % ofertasTopo.length]; };
+  trocarOferta();
+  if (!matchMedia('(prefers-reduced-motion: reduce)').matches) setInterval(trocarOferta, 5000);
+
+  // "Monte pra mim": distribui as marmitas entre pratos variados (alternando frango, carne e peixe).
+  function sugestao(c) {
+    const filas = categorias.map((cat) => [...D.pratos[cat]]);
+    const escolhidos = [];
+    for (let i = 0; escolhidos.length < c.maxPratos && filas.some((f) => f.length); i++) {
+      const f = filas[i % filas.length];
+      if (f.length) escolhidos.push(f.shift());
+    }
+    const itens = {};
+    escolhidos.forEach((p, i) => { itens[p] = Math.floor(c.marmitas / escolhidos.length) + (i < c.marmitas % escolhidos.length ? 1 : 0); });
+    return itens;
+  }
+  function montarPraMim(id) {
+    const c = D.combos.find((x) => x.id === id);
+    if (!c || c.avulso) return;
+    estado.combo = id;
+    estado.itens = sugestao(c);
+    atualizar();
+    $('#montar').scrollIntoView();
+  }
+  $('#btn-sugestao').addEventListener('click', () => montarPraMim(combo().avulso ? combosReais[0].id : estado.combo));
+
+  // Qual kit é para mim? (refeições por semana × pessoas → kit que dura umas 2 semanas)
+  function recomendar() {
+    const porSemana = Number($('#quiz-refeicoes').value) * Number($('#quiz-pessoas').value);
+    const alvo = porSemana * 2;
+    const c = [...combosReais].reverse().reduce((m, k) => (Math.abs(k.marmitas - alvo) < Math.abs(m.marmitas - alvo) ? k : m));
+    const semanas = Math.max(1, Math.round(c.marmitas / porSemana));
+    $('#quiz-resultado').textContent = `Sugestão: ${c.nome} (${c.marmitas} marmitas), rende cerca de ${semanas} semana${semanas > 1 ? 's' : ''}, a partir de ${brlC(menorPreco(c))} cada.`;
+    $('#quiz-montar').dataset.kit = c.id;
+  }
+  ['#quiz-refeicoes', '#quiz-pessoas'].forEach((s) => $(s).addEventListener('change', recomendar));
+  recomendar();
+  $('#quiz-montar').addEventListener('click', () => montarPraMim(Number($('#quiz-montar').dataset.kit)));
+
+  // Indique um amigo: mensagem pronta no WhatsApp.
+  if (D.indicacao) $('#btn-indicar').href = `https://wa.me/?text=${encodeURIComponent(
+    `Conhece a Fit Premium? Marmitas fit de 450 g congeladas, a partir de ${brlC(Math.min(...combosReais.map(menorPreco)))}. `
+    + `No primeiro pedido, informe o meu WhatsApp em "Quem te indicou?" 😉 Monte o seu: https://fitpremium.onrender.com`)}`;
+
+  // Saldo de cashback e créditos.
+  mascaraTel($('#inp-saldo'));
+  $('#form-saldo').addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const tel = $('#inp-saldo').value.replace(/\D/g, '');
+    const res = $('#res-saldo');
+    if (tel.length < 10) { res.textContent = 'Digite o WhatsApp com DDD.'; return; }
+    res.textContent = 'Consultando…';
+    try {
+      const r = await fetch(`${D.loja.api}/api/saldo?telefone=${tel}`, { signal: AbortSignal.timeout(12000) });
+      if (!r.ok) throw new Error();
+      const j = await r.json();
+      const lista = (j.creditos || []).map((c) => `${brlC(c.valor)} até ${c.expira.split('-').reverse().join('/')}`).join(' · ');
+      res.textContent = j.total > 0 ? `💰 Você tem ${brlC(j.total)} de crédito (${lista}). Ele entra sozinho no próximo pedido com esse WhatsApp.` : 'Nenhum crédito disponível para esse WhatsApp no momento.';
+    } catch { res.textContent = 'Não foi possível consultar agora. Pergunte pelo WhatsApp que a equipe confere.'; }
+  });
+
+  // Lembrete do cashback: aparece uma vez por visita, depois de rolar metade da página ou 30 s, se o carrinho estiver vazio.
+  if (PC) {
+    let mostrado = false;
+    try { mostrado = sessionStorage.getItem('fp-lembrete') === '1'; } catch {}
+    const mostrar = () => {
+      if (mostrado || totalMarmitas() > 0 || dlg.open) return;
+      mostrado = true;
+      try { sessionStorage.setItem('fp-lembrete', '1'); } catch {}
+      $('#lembrete').hidden = false;
+    };
+    setTimeout(mostrar, 30000);
+    addEventListener('scroll', () => { if (scrollY > document.body.scrollHeight / 2) mostrar(); }, { passive: true });
+    const fechar = () => { $('#lembrete').hidden = true; };
+    $('#lembrete-fechar').addEventListener('click', fechar);
+    $('#lembrete-btn').addEventListener('click', fechar);
+  }
 
   desenharFiltros();
   atualizar();

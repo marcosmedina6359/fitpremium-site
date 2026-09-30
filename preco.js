@@ -81,11 +81,14 @@
 
     const totalMarmitas = itens.reduce((a, l) => a + l.qtd, 0);
     const pratosDistintos = itens.length;
+    const totalAdicionais = [...extras, ...avulsos, ...doces].reduce((a, l) => a + l.qtd, 0);
     if (combo && combo.avulso) {
-      if (totalMarmitas < combo.minimo || totalMarmitas > combo.marmitas) erros.push(`Marmitas avulsas: de ${combo.minimo} a ${combo.marmitas} unidades (tem ${totalMarmitas}).`);
+      // Avulsas: de minimo a marmitas unidades, ou nenhuma marmita quando o pedido é só de adicionais (caldos, sobremesas etc.).
+      const soAdicionais = totalMarmitas === 0 && totalAdicionais > 0;
+      if (!soAdicionais && (totalMarmitas < combo.minimo || totalMarmitas > combo.marmitas)) erros.push(`Marmitas avulsas: de ${combo.minimo} a ${combo.marmitas} unidades (tem ${totalMarmitas}).`);
     } else if (combo) {
-      if (totalMarmitas !== combo.marmitas) erros.push(`O combo de ${combo.marmitas} precisa de ${combo.marmitas} marmitas (tem ${totalMarmitas}).`);
-      if (pratosDistintos > combo.maxPratos) erros.push(`O combo de ${combo.marmitas} permite até ${combo.maxPratos} pratos diferentes.`);
+      if (totalMarmitas !== combo.marmitas) erros.push(`O ${combo.nome} precisa de ${combo.marmitas} marmitas (tem ${totalMarmitas}).`);
+      if (pratosDistintos > combo.maxPratos) erros.push(`O ${combo.nome} permite até ${combo.maxPratos} pratos diferentes.`);
     }
 
     const qtdDoces = doces.reduce((a, l) => a + l.qtd, 0);

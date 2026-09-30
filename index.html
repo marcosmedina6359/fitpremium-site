@@ -53,7 +53,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,700&family=DM+Sans:wght@400;500;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="estilo.css?v=20260930b">
+  <link rel="stylesheet" href="estilo.css?v=20260930c">
 </head>
 <body>
   <header class="topo">
@@ -185,7 +185,7 @@
       <div class="info-card">
         <h3>Indique e ganhe R$ 30</h3>
         <p>Já é cliente? Indique um amigo: quando o primeiro pedido dele for entregue, você ganha <strong>R$ 30 de crédito</strong> para usar em até 30 dias. O amigo só precisa informar o seu WhatsApp no pedido.</p>
-        <p>E na <strong>primeira compra do Kit Premium (30 marmitas)</strong>, a sobremesa é por nossa conta. 🎁</p>
+        <p>E na <strong>primeira compra a partir de 15 marmitas</strong>, você ganha <strong>R$ 30 de cashback</strong> para usar em até 30 dias. 🎁</p>
       </div>
       <div class="info-card">
         <h3>Pagamento</h3>
@@ -233,11 +233,9 @@
       <p class="pequeno">Ao enviar, abriremos o WhatsApp da Fit Premium com o seu pedido pronto. A equipe confirma disponibilidade, entrega e total antes de fechar.</p>
       <label>Nome<input name="nome" required autocomplete="name" maxlength="80"></label>
       <label>Seu WhatsApp<input name="telefone" required inputmode="tel" autocomplete="tel-national" placeholder="(21) 99999-9999" maxlength="16"></label>
-      <fieldset class="opcoes">
-        <legend>Receber como?</legend>
-        <label><input type="radio" name="tipo" value="Entrega" checked> Entrega</label>
-        <label><input type="radio" name="tipo" value="Retirada"> Retirada</label>
-      </fieldset>
+      <input type="hidden" name="tipo" value="Entrega">
+      <!-- Campo-armadilha contra robôs: fica invisível e deve continuar vazio. -->
+      <div class="hp" aria-hidden="true"><label>Site<input name="site" tabindex="-1" autocomplete="off"></label></div>
       <div id="campos-endereco">
         <label>CEP<input name="cep" inputmode="numeric" autocomplete="postal-code" placeholder="00000-000 (preenche o endereço)" maxlength="9"></label>
         <label>Endereço completo<input name="endereco" autocomplete="street-address" placeholder="Rua, número, complemento" maxlength="200"></label>
@@ -252,12 +250,11 @@
         <label>Pagamento<select name="pagamento" id="sel-pagamento" required></select></label>
         <label>Data desejada<input name="data" type="date" id="inp-data"></label>
       </div>
+      <p class="pequeno">🚚 Entregamos em 2 dias após a confirmação do pedido. Deixe a data em branco para receber o quanto antes.</p>
       <label>Observações<textarea name="obs" rows="2" placeholder="Opcional" maxlength="300"></textarea></label>
       <details class="extras-checkout">
         <summary>🎁 Primeira compra? Indicação de amigo?</summary>
-        <label id="campo-brinde">Primeira compra no Kit Premium (30 marmitas) ganha uma sobremesa de 250 g. Escolha o sabor:
-          <select name="brinde" id="sel-brinde"><option value="">Não é minha primeira compra</option></select></label>
-        <p class="pequeno" id="aviso-brinde" hidden>🎁 Na primeira compra do Kit Premium (30 marmitas), a sobremesa é por nossa conta.</p>
+        <p class="pequeno" id="aviso-cashback"></p>
         <label>Quem te indicou? (WhatsApp)<input name="indicadoPor" inputmode="tel" placeholder="(21) 99999-9999" maxlength="16"></label>
         <p class="pequeno">Conferimos pelo seu WhatsApp se é a primeira compra. Créditos de indicação que você tiver entram sozinhos no total. Quem indica precisa já ter recebido um pedido.</p>
       </details>
@@ -280,8 +277,8 @@
     </div>
   </dialog>
 
-  <script src="dados.js?v=20260930b"></script>
-  <script src="preco.js?v=20260930b"></script>
-  <script src="app.js?v=20260930b"></script>
+  <script src="dados.js?v=20260930c"></script>
+  <script src="preco.js?v=20260930c"></script>
+  <script src="app.js?v=20260930c"></script>
 </body>
 </html>

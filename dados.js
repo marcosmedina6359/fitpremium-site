@@ -5,7 +5,7 @@ window.FIT_DADOS = {
     nome: 'Fit Premium Marmitaria',
     whatsapp: '5521993046464',
     // Chave Pix mostrada ao cliente que escolher Pix (e na confirmação enviada pelo painel).
-    pix: { tipo: 'E-mail', chave: '' },
+    pix: { tipo: 'E-mail', chave: 'fitpremiumarmitaria@gmail.com' },
     // Servidor de pedidos e avaliações (Render). Se estiver fora do ar, o site usa só o WhatsApp.
     api: 'https://fitpremium-api.onrender.com',
     whatsappExibicao: '(21) 99304-6464',
@@ -196,9 +196,8 @@ window.FIT_DADOS = {
     'Lasanha de berinjela': 'Leva carne moída',
   },
 
-  // Primeira compra: um doce de brinde (o servidor confere pelo WhatsApp se é mesmo a 1ª compra).
-  // aPartirDe: só vale em pedidos com pelo menos esse número de marmitas (combo de 30).
-  primeiraCompra: { brinde: 'sobremesa', aPartirDe: 30, texto: 'Primeira compra no combo de 30? Ganhe uma sobremesa de 250 g!' },
+  // Cashback da 1ª compra: kits a partir de 15 marmitas ganham crédito para a próxima compra, liberado na entrega.
+  primeiraCompra: { tipo: 'cashback', valor: 30, validadeDias: 30, aPartirDe: 15, texto: 'Primeira compra a partir de 15 marmitas? Ganhe R$ 30 de cashback para usar em até 30 dias!' },
 
   // Indique e ganhe: quem indica ganha crédito quando o indicado recebe o 1º pedido.
   indicacao: { valor: 30, validadeDias: 30 },

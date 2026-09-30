@@ -122,13 +122,13 @@
       html += '</div>';
     });
     if (estado.filtro === 'Todos' || estado.filtro === D.extras.categoria) {
-      html += `<div class="grupo"><h4>${D.extras.categoria}<span>${brl(D.extras.preco)} cada · adicional ao pedido de marmitas</span></h4>`;
+      html += `<div class="grupo"><h4>${D.extras.categoria}<span>${brl(D.extras.preco)} cada</span></h4>`;
       D.extras.pratos.forEach((p) => { html += linhaPrato(p, estado.extras[p] || 0, true, 'extras'); });
       html += '</div>';
     }
     D.avulsos.forEach((g) => {
       if (estado.filtro !== 'Todos' && estado.filtro !== g.categoria) return;
-      html += `<div class="grupo"><h4>${g.categoria}<span>adicional ao pedido de marmitas</span></h4>`;
+      html += `<div class="grupo"><h4>${g.categoria}<span>preço por unidade</span></h4>`;
       g.itens.forEach((i) => { html += linhaPrato(i.nome, estado.avulsos[i.nome] || 0, true, 'avulsos', brl(i.preco)); });
       html += '</div>';
     });
@@ -206,7 +206,8 @@
     }
     else if (total > c.marmitas) aviso.textContent = `Você escolheu ${total} marmitas. Remova ${total - c.marmitas} para o ${c.nome}.`;
     else if (distintos > c.maxPratos) aviso.textContent = `O ${c.nome} permite até ${c.maxPratos} pratos diferentes. Remova ${distintos - c.maxPratos}.`;
-    else if (total === 0) aviso.textContent = totalExtras() > 0 ? 'Caldos, feijões, empadão, camarão e sobremesas são adicionais: escolha também as marmitas.' : '';
+    else if (total === 0 && totalExtras() > 0 && c.avulso) { aviso.textContent = 'Pronto! Pedido só de adicionais. É só finalizar.'; ok = true; }
+    else if (total === 0) aviso.textContent = totalExtras() > 0 ? 'Para pedir só caldos, feijões, empadão, camarão ou sobremesas, escolha "Avulsas" acima.' : '';
     else if (total < c.marmitas) aviso.textContent = `Faltam ${c.marmitas - total} marmita${c.marmitas - total > 1 ? 's' : ''} para completar o kit.`;
     else { aviso.textContent = 'Kit completo! É só finalizar.'; ok = true; }
     aviso.classList.toggle('ok', ok);
@@ -235,7 +236,7 @@
     ...categorias.map((cat) => `<div class="cardapio-cat"><h3>${cat}<span>a partir de ${brl(Math.min(...D.combos.map((c) => c.precos[cat])))}</span></h3>
       <ul>${D.pratos[cat].map((p) => `<li>${p}${D.observacoes[p] ? ` <span class="pequeno">(${D.observacoes[p].toLowerCase()})</span>` : ''}</li>`).join('')}</ul></div>`),
     `<div class="cardapio-cat"><h3>${D.extras.categoria}<span>${brl(D.extras.preco)} cada</span></h3>
-      <ul>${D.extras.pratos.map((p) => `<li>${p}</li>`).join('')}</ul><p class="pequeno">Adicional ao pedido de marmitas.</p></div>`,
+      <ul>${D.extras.pratos.map((p) => `<li>${p}</li>`).join('')}</ul><p class="pequeno">Peça junto com as marmitas ou sozinho, na opção Avulsas.</p></div>`,
     ...D.avulsos.map((g) => `<div class="cardapio-cat"><h3>${g.categoria}<span>avulso</span></h3>
       <ul>${g.itens.map((i) => `<li>${i.nome} <span class="pequeno">· ${brl(i.preco)}</span></li>`).join('')}</ul></div>`),
     `<div class="cardapio-cat"><h3>${S.categoria}<span>pote de ${S.peso}</span></h3>
@@ -306,7 +307,7 @@
   $('#sel-pagamento').innerHTML = D.pagamentos.map((p) => `<option>${p}</option>`).join('');
   // Datas no fuso de Brasília (toISOString usa UTC e pulava um dia depois das 21h). O servidor aceita até 60 dias.
   const diaSP = (dias) => new Date(Date.now() + dias * 864e5).toLocaleDateString('en-CA', { timeZone: 'America/Sao_Paulo' });
-  $('#inp-data').min = diaSP(1);
+  $('#inp-data').min = diaSP(2); // entregamos em 2 dias
   $('#inp-data').max = diaSP(60);
 
   // ---------- Entrega: cidades, bairros e taxa ----------
@@ -320,11 +321,11 @@
   }
   const taxaAtual = () => window.FIT_PRECO.taxaEntrega(D, form.bairro.value, form.cidade.value, totalMarmitas());
   function atualizarTaxa() {
-    // Brinde só aparece no combo que dá direito (ex.: 30 marmitas).
-    const podeBrinde = totalMarmitas() >= ((D.primeiraCompra && D.primeiraCompra.aPartirDe) || 0);
-    $('#campo-brinde').hidden = !podeBrinde;
-    $('#aviso-brinde').hidden = podeBrinde;
-    if (!podeBrinde) form.brinde.value = '';
+    // Cashback da 1ª compra: só nos kits que dão direito (ex.: a partir de 15 marmitas).
+    const PC = D.primeiraCompra;
+    if (PC) $('#aviso-cashback').textContent = totalMarmitas() >= PC.aPartirDe
+      ? `🎁 Se for sua primeira compra, você ganha ${brl(PC.valor)} de cashback para usar em até ${PC.validadeDias} dias. O crédito é liberado quando o pedido é entregue.`
+      : `🎁 Primeira compra a partir de ${PC.aPartirDe} marmitas ganha ${brl(PC.valor)} de cashback para a próxima compra.`;
     const entrega = form.tipo.value === 'Entrega';
     const { subtotal } = calcular();
     const t = entrega ? taxaAtual() : { atendido: true, taxa: 0 };
@@ -364,8 +365,6 @@
     form.endereco.setSelectionRange(form.endereco.value.length, form.endereco.value.length);
   });
 
-  // Brinde da 1ª compra
-  $('#sel-brinde').append(...S.itens.map((n) => new Option(`🎁 ${n}`, n)));
   form.indicadoPor.addEventListener('input', () => {
     const d = form.indicadoPor.value.replace(/\D/g, '').slice(0, 11);
     form.indicadoPor.value = d.length > 7 ? `(${d.slice(0, 2)}) ${d.slice(2, d.length - 4)}-${d.slice(-4)}` : d.length > 2 ? `(${d.slice(0, 2)}) ${d.slice(2)}` : d;
@@ -439,7 +438,7 @@
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ selecao: selecao(), cliente: {
             nome: f.nome, telefone: tel, tipo: f.tipo, endereco: f.endereco, bairro: f.bairro, cidade: f.cidade,
-            cep: f.cep, pagamento: f.pagamento, data: f.data, obs: f.obs, brinde: f.brinde, indicadoPor: f.indicadoPor } }),
+            cep: f.cep, pagamento: f.pagamento, data: f.data, obs: f.obs, indicadoPor: f.indicadoPor, site: f.site } }),
           signal: AbortSignal.timeout(12000),
         });
         if (r.ok) { srv = await r.json(); codigo = srv.codigo; }
@@ -450,7 +449,7 @@
     const taxa = srv ? srv.taxa : (tLocal.atendido ? tLocal.taxa : null);
     const credito = srv ? srv.credito : 0;
     const total = srv ? srv.total : subtotal + (taxa || 0);
-    const brinde = srv ? srv.brinde : (f.brinde || null);
+    const cashback = srv && srv.cashbackPrevisto;
 
     const data = f.data ? f.data.split('-').reverse().join('/') : 'A combinar';
     const msg = [
@@ -462,7 +461,7 @@
       ...(extras.length ? [``, `*Avulsos (camarão)*`, ...extras.map((l) => `• ${l.qtd}× ${l.nome} (${brl(l.preco)})`)] : []),
       ...(doces.length ? [``, `*Sobremesas (pote de ${S.peso})*`, ...doces.map((l) => `• ${l.qtd}× ${l.nome}${l.preco == null ? '' : ` (${brl(l.preco)})`}`),
         ...(descontoDoces > 0 ? [`Desconto nas sobremesas: − ${brl(descontoDoces)}`] : [])] : []),
-      ...(brinde ? [``, `🎁 *Brinde de 1ª compra:* 1× ${brinde}${srv ? '' : ' (se for mesmo a minha 1ª compra)'}`] : []),
+      ...(cashback ? [``, `🎁 *Cashback de 1ª compra:* ${brl(cashback.valor)} para usar em até ${cashback.validadeDias} dias (liberado na entrega)`] : []),
       ``,
       `Itens: ${brl(subtotal)}`,
       ...(f.tipo === 'Entrega' ? [`Entrega: ${taxa == null ? 'a combinar' : taxa === 0 ? 'grátis' : brl(taxa)}`] : []),
@@ -488,7 +487,7 @@
     $('#ok-texto').textContent = (codigo
       ? `Seu pedido foi registrado. Total: ${brl(total)}${taxa == null && f.tipo === 'Entrega' ? ' + entrega' : ''}.`
       : `Total: ${brl(total)}.`)
-      + (brinde && srv ? ` 🎁 Você ganhou 1 ${brinde} de brinde!` : '')
+      + (cashback ? ` 🎁 Primeira compra: você vai ganhar ${brl(cashback.valor)} de cashback quando o pedido for entregue!` : '')
       + (credito > 0 ? ` Crédito de indicação aplicado: − ${brl(credito)}.` : '')
       + ' Agora é só tocar em enviar no WhatsApp para a equipe confirmar.';
     $('#ok-whats').href = url;

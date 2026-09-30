@@ -67,6 +67,7 @@
     btn.textContent = 'Enviando...';
     const janela = D.loja.api ? null : window.open('', '_blank');
 
+    const telefone = form.telefone.value.replace(/\D/g, '');
     // 1o: grava no servidor. Se falhar, envia pelo WhatsApp para nao perder a avaliacao.
     let salvo = false;
     if (D.loja.api) {
@@ -75,7 +76,7 @@
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ pedido: codigoPedido || null, nota, aspectos, prato: form.prato.value || null,
-            texto: limpa(txt.value), nome: limpa(form.nome.value), bairro: limpa(form.bairro.value), autoriza: form.autoriza.checked }),
+            texto: limpa(txt.value), nome: limpa(form.nome.value), bairro: limpa(form.bairro.value), telefone: telefone || null, autoriza: form.autoriza.checked }),
           signal: AbortSignal.timeout(12000),
         });
         salvo = r.ok;
@@ -91,6 +92,7 @@
       '',
       `Nome: ${nome}`,
       `Bairro: ${limpa(form.bairro.value) || '-'}`,
+      ...(telefone ? [`WhatsApp: ${form.telefone.value}`] : []),
       `Pode publicar no site: ${form.autoriza.checked ? 'Sim' : 'Não'}`,
       ...(codigoPedido ? [`Pedido: #${codigoPedido}`] : []),
     ].join('\n');
@@ -112,7 +114,9 @@
       a.textContent = 'Abrir o Instagram da Fit Premium';
       extra.replaceChildren(p, a);
     } else {
-      p.textContent = 'Sentimos muito que não foi perfeito. Nossa equipe vai ler sua mensagem e falar com você para resolver.';
+      p.textContent = telefone || codigoPedido
+        ? 'Sentimos muito que não foi perfeito. Nossa equipe vai ler sua mensagem e falar com você pelo WhatsApp para resolver.'
+        : `Sentimos muito que não foi perfeito. Para a gente resolver, chame a equipe no WhatsApp ${D.loja.whatsappExibicao}.`;
       extra.replaceChildren(p);
     }
     form.hidden = true;

@@ -60,34 +60,20 @@ window.FIT_DADOS = {
   },
 
   // Entrega: taxa por bairro (tabela baseada na da Marmitas da Lulu, 29/09/2026).
-  // Desde 30/09/2026 não entregamos na Zona Norte, em Niterói nem na Baixada.
+  // Desde 30/09/2026 entregamos SÓ em Jacarepaguá (até ajustar a logística de motoboy/caixa térmica).
+  // Para voltar a atender Barra/Recreio/Zona Sul, recrie as faixas de R$ 15 e R$ 20 (ver histórico do git).
   // freteGratisAPartirDe: nº de marmitas do combo a partir do qual a entrega nessa faixa sai grátis.
   entrega: {
     // Janelas de entrega que o cliente escolhe no pedido (motoboy de aplicativo, rotas agrupadas por região).
     periodos: ['Manhã (9h às 12h)', 'Tarde (14h às 18h)'],
     // Nomes alternativos que o cliente (ou o CEP) pode mandar.
     apelidos: { 'freguesia': 'Freguesia (Jacarepaguá)', 'freguesia jpa': 'Freguesia (Jacarepaguá)', 'colonia': 'Colônia',
-      'colonia (jacarepagua)': 'Colônia', 'barra': 'Barra da Tijuca', 'recreio': 'Recreio dos Bandeirantes' },
+      'colonia (jacarepagua)': 'Colônia' },
     faixas: [
     { cidade: 'Rio de Janeiro', taxa: 10, freteGratisAPartirDe: 15, bairros: [
         'Anil', 'Camorim', 'Cidade de Deus', 'Colônia', 'Curicica', 'Freguesia (Jacarepaguá)',
-        'Gardênia Azul', 'Jacarepaguá', 'Pechincha', 'Tanque', 'Taquara',
+        'Gardênia Azul', 'Jacarepaguá', 'Pechincha', 'Praça Seca', 'Tanque', 'Taquara', 'Vila Valqueire',
       ] },
-    { cidade: 'Rio de Janeiro', taxa: 15, bairros: [
-        'Barra da Tijuca', 'Barra Olímpica', 'Jardim Sulacap', 'Santa Cruz',
-        'Vargem Grande', 'Vargem Pequena', 'Vila Militar', 'Vila Valqueire',
-      ] },
-    { cidade: 'Rio de Janeiro', taxa: 20, bairros: [
-        'Bangu', 'Barra de Guaratiba', 'Benfica', 'Botafogo', 'Caju', 'Campo Grande', 'Campo dos Afonsos', 'Catete', 'Catumbi', 'Centro', 'Cidade Nova', 'Cidade Universitária', 'Copacabana', 'Cosme Velho', 'Cosmos', 'Deodoro', 'Estácio', 'Flamengo', 'Gamboa', 'Glória',
-        'Grumari', 'Guaratiba', 'Gávea',
-        'Humaitá', 'Inhoaíba', 'Ipanema',
-        'Itanhangá', 'Jardim Botânico', 'Jardim da Posse', 'Joá', 'Lagoa',
-        'Laranjeiras', 'Leblon', 'Leme', 'Magalhães Bastos',
-        'Mangueira', 'Nossa Senhora das Graças', 'Paciência', 'Padre Miguel',
-        'Paquetá', 'Pedra de Guaratiba',
-        'Praça Seca', 'Realengo',
-        'Recreio dos Bandeirantes', 'Rio Comprido', 'Rocinha', 'Santa Teresa', 'Santo Cristo', 'Santíssimo',
-        'Saúde', 'Senador Camará', 'Senador Vasconcelos', 'Sepetiba', 'São Conrado', 'Tubiacanga', 'Urca', 'Vasco da Gama', 'Vidigal', ] },
     ],
   },
 

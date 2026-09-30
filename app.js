@@ -337,7 +337,7 @@
     const el = $('#taxa-entrega');
     if (!entrega) el.textContent = '';
     else if (!form.bairro.value.trim()) el.textContent = 'Informe o bairro (ou o CEP) para calcular a entrega.';
-    else if (!t.atendido) el.textContent = '⚠️ Não achamos esse bairro na nossa área (Jacarepaguá, Barra, Recreio, Zona Sul e Zona Oeste). Não entregamos na Zona Norte, em Niterói nem na Baixada. Se for engano de digitação, a equipe confere pelo WhatsApp.';
+    else if (!t.atendido) el.textContent = '⚠️ Por enquanto entregamos só em Jacarepaguá (Taquara, Freguesia, Pechincha, Anil, Tanque, Curicica, Camorim, Gardênia Azul, Cidade de Deus, Praça Seca e Vila Valqueire). Se for engano de digitação, a equipe confere pelo WhatsApp.';
     else el.textContent = t.gratis ? `🎉 Entrega grátis em ${t.bairro}!` : `🚚 Entrega em ${t.bairro}: ${brl(t.taxa)}`;
     el.classList.toggle('gratis', !!t.gratis);
     const total = subtotal + (t.atendido ? t.taxa : 0);
@@ -392,7 +392,7 @@
     const livre = E.faixas.find((f) => f.freteGratisAPartirDe && f.bairros.includes(t.bairro));
     res.textContent = t.atendido
       ? `✅ Entregamos em ${t.bairro}${t.cidade !== 'Rio de Janeiro' ? ` (${t.cidade})` : ''}: ${brl(t.taxaCheia)}${livre ? ` · grátis a partir de ${livre.freteGratisAPartirDe} marmitas` : ''}.`
-      : `${bairro || v}: esse bairro não está na nossa área de entrega. Atendemos Jacarepaguá, Barra, Recreio, Zona Sul e Zona Oeste (não entregamos na Zona Norte, em Niterói nem na Baixada).`;
+      : `${bairro || v}: esse bairro ainda não está na nossa área. Por enquanto entregamos só em Jacarepaguá (Taquara, Freguesia, Pechincha, Anil, Tanque, Curicica, Camorim, Gardênia Azul, Cidade de Deus, Praça Seca e Vila Valqueire).`;
   });
 
   $('#btn-finalizar').addEventListener('click', () => { dlg.showModal(); atualizarTaxa(); });

@@ -28,7 +28,9 @@
   const salvar = () => { try { localStorage.setItem(CHAVE, JSON.stringify(estado)); } catch {} };
 
   const combo = () => D.combos.find((c) => c.id === estado.combo);
-  const totalMarmitas = () => [...Object.values(estado.itens), ...Object.values(estado.leves)].reduce((a, b) => a + b, 0);
+  const soma = (o) => Object.values(o).reduce((a, b) => a + b, 0);
+  const totalTradicionais = () => soma(estado.itens), totalLeves = () => soma(estado.leves);
+  const totalMarmitas = () => totalTradicionais() + totalLeves();
   // O mesmo prato em 450 g e 300 g conta como um prato só.
   const pratosDistintos = () => new Set([...Object.keys(estado.itens), ...Object.keys(estado.leves)]).size;
   const T = D.tamanhos;
@@ -241,7 +243,7 @@
     else if (c.avulso && total > 0) {
       const falta = proximo.marmitas - total;
       aviso.textContent = total >= proximo.marmitas - 3
-        ? `Faltam só ${falta} para o ${proximo.nome} (${proximo.marmitas} marmitas), que sai ${brl(c.precos.Frango - proximo.precos.Frango)} mais barato por marmita.`
+        ? `Faltam só ${falta} para o ${proximo.nome} (${proximo.marmitas} marmitas), que sai ${brl(totalLeves() > totalTradicionais() ? c.precosLeve.Frango - proximo.precosLeve.Frango : c.precos.Frango - proximo.precos.Frango)} mais barato por marmita.`
         : 'Pronto! É só finalizar.';
       ok = true;
     }
@@ -603,29 +605,47 @@
     escolhidos.forEach((p, i) => { itens[p] = Math.floor(c.marmitas / escolhidos.length) + (i < c.marmitas % escolhidos.length ? 1 : 0); });
     return itens;
   }
-  function montarPraMim(id) {
+  // tamanho: '450' (tudo 450 g), '300' (tudo 300 g) ou 'misto' (metade de cada prato em cada tamanho, ex.: casal).
+  function montarPraMim(id, tamanho) {
     const c = D.combos.find((x) => x.id === id);
     if (!c || c.avulso) return;
+    const pratos = sugestao(c);
     estado.combo = id;
-    estado.itens = sugestao(c);
+    estado.itens = {};
     estado.leves = {};
+    // Metade de cada: cada prato vai dividido; as sobras (pratos com quantidade ímpar) completam a metade do kit em 300 g.
+    let sobra = Math.floor(c.marmitas / 2) - Object.values(pratos).reduce((a, q) => a + Math.floor(q / 2), 0);
+    Object.entries(pratos).forEach(([p, q]) => {
+      let de300 = tamanho === '300' ? q : tamanho === 'misto' ? Math.floor(q / 2) : 0;
+      if (tamanho === 'misto' && q % 2 && sobra > 0) { de300++; sobra--; }
+      if (q - de300) estado.itens[p] = q - de300;
+      if (de300) estado.leves[p] = de300;
+    });
     atualizar();
     $('#montar').scrollIntoView();
   }
-  $('#btn-sugestao').addEventListener('click', () => montarPraMim(combo().avulso ? combosReais[0].id : estado.combo));
+  document.querySelectorAll('[data-sugestao]').forEach((b) => b.addEventListener('click', () =>
+    montarPraMim(combo().avulso ? combosReais[0].id : estado.combo, b.dataset.sugestao)));
 
-  // Qual kit é para mim? (refeições por semana × pessoas → kit que dura umas 2 semanas)
+  // Preço por marmita do kit no tamanho escolhido (frango, o menor).
+  const precoDoTamanho = (c, tamanho) => (tamanho === '300' ? c.precosLeve.Frango : tamanho === 'misto' ? Math.min(c.precos.Frango, c.precosLeve.Frango) : c.precos.Frango);
+  const textoTamanho = { 450: `marmitas de ${P450}`, 300: `marmitas de ${P300}`, misto: `metade ${P450} e metade ${P300}` };
+
+  // Qual kit é para mim? (refeições por semana × pessoas → kit que dura umas 2 semanas, no tamanho escolhido)
   function recomendar() {
     const porSemana = Number($('#quiz-refeicoes').value) * Number($('#quiz-pessoas').value);
+    const tamanho = $('#quiz-tamanho').value;
     const alvo = porSemana * 2;
     const c = [...combosReais].reverse().reduce((m, k) => (Math.abs(k.marmitas - alvo) < Math.abs(m.marmitas - alvo) ? k : m));
     const semanas = Math.max(1, Math.round(c.marmitas / porSemana));
-    $('#quiz-resultado').textContent = `Sugestão: ${c.nome} (${c.marmitas} marmitas), rende cerca de ${semanas} semana${semanas > 1 ? 's' : ''}, a partir de ${brlC(menorPreco(c))} cada.`;
+    $('#quiz-resultado').textContent = `Sugestão: ${c.nome} (${c.marmitas} marmitas, ${textoTamanho[tamanho]}), rende cerca de ${semanas} semana${semanas > 1 ? 's' : ''}, a partir de ${brlC(precoDoTamanho(c, tamanho))} cada.`;
     $('#quiz-montar').dataset.kit = c.id;
   }
-  ['#quiz-refeicoes', '#quiz-pessoas'].forEach((s) => $(s).addEventListener('change', recomendar));
+  // 2 pessoas ou mais: já sugere metade de cada tamanho (a pessoa pode trocar).
+  $('#quiz-pessoas').addEventListener('change', () => { if ($('#quiz-pessoas').value !== '1' && $('#quiz-tamanho').value === '450') $('#quiz-tamanho').value = 'misto'; });
+  ['#quiz-refeicoes', '#quiz-pessoas', '#quiz-tamanho'].forEach((s) => $(s).addEventListener('change', recomendar));
   recomendar();
-  $('#quiz-montar').addEventListener('click', () => montarPraMim(Number($('#quiz-montar').dataset.kit)));
+  $('#quiz-montar').addEventListener('click', () => montarPraMim(Number($('#quiz-montar').dataset.kit), $('#quiz-tamanho').value));
 
   // Indique um amigo: mensagem pronta no WhatsApp.
   if (D.indicacao) $('#btn-indicar').href = `https://wa.me/?text=${encodeURIComponent(

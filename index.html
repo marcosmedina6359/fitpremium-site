@@ -55,7 +55,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,700&family=DM+Sans:wght@400;500;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="estilo.css?v=20260930t">
+  <link rel="stylesheet" href="estilo.css?v=20260930u">
 </head>
 <body>
   <div class="aviso-topo" id="aviso-topo"></div>
@@ -112,7 +112,7 @@
       <div id="lista-combos" class="combos"></div>
       <div class="quiz" id="quiz">
         <h3>Não sabe qual kit escolher?</h3>
-        <p>Responda 2 perguntas e a gente monta uma sugestão para você.</p>
+        <p>Responda 3 perguntas e a gente monta uma sugestão para você.</p>
         <div class="duas">
           <label>Quantas refeições por semana?<select id="quiz-refeicoes">
             <option value="3">Umas 3 (só para garantir)</option>
@@ -124,6 +124,11 @@
             <option value="1" selected>Só para mim</option>
             <option value="2">2 pessoas</option>
             <option value="3">3 ou mais</option>
+          </select></label>
+          <label>Qual tamanho?<select id="quiz-tamanho">
+            <option value="450" selected>450 g (como bem)</option>
+            <option value="300">300 g (como menos)</option>
+            <option value="misto">Metade de cada (ex.: casal)</option>
           </select></label>
         </div>
         <p class="quiz-resultado" id="quiz-resultado" aria-live="polite"></p>
@@ -138,7 +143,11 @@
       </div>
 
       <div class="passo-combo" role="radiogroup" aria-label="Tamanho do kit" id="seletor-combo"></div>
-      <p class="monte-pra-mim"><button type="button" class="btn btn-contorno btn-pequeno" id="btn-sugestao">✨ Monte pra mim (sugestão variada)</button> <span>Depois é só trocar o que quiser.</span></p>
+      <div class="monte-pra-mim"><strong>✨ Monte pra mim:</strong>
+        <button type="button" class="btn btn-contorno btn-pequeno" data-sugestao="450">Tudo 450 g</button>
+        <button type="button" class="btn btn-contorno btn-pequeno" data-sugestao="300">Tudo 300 g</button>
+        <button type="button" class="btn btn-contorno btn-pequeno" data-sugestao="misto">Metade de cada (casal)</button>
+        <span>Sugestão variada de pratos. Depois é só trocar o que quiser.</span></div>
 
       <div class="montador-grid">
         <div class="pratos">
@@ -335,8 +344,8 @@
     </div>
   </dialog>
 
-  <script src="dados.js?v=20260930t"></script>
-  <script src="preco.js?v=20260930t"></script>
-  <script src="app.js?v=20260930t"></script>
+  <script src="dados.js?v=20260930u"></script>
+  <script src="preco.js?v=20260930u"></script>
+  <script src="app.js?v=20260930u"></script>
 </body>
 </html>

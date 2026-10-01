@@ -11,7 +11,16 @@
     "instagram": "fitpremiumarmitaria",
     "horario": "Todos os dias, das 8h às 20h",
     "regiao": "Jacarepaguá",
-    "pesoMarmita": "450 g"
+    "pesoMarmita": "450 g ou 300 g"
+  },
+  "tamanhos": {
+    "tradicional": {
+      "peso": "450 g"
+    },
+    "leve": {
+      "peso": "300 g",
+      "descricao": "porção menor, rica em proteína"
+    }
   },
   "combos": [
     {
@@ -23,6 +32,11 @@
         "Frango": 30,
         "Carne": 33,
         "Peixe": 33
+      },
+      "precosLeve": {
+        "Frango": 26,
+        "Carne": 29,
+        "Peixe": 29
       },
       "freteGratis": false
     },
@@ -36,6 +50,11 @@
         "Carne": 32,
         "Peixe": 32
       },
+      "precosLeve": {
+        "Frango": 24,
+        "Carne": 28,
+        "Peixe": 28
+      },
       "freteGratis": true,
       "destaque": "Mais pedido"
     },
@@ -48,6 +67,11 @@
         "Frango": 26,
         "Carne": 30,
         "Peixe": 30
+      },
+      "precosLeve": {
+        "Frango": 22,
+        "Carne": 26,
+        "Peixe": 26
       },
       "freteGratis": true,
       "destaque": "Melhor preço"
@@ -63,6 +87,11 @@
         "Frango": 35,
         "Carne": 38,
         "Peixe": 38
+      },
+      "precosLeve": {
+        "Frango": 30,
+        "Carne": 33,
+        "Peixe": 33
       },
       "freteGratis": false
     }

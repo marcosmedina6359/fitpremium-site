@@ -48,7 +48,7 @@
   }
 
   /**
-   * sel = { combo: 1 (avulsas)|10|15|30, itens: {prato: qtd}, extras: {...}, avulsos: {...}, doces: {...} }
+   * sel = { combo: 1 (avulsas)|10|15|30, itens: {prato: qtd}, leves: {prato: qtd}, extras: {...}, avulsos: {...}, doces: {...} }
    * Retorna linhas com preços do cardápio, subtotal e a lista de erros (vazia quando o pedido é válido).
    */
   function calcularPedido(D, sel) {
@@ -68,10 +68,20 @@
       return q > 0;
     });
 
-    const itens = ler(sel && sel.itens, Object.keys(categoriaDe), 'marmitas').map(([nome, qtd]) => {
-      const preco = combo ? combo.precos[categoriaDe[nome]] : 0;
-      return { nome, qtd, preco, total: preco * qtd, categoria: categoriaDe[nome] };
-    });
+    // Dois tamanhos com as mesmas receitas, que podem ir juntos no mesmo kit (ex.: casal):
+    // itens = 450 g (combo.precos) e leves = 300 g (combo.precosLeve). O peso vai escrito em cada linha do pedido.
+    const T = D.tamanhos || {};
+    const pesoT = (T.tradicional && T.tradicional.peso) || '450 g';
+    const temLeve = !!(T.leve && combo && combo.precosLeve);
+    const linha = (nome, qtd, peso, preco) => ({ nome: `${nome} (${peso})`, prato: nome, peso, qtd, preco, total: preco * qtd, categoria: categoriaDe[nome] });
+    const tradicionais = ler(sel && sel.itens, Object.keys(categoriaDe), 'marmitas')
+      .map(([nome, qtd]) => linha(nome, qtd, pesoT, combo ? combo.precos[categoriaDe[nome]] : 0));
+    const pedidosLeves = ler(sel && sel.leves, Object.keys(categoriaDe), 'marmitas de 300 g');
+    if (pedidosLeves.length && combo && !temLeve) erros.push('Marmita de 300 g indisponível neste kit.');
+    const leves = pedidosLeves.map(([nome, qtd]) => linha(nome, qtd, T.leve ? T.leve.peso : '300 g', temLeve ? combo.precosLeve[categoriaDe[nome]] : 0));
+    // Mesma ordem do cardápio, com os dois tamanhos do mesmo prato juntos.
+    const ordem = Object.keys(categoriaDe);
+    const itens = [...tradicionais, ...leves].sort((a, b) => ordem.indexOf(a.prato) - ordem.indexOf(b.prato));
     const extras = ler(sel && sel.extras, D.extras.pratos, 'camarão')
       .map(([nome, qtd]) => ({ nome, qtd, preco: D.extras.preco, total: D.extras.preco * qtd }));
     const avulsos = ler(sel && sel.avulsos, Object.keys(precoAvulso), 'avulsos')
@@ -80,7 +90,8 @@
       .map(([nome, qtd]) => ({ nome, qtd, preco: S.preco, total: (S.preco || 0) * qtd }));
 
     const totalMarmitas = itens.reduce((a, l) => a + l.qtd, 0);
-    const pratosDistintos = itens.length;
+    // O mesmo prato nos dois tamanhos conta como um prato só (é a mesma receita).
+    const pratosDistintos = new Set(itens.map((l) => l.prato)).size;
     const totalAdicionais = [...extras, ...avulsos, ...doces].reduce((a, l) => a + l.qtd, 0);
     if (combo && combo.avulso) {
       // Avulsas: de minimo a marmitas unidades, ou nenhuma marmita quando o pedido é só de adicionais (caldos, sobremesas etc.).

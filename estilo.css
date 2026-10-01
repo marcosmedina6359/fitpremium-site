@@ -337,3 +337,17 @@ h1 .selo { display: block; font-family: var(--sans); font-size: .8rem; line-heig
   .lembrete { left: 16px; right: 16px; max-width: none; bottom: calc(16px + env(safe-area-inset-bottom)); }
   .quiz { padding: 18px; }
 }
+
+/* Dois tamanhos (450 g e 300 g) em cada prato: dois contadores sempre visíveis */
+.prato-marmita { flex-wrap: wrap; }
+.tamanhos { display: flex; gap: 10px; flex-shrink: 0; }
+.tam { display: flex; flex-direction: column; align-items: center; gap: 2px; padding: 4px 6px; border-radius: 12px; background: var(--creme-claro); }
+.tam-rotulo { font-size: .8rem; color: var(--suave); white-space: nowrap; }
+.tam-rotulo strong { color: var(--marrom); font-size: .9rem; }
+.tabela-precos .cab td { border-top: 0; padding: 0 0 4px; font-size: .78rem; font-weight: 700; color: var(--suave); text-transform: uppercase; letter-spacing: .04em; }
+.tabela-precos td:nth-child(2) { text-align: right; font-weight: 700; color: var(--marrom); }
+@media (max-width: 720px) {
+  .tamanhos { width: 100%; }
+  .tam { flex: 1; min-width: 0; }
+  .tam .contador button { width: 40px; height: 40px; }
+}

@@ -10,7 +10,8 @@
 
   // ---------- Estado ----------
   const CHAVE = 'fitpremium-pedido';
-  let estado = { combo: 15, itens: {}, extras: {}, doces: {}, avulsos: {}, filtro: 'Todos' };
+  // itens = marmitas de 450 g, leves = marmitas de 300 g (mesmos pratos; podem ir juntas no mesmo kit).
+  let estado = { combo: 15, itens: {}, leves: {}, extras: {}, doces: {}, avulsos: {}, filtro: 'Todos' };
   try {
     const salvo = JSON.parse(localStorage.getItem(CHAVE));
     if (salvo && D.combos.some((c) => c.id === salvo.combo)) estado = { ...estado, ...salvo, filtro: 'Todos' };
@@ -18,6 +19,7 @@
   // Descarta pratos salvos que saíram do cardápio ou mudaram de nome.
   const filtrar = (obj, validos) => Object.fromEntries(Object.entries(obj || {}).filter(([p, q]) => validos.includes(p) && q > 0));
   estado.itens = filtrar(estado.itens, Object.keys(categoriaDe));
+  estado.leves = filtrar(estado.leves, Object.keys(categoriaDe));
   estado.extras = filtrar(estado.extras, D.extras.pratos);
   estado.doces = filtrar(estado.doces, D.sobremesas.itens);
   const precoAvulso = {};
@@ -26,8 +28,11 @@
   const salvar = () => { try { localStorage.setItem(CHAVE, JSON.stringify(estado)); } catch {} };
 
   const combo = () => D.combos.find((c) => c.id === estado.combo);
-  const totalMarmitas = () => Object.values(estado.itens).reduce((a, b) => a + b, 0);
-  const pratosDistintos = () => Object.values(estado.itens).filter((n) => n > 0).length;
+  const totalMarmitas = () => [...Object.values(estado.itens), ...Object.values(estado.leves)].reduce((a, b) => a + b, 0);
+  // O mesmo prato em 450 g e 300 g conta como um prato só.
+  const pratosDistintos = () => new Set([...Object.keys(estado.itens), ...Object.keys(estado.leves)]).size;
+  const T = D.tamanhos;
+  const P450 = T.tradicional.peso, P300 = T.leve.peso;
   const totalExtras = () => [...Object.values(estado.extras), ...Object.values(estado.doces), ...Object.values(estado.avulsos)].reduce((a, b) => a + b, 0);
   const S = D.sobremesas;
   const precoDoce = () => (S.preco == null ? 'valor a confirmar' : brl(S.preco));
@@ -37,7 +42,7 @@
     : [`${brl(S.preco)} cada`];
   const ofertasDoces = () => S.preco == null ? 'valor a confirmar' : listaOfertas().join(' · ');
   const ofertaCombo = () => S.precoNoCombo ? `${brl(S.precoNoCombo.preco)} cada nos kits de ${S.precoNoCombo.aPartirDe} ou mais marmitas` : '';
-  const menorPreco = (c) => Math.min(...Object.values(c.precos));
+  const menorPreco = (c) => Math.min(...Object.values(c.precos), ...Object.values(c.precosLeve || {}));
 
   // ---------- Cards de combos ----------
   const AVULSA = D.combos.find((c) => c.avulso);
@@ -51,15 +56,16 @@
       <h3>${c.nome}</h3>
       <p class="sub">Até ${c.maxPratos} pratos diferentes</p>
       <table class="tabela-precos">
-        <tr><td>Frango</td><td>${AVULSA ? `<s>${brl(AVULSA.precos.Frango)}</s> ` : ''}${brl(c.precos.Frango)}</td></tr>
-        <tr><td>Carne ou peixe</td><td>${AVULSA ? `<s>${brl(AVULSA.precos.Carne)}</s> ` : ''}${brl(c.precos.Carne)}</td></tr>
+        <tr class="cab"><td>Por marmita</td><td>${P450}</td><td>${P300}</td></tr>
+        <tr><td>Frango</td><td>${brl(c.precos.Frango)}</td><td>${brl(c.precosLeve.Frango)}</td></tr>
+        <tr><td>Carne ou peixe</td><td>${brl(c.precos.Carne)}</td><td>${brl(c.precosLeve.Carne)}</td></tr>
       </table>
-      <p class="sub">A partir de <strong>${brl(Math.min(c.precos.Frango, c.precos.Carne, c.precos.Peixe) * c.marmitas)}</strong> o kit</p>
+      <p class="sub">Pode misturar ${P450} e ${P300} no mesmo kit</p>
       ${economia(c) > 0 ? `<p class="economia">Economize até ${brl(economia(c))}</p>` : ''}
       <p class="beneficio${c.freteGratis ? '' : ' neutro'}">${c.freteGratis ? 'Frete grátis em Jacarepaguá' : 'Entrega a partir de R$ 10'}</p>
       <button class="btn${c.destaque ? '' : ' btn-contorno'}" data-escolher="${c.id}">Montar kit de ${c.marmitas}</button>
     </article>`).join('')
-    + (AVULSA ? `<p class="avulsa-nota">Quer só algumas? Marmitas avulsas (de ${AVULSA.minimo} a ${AVULSA.marmitas}): frango ${brl(AVULSA.precos.Frango)} · carne ou peixe ${brl(AVULSA.precos.Carne)}. <button class="link-limpar" data-escolher="${AVULSA.id}">Pedir avulsas</button></p>` : '');
+    + (AVULSA ? `<p class="avulsa-nota">Quer só algumas? Marmitas avulsas (de ${AVULSA.minimo} a ${AVULSA.marmitas}): ${P450} frango ${brl(AVULSA.precos.Frango)} · carne ou peixe ${brl(AVULSA.precos.Carne)}; ${P300} frango ${brl(AVULSA.precosLeve.Frango)} · carne ou peixe ${brl(AVULSA.precosLeve.Carne)}. <button class="link-limpar" data-escolher="${AVULSA.id}">Pedir avulsas</button></p>` : '');
 
   document.querySelectorAll('[data-escolher]').forEach((b) => b.addEventListener('click', () => {
     escolherCombo(Number(b.dataset.escolher));
@@ -112,6 +118,32 @@
       </div>`;
   }
 
+  // Marmita: dois contadores sempre visíveis, um para cada tamanho (ex.: casal pede os dois no mesmo kit).
+  function contador(nome, qtd, podeMais, grupo, rotulo, preco) {
+    return `
+          <div class="tam">
+            <span class="tam-rotulo"><strong>${rotulo}</strong> ${brl(preco)}</span>
+            <div class="contador">
+              <button type="button" data-menos="${nome}" data-grupo="${grupo}" ${qtd ? '' : 'disabled'} aria-label="Remover ${nome} ${rotulo}">−</button>
+              <output aria-label="Quantidade de ${nome} ${rotulo}">${qtd}</output>
+              <button type="button" data-mais="${nome}" data-grupo="${grupo}" ${podeMais ? '' : 'disabled'} aria-label="Adicionar ${nome} ${rotulo}">+</button>
+            </div>
+          </div>`;
+  }
+  function linhaMarmita(nome, c, cheio, limitePratos) {
+    const q450 = estado.itens[nome] || 0, q300 = estado.leves[nome] || 0;
+    const podeMais = !cheio && (q450 + q300 > 0 || !limitePratos);
+    const obs = D.observacoes[nome];
+    const foto = D.fotosPratos[nome];
+    const cat = categoriaDe[nome];
+    return `
+      <div class="prato prato-marmita${q450 + q300 ? ' ativo' : ''}">
+        ${foto ? `<img class="prato-foto" src="${foto}" alt="" loading="lazy" width="64" height="64">` : ''}
+        <div class="prato-nome">${nome}${obs ? `<small>${obs}</small>` : ''}</div>
+        <div class="tamanhos">${contador(nome, q450, podeMais, 'itens', P450, c.precos[cat])}${contador(nome, q300, podeMais, 'leves', P300, c.precosLeve[cat])}</div>
+      </div>`;
+  }
+
   function desenharPratos() {
     const c = combo();
     const cheio = totalMarmitas() >= c.marmitas;
@@ -119,11 +151,8 @@
     let html = '';
     categorias.forEach((cat) => {
       if (estado.filtro !== 'Todos' && estado.filtro !== cat) return;
-      html += `<div class="grupo"><h4>${cat}<span>${brl(c.precos[cat])} cada ${c.avulso ? '(avulsa)' : `no ${c.nome}`}</span></h4>`;
-      D.pratos[cat].forEach((p) => {
-        const q = estado.itens[p] || 0;
-        html += linhaPrato(p, q, !cheio && (q > 0 || !limitePratos), 'itens');
-      });
+      html += `<div class="grupo"><h4>${cat}<span>${c.avulso ? 'preço da avulsa' : `preço no ${c.nome}`}</span></h4>`;
+      D.pratos[cat].forEach((p) => { html += linhaMarmita(p, c, cheio, limitePratos); });
       html += '</div>';
     });
     if (estado.filtro === 'Todos' || estado.filtro === D.extras.categoria) {
@@ -159,10 +188,17 @@
 
   // ---------- Cálculos ----------
   // Mesmo cálculo que o servidor usa (preco.js).
-  const selecao = () => ({ combo: estado.combo, itens: estado.itens, extras: estado.extras, avulsos: estado.avulsos, doces: estado.doces });
+  const selecao = () => ({ combo: estado.combo, itens: estado.itens, leves: estado.leves, extras: estado.extras, avulsos: estado.avulsos, doces: estado.doces });
   function calcular() {
     const r = window.FIT_PRECO.calcularPedido(D, selecao());
     return { c: combo(), linhas: r.itens, extras: r.extras, avulsos: r.avulsos, doces: r.doces, descontoDoces: r.descontoDoces, subtotal: r.subtotal };
+  }
+
+  // " (10 de 450 g + 5 de 300 g)" — só quando o pedido tem marmitas dos dois tamanhos.
+  function porTamanho(linhas) {
+    const soma = (peso) => linhas.filter((l) => l.peso === peso).reduce((a, l) => a + l.qtd, 0);
+    const a = soma(P450), b = soma(P300);
+    return a && b ? ` (${a} de ${P450} + ${b} de ${P300})` : '';
   }
 
   // ---------- Resumo ----------
@@ -171,7 +207,7 @@
     const total = totalMarmitas();
     const distintos = pratosDistintos();
 
-    $('#prog-marmitas').textContent = c.avulso ? `${total} marmita${total === 1 ? '' : 's'} avulsa${total === 1 ? '' : 's'}` : `${total} de ${c.marmitas} marmitas`;
+    $('#prog-marmitas').textContent = (c.avulso ? `${total} marmita${total === 1 ? '' : 's'} avulsa${total === 1 ? '' : 's'}` : `${total} de ${c.marmitas} marmitas`) + porTamanho(linhas);
     $('#prog-pratos').textContent = c.avulso ? `até ${c.marmitas}` : `${distintos} de ${c.maxPratos} pratos diferentes`;
     const fill = $('#barra-fill');
     fill.style.width = Math.min(100, (total / c.marmitas) * 100) + '%';
@@ -234,11 +270,11 @@
     salvar();
   }
 
-  $('#btn-limpar').addEventListener('click', () => { estado.itens = {}; estado.extras = {}; estado.doces = {}; estado.avulsos = {}; atualizar(); });
+  $('#btn-limpar').addEventListener('click', () => { estado.itens = {}; estado.leves = {}; estado.extras = {}; estado.doces = {}; estado.avulsos = {}; atualizar(); });
 
   // ---------- Cardápio ----------
   $('#cardapio-lista').innerHTML = [
-    ...categorias.map((cat) => `<div class="cardapio-cat"><h3>${cat}<span>a partir de ${brl(Math.min(...D.combos.map((c) => c.precos[cat])))}</span></h3>
+    ...categorias.map((cat) => `<div class="cardapio-cat"><h3>${cat}<span>${P450} a partir de ${brl(Math.min(...D.combos.map((c) => c.precos[cat])))} · ${P300} a partir de ${brl(Math.min(...D.combos.map((c) => c.precosLeve[cat])))}</span></h3>
       <ul>${D.pratos[cat].map((p) => `<li>${p}${D.observacoes[p] ? ` <span class="pequeno">(${D.observacoes[p].toLowerCase()})</span>` : ''}</li>`).join('')}</ul></div>`),
     `<div class="cardapio-cat"><h3>${D.extras.categoria}<span>${brl(D.extras.preco)} cada</span></h3>
       <ul>${D.extras.pratos.map((p) => `<li>${p}</li>`).join('')}</ul><p class="pequeno">Peça junto com as marmitas ou sozinho, na opção Avulsas.</p></div>`,
@@ -474,8 +510,8 @@
     const msg = [
       codigo ? `Olá, Fit Premium! Fiz o pedido *#${codigo}* pelo site 💚` : `Olá, Fit Premium! Quero fazer um pedido pelo site 💚`,
       ``,
-      c.avulso ? `*${c.nome} — ${totalMarmitas()} un.*` : `*${c.nome} — ${c.marmitas} marmitas*`,
-      ...linhas.map((l) => `• ${l.qtd}× ${l.nome} (${brl(l.preco)})`),
+      (c.avulso ? `*${c.nome} — ${totalMarmitas()} un.*` : `*${c.nome} — ${c.marmitas} marmitas*`) + porTamanho(linhas),
+      ...linhas.map((l) => `• ${l.qtd}× ${l.nome} · ${brl(l.preco)}`),
       ...(avulsos.length ? [``, `*Caldos, feijões, empadão e bolos*`, ...avulsos.map((l) => `• ${l.qtd}× ${l.nome} (${brl(l.preco)})`)] : []),
       ...(extras.length ? [``, `*Avulsos (camarão)*`, ...extras.map((l) => `• ${l.qtd}× ${l.nome} (${brl(l.preco)})`)] : []),
       ...(doces.length ? [``, `*Sobremesas (pote de ${S.peso})*`, ...doces.map((l) => `• ${l.qtd}× ${l.nome}${l.preco == null ? '' : ` (${brl(l.preco)})`}`),
@@ -517,7 +553,7 @@
     if (pix && pix.chave) { $('#pix-tipo').textContent = pix.tipo.toLowerCase(); $('#pix-chave').textContent = pix.chave; }
     form.hidden = true;
     $('#pedido-ok').hidden = false;
-    estado.itens = {}; estado.extras = {}; estado.doces = {}; estado.avulsos = {};
+    estado.itens = {}; estado.leves = {}; estado.extras = {}; estado.doces = {}; estado.avulsos = {};
     atualizar();
     btn.disabled = false;
     btn.textContent = 'Enviar pedido pelo WhatsApp';
@@ -546,7 +582,8 @@
   const ofertasTopo = [
     PC && `🎁 1ª compra a partir de ${PC.aPartirDe} marmitas: ${brlC(PC.valor)} de crédito para o próximo pedido`,
     '🚚 Frete grátis em Jacarepaguá a partir de 15 marmitas',
-    `🍱 Marmitas de 450 g a partir de ${brlC(Math.min(...combosReais.map(menorPreco)))}`,
+    `🍱 Marmitas de ${P450} ou ${P300} a partir de ${brlC(Math.min(...combosReais.map(menorPreco)))}`,
+    `🥗 Come menos? Marmita de ${P300}: ${T.leve.descricao}`,
     D.indicacao && `🤝 Indique um amigo e ganhe ${brlC(D.indicacao.valor)} de crédito`,
   ].filter(Boolean);
   let iOferta = 0;
@@ -571,6 +608,7 @@
     if (!c || c.avulso) return;
     estado.combo = id;
     estado.itens = sugestao(c);
+    estado.leves = {};
     atualizar();
     $('#montar').scrollIntoView();
   }
@@ -591,7 +629,7 @@
 
   // Indique um amigo: mensagem pronta no WhatsApp.
   if (D.indicacao) $('#btn-indicar').href = `https://wa.me/?text=${encodeURIComponent(
-    `Conhece a Fit Premium? Marmitas fit de 450 g congeladas, a partir de ${brlC(Math.min(...combosReais.map(menorPreco)))}. `
+    `Conhece a Fit Premium? Marmitas fit congeladas de ${P450} ou ${P300}, a partir de ${brlC(Math.min(...combosReais.map(menorPreco)))}. `
     + `No primeiro pedido, informe o meu WhatsApp em "Quem te indicou?" 😉 Monte o seu: https://fitpremium.onrender.com`)}`;
 
   // Saldo de cashback e créditos.

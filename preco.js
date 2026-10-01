@@ -82,6 +82,8 @@
     // Mesma ordem do cardápio, com os dois tamanhos do mesmo prato juntos.
     const ordem = Object.keys(categoriaDe);
     const itens = [...tradicionais, ...leves].sort((a, b) => ordem.indexOf(a.prato) - ordem.indexOf(b.prato));
+    // Cardápio sem preço para a categoria/tamanho: recusa (nunca grava total NaN).
+    if (combo) itens.filter((l) => typeof l.preco !== 'number' || !Number.isFinite(l.preco)).forEach((l) => erros.push(`Sem preço para ${l.nome}.`));
     const extras = ler(sel && sel.extras, D.extras.pratos, 'camarão')
       .map(([nome, qtd]) => ({ nome, qtd, preco: D.extras.preco, total: D.extras.preco * qtd }));
     const avulsos = ler(sel && sel.avulsos, Object.keys(precoAvulso), 'avulsos')

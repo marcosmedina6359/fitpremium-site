@@ -33,8 +33,12 @@
   const totalMarmitas = () => totalTradicionais() + totalLeves();
   // O mesmo prato em 450 g e 300 g conta como um prato só.
   const pratosDistintos = () => new Set([...Object.keys(estado.itens), ...Object.keys(estado.leves)]).size;
-  const T = D.tamanhos;
+  const T = D.tamanhos || { tradicional: { peso: '450 g' }, leve: { peso: '300 g', descricao: 'porção menor' } };
   const P450 = T.tradicional.peso, P300 = T.leve.peso;
+  // Preço de 300 g do kit (null quando o kit não tem 300 g: o site esconde essa opção em vez de quebrar).
+  const pl = (c, cat) => (c && c.precosLeve && typeof c.precosLeve[cat] === 'number' ? c.precosLeve[cat] : null);
+  const brlOu = (v) => (v == null ? '—' : brl(v));
+  const minimo = (lista) => { const v = lista.filter((x) => typeof x === 'number'); return v.length ? Math.min(...v) : null; };
   const totalExtras = () => [...Object.values(estado.extras), ...Object.values(estado.doces), ...Object.values(estado.avulsos)].reduce((a, b) => a + b, 0);
   const S = D.sobremesas;
   const precoDoce = () => (S.preco == null ? 'valor a confirmar' : brl(S.preco));
@@ -59,15 +63,15 @@
       <p class="sub">Até ${c.maxPratos} pratos diferentes</p>
       <table class="tabela-precos">
         <tr class="cab"><td>Por marmita</td><td>${P450}</td><td>${P300}</td></tr>
-        <tr><td>Frango</td><td>${brl(c.precos.Frango)}</td><td>${brl(c.precosLeve.Frango)}</td></tr>
-        <tr><td>Carne ou peixe</td><td>${brl(c.precos.Carne)}</td><td>${brl(c.precosLeve.Carne)}</td></tr>
+        <tr><td>Frango</td><td>${brl(c.precos.Frango)}</td><td>${brlOu(pl(c, 'Frango'))}</td></tr>
+        <tr><td>Carne ou peixe</td><td>${brl(c.precos.Carne)}</td><td>${brlOu(pl(c, 'Carne'))}</td></tr>
       </table>
       <p class="sub">Pode misturar ${P450} e ${P300} no mesmo kit</p>
       ${economia(c) > 0 ? `<p class="economia">Economize até ${brl(economia(c))}</p>` : ''}
       <p class="beneficio${c.freteGratis ? '' : ' neutro'}">${c.freteGratis ? 'Frete grátis em Jacarepaguá' : 'Entrega a partir de R$ 10'}</p>
       <button class="btn${c.destaque ? '' : ' btn-contorno'}" data-escolher="${c.id}">Montar kit de ${c.marmitas}</button>
     </article>`).join('')
-    + (AVULSA ? `<p class="avulsa-nota">Quer só algumas? Marmitas avulsas (de ${AVULSA.minimo} a ${AVULSA.marmitas}): ${P450} frango ${brl(AVULSA.precos.Frango)} · carne ou peixe ${brl(AVULSA.precos.Carne)}; ${P300} frango ${brl(AVULSA.precosLeve.Frango)} · carne ou peixe ${brl(AVULSA.precosLeve.Carne)}. <button class="link-limpar" data-escolher="${AVULSA.id}">Pedir avulsas</button></p>` : '');
+    + (AVULSA ? `<p class="avulsa-nota">Quer só algumas? Marmitas avulsas (de ${AVULSA.minimo} a ${AVULSA.marmitas}): ${P450} frango ${brl(AVULSA.precos.Frango)} · carne ou peixe ${brl(AVULSA.precos.Carne)}${pl(AVULSA, 'Frango') != null ? `; ${P300} frango ${brl(pl(AVULSA, 'Frango'))} · carne ou peixe ${brl(pl(AVULSA, 'Carne'))}` : ''}. <button class="link-limpar" data-escolher="${AVULSA.id}">Pedir avulsas</button></p>` : '');
 
   document.querySelectorAll('[data-escolher]').forEach((b) => b.addEventListener('click', () => {
     escolherCombo(Number(b.dataset.escolher));
@@ -142,7 +146,7 @@
       <div class="prato prato-marmita${q450 + q300 ? ' ativo' : ''}">
         ${foto ? `<img class="prato-foto" src="${foto}" alt="" loading="lazy" width="64" height="64">` : ''}
         <div class="prato-nome">${nome}${obs ? `<small>${obs}</small>` : ''}</div>
-        <div class="tamanhos">${contador(nome, q450, podeMais, 'itens', P450, c.precos[cat])}${contador(nome, q300, podeMais, 'leves', P300, c.precosLeve[cat])}</div>
+        <div class="tamanhos">${contador(nome, q450, podeMais, 'itens', P450, c.precos[cat])}${pl(c, cat) != null ? contador(nome, q300, podeMais, 'leves', P300, pl(c, cat)) : ''}</div>
       </div>`;
   }
 
@@ -243,7 +247,7 @@
     else if (c.avulso && total > 0) {
       const falta = proximo.marmitas - total;
       aviso.textContent = total >= proximo.marmitas - 3
-        ? `Faltam só ${falta} para o ${proximo.nome} (${proximo.marmitas} marmitas), que sai ${brl(totalLeves() > totalTradicionais() ? c.precosLeve.Frango - proximo.precosLeve.Frango : c.precos.Frango - proximo.precos.Frango)} mais barato por marmita.`
+        ? `Faltam só ${falta} para o ${proximo.nome} (${proximo.marmitas} marmitas), que sai ${brl(totalLeves() > totalTradicionais() && pl(c, 'Frango') != null && pl(proximo, 'Frango') != null ? pl(c, 'Frango') - pl(proximo, 'Frango') : c.precos.Frango - proximo.precos.Frango)} mais barato por marmita.`
         : 'Pronto! É só finalizar.';
       ok = true;
     }
@@ -276,7 +280,7 @@
 
   // ---------- Cardápio ----------
   $('#cardapio-lista').innerHTML = [
-    ...categorias.map((cat) => `<div class="cardapio-cat"><h3>${cat}<span>${P450} a partir de ${brl(Math.min(...D.combos.map((c) => c.precos[cat])))} · ${P300} a partir de ${brl(Math.min(...D.combos.map((c) => c.precosLeve[cat])))}</span></h3>
+    ...categorias.map((cat) => `<div class="cardapio-cat"><h3>${cat}<span>${P450} a partir de ${brl(Math.min(...D.combos.map((c) => c.precos[cat])))}${minimo(D.combos.map((c) => pl(c, cat))) != null ? ` · ${P300} a partir de ${brl(minimo(D.combos.map((c) => pl(c, cat))))}` : ''}</span></h3>
       <ul>${D.pratos[cat].map((p) => `<li>${p}${D.observacoes[p] ? ` <span class="pequeno">(${D.observacoes[p].toLowerCase()})</span>` : ''}</li>`).join('')}</ul></div>`),
     `<div class="cardapio-cat"><h3>${D.extras.categoria}<span>${brl(D.extras.preco)} cada</span></h3>
       <ul>${D.extras.pratos.map((p) => `<li>${p}</li>`).join('')}</ul><p class="pequeno">Peça junto com as marmitas ou sozinho, na opção Avulsas.</p></div>`,
@@ -609,6 +613,7 @@
   function montarPraMim(id, tamanho) {
     const c = D.combos.find((x) => x.id === id);
     if (!c || c.avulso) return;
+    if (pl(c, 'Frango') == null) tamanho = '450'; // kit sem 300 g
     const pratos = sugestao(c);
     estado.combo = id;
     estado.itens = {};
@@ -628,7 +633,7 @@
     montarPraMim(combo().avulso ? combosReais[0].id : estado.combo, b.dataset.sugestao)));
 
   // Preço por marmita do kit no tamanho escolhido (frango, o menor).
-  const precoDoTamanho = (c, tamanho) => (tamanho === '300' ? c.precosLeve.Frango : tamanho === 'misto' ? Math.min(c.precos.Frango, c.precosLeve.Frango) : c.precos.Frango);
+  const precoDoTamanho = (c, tamanho) => (pl(c, 'Frango') == null || tamanho === '450' ? c.precos.Frango : tamanho === '300' ? pl(c, 'Frango') : Math.min(c.precos.Frango, pl(c, 'Frango')));
   const textoTamanho = { 450: `marmitas de ${P450}`, 300: `marmitas de ${P300}`, misto: `metade ${P450} e metade ${P300}` };
 
   // Qual kit é para mim? (refeições por semana × pessoas → kit que dura umas 2 semanas, no tamanho escolhido)

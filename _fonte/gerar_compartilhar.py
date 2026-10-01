@@ -20,9 +20,9 @@ h1{{font:800 58px/1.05 'Fraunces',serif;margin-bottom:18px}} h1 b{{color:#f08a4b
 .foto{{flex:1;background:url('{foto}') center/cover}}
 </style><body><div class="txt">
 <div class="logo"><img src="{logo}">Fit Premium</div>
-<h1>Marmitas fit de 450 g a partir de <b>R$ 26</b></h1>
-<p class="sub">Monte seu kit em 2 minutos e receba em casa.</p>
-<div class="tags"><span class="tag v">🎁 R$ 30 de cashback na 1ª compra</span><span class="tag">🚚 Frete grátis em Jacarepaguá</span></div>
+<h1>Marmitas fit de 450 g ou 300 g a partir de <b>R$ 22</b></h1>
+<p class="sub">Pode misturar os dois tamanhos no mesmo kit. Monte em 2 minutos.</p>
+<div class="tags"><span class="tag v">🎁 R$ 30 de cashback no 1º kit de 15+</span><span class="tag">🚚 Frete grátis a partir de 15 marmitas</span></div>
 </div><div class="foto"></div></body>"""
 h = AQUI / '_compartilhar.html'
 h.write_text(html, encoding='utf-8')

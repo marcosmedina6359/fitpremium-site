@@ -345,7 +345,8 @@ h1 .selo { display: block; font-family: var(--sans); font-size: .8rem; line-heig
 .tam-rotulo { font-size: .8rem; color: var(--suave); white-space: nowrap; }
 .tam-rotulo strong { color: var(--marrom); font-size: .9rem; }
 .tabela-precos .cab td { border-top: 0; padding: 0 0 4px; font-size: .78rem; font-weight: 700; color: var(--suave); text-transform: uppercase; letter-spacing: .04em; }
-.tabela-precos td:nth-child(2) { text-align: right; font-weight: 700; color: var(--marrom); }
+.tabela-precos tr:not(.cab) td:nth-child(2) { text-align: right; font-weight: 700; color: var(--marrom); }
+.tabela-precos .cab td:nth-child(n+2) { text-align: right; }
 @media (max-width: 720px) {
   .tamanhos { width: 100%; }
   .tam { flex: 1; min-width: 0; }

@@ -1,5 +1,6 @@
 (() => {
   const D = window.FIT_DADOS;
+  const medir = (evento, dados) => window.FIT_MEDICAO?.(evento, dados);
   const $ = (s) => document.querySelector(s);
   const brl = (v) => v.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
   // Valor curto para chamadas de marketing: "R$ 30" em vez de "R$ 30,00".
@@ -61,6 +62,8 @@
       <div class="qtd">${c.marmitas}<small>marmitas</small></div>
       <h3>${c.nome}</h3>
       <p class="sub">Até ${c.maxPratos} pratos diferentes</p>
+      <p class="beneficio">Kit a partir de ${brl(menorPreco(c) * c.marmitas)}${c.freteGratis ? ' com entrega grátis' : ' + R$ 10 de entrega'}</p>
+      <p class="sub">Valor mínimo para frango de ${pl(c, 'Frango') != null ? P300 : P450}, em Jacarepaguá.</p>
       <table class="tabela-precos">
         <tr class="cab"><td>Por marmita</td><td>${P450}</td><td>${P300}</td></tr>
         <tr><td>Frango</td><td>${brl(c.precos.Frango)}</td><td>${brlOu(pl(c, 'Frango'))}</td></tr>
@@ -190,6 +193,7 @@
     alvo[nome] = Math.max(0, (alvo[nome] || 0) + delta);
     if (!alvo[nome]) delete alvo[nome];
     atualizar();
+    if (delta > 0) medir('AddToCart');
   });
 
   // ---------- Cálculos ----------
@@ -380,16 +384,16 @@
     const el = $('#taxa-entrega');
     if (!entrega) el.textContent = '';
     else if (!form.bairro.value.trim()) el.textContent = totalMarmitas() >= 15 ? 'Entrega grátis em Jacarepaguá: informe o bairro (ou o CEP) para confirmar.' : 'Entrega R$ 10 em Jacarepaguá: informe o bairro (ou o CEP) para confirmar.';
-    else if (!t.atendido) el.textContent = '⚠️ Por enquanto entregamos só em Jacarepaguá (Taquara, Freguesia, Pechincha, Anil, Tanque, Curicica, Camorim, Colônia, Gardênia Azul, Cidade de Deus, Praça Seca e Vila Valqueire). Se for engano de digitação, a equipe confere pelo WhatsApp.';
+    else if (!t.atendido) el.textContent = '⚠️ Bairro fora da área atendida ou não reconhecido. Confira a grafia e escolha um bairro da lista. Se precisar, consulte a entrega pelo WhatsApp antes de montar o pedido.';
     else el.textContent = t.gratis ? `🎉 Entrega grátis em ${t.bairro}!` : `🚚 Entrega em ${t.bairro}: ${brl(t.taxa)}`;
     el.classList.toggle('gratis', !!t.gratis);
     const total = subtotal + (t.atendido ? t.taxa : 0);
     $('#total-checkout').replaceChildren(
-      Object.assign(document.createElement('span'), { textContent: entrega && !t.atendido ? (form.bairro.value.trim() ? 'Total (+ entrega a combinar)' : 'Total (sem a entrega: informe o bairro)') : 'Total' }),
+      Object.assign(document.createElement('span'), { textContent: entrega && !t.atendido ? 'Subtotal (confirme um bairro atendido)' : 'Total' }),
       Object.assign(document.createElement('strong'), { textContent: brl(total) }));
   }
   listarBairros();
-  form.bairro.addEventListener('input', atualizarTaxa);
+  form.bairro.addEventListener('input', () => { $('#erro-checkout').textContent = ''; atualizarTaxa(); });
   form.cidade.addEventListener('change', () => { listarBairros(); atualizarTaxa(); });
 
   // CEP: busca rua e bairro no ViaCEP (serviço público dos Correios).
@@ -404,7 +408,9 @@
     const d = form.cep.value.replace(/\D/g, '');
     if (d.length !== 8) return;
     const j = await buscarCep(d);
+    if (form.cep.value.replace(/\D/g, '') !== d) return; // ignora resposta de um CEP que o cliente já alterou
     if (!j) { $('#taxa-entrega').textContent = 'CEP não encontrado. Preencha o endereço e o bairro.'; return; }
+    if (!cidades.includes(j.localidade)) { form.bairro.value = ''; $('#taxa-entrega').textContent = 'Este CEP fica fora da cidade atendida. Entregamos somente nos bairros indicados de Jacarepaguá.'; return; }
     if (j.logradouro && !form.endereco.value) form.endereco.value = `${j.logradouro}, `;
     if (cidades.includes(j.localidade)) { form.cidade.value = j.localidade; listarBairros(); }
     if (j.bairro) form.bairro.value = j.bairro;
@@ -438,12 +444,14 @@
       : `${bairro || v}: esse bairro ainda não está na nossa área. Por enquanto entregamos só em Jacarepaguá (Taquara, Freguesia, Pechincha, Anil, Tanque, Curicica, Camorim, Colônia, Gardênia Azul, Cidade de Deus, Praça Seca e Vila Valqueire).`;
   });
 
-  $('#btn-finalizar').addEventListener('click', () => { dlg.showModal(); atualizarTaxa(); });
+  const medirCheckout = () => medir('InitiateCheckout', { value: calcular().subtotal, num_items: totalMarmitas() + totalExtras() });
+  $('#btn-finalizar').addEventListener('click', () => { dlg.showModal(); atualizarTaxa(); medirCheckout(); });
   $('#bm-btn').addEventListener('click', (e) => {
     if ($('#btn-finalizar').disabled) return;
     e.preventDefault();
     dlg.showModal();
     atualizarTaxa();
+    medirCheckout();
   });
   $('#btn-fechar').addEventListener('click', () => dlg.close());
   dlg.addEventListener('close', () => { form.hidden = false; $('#pedido-ok').hidden = true; });
@@ -467,6 +475,11 @@
   form.addEventListener('submit', async (e) => {
     e.preventDefault();
     if (enviando) return;
+    if (!taxaAtual().atendido) {
+      $('#erro-checkout').textContent = 'Confira o bairro: entregamos apenas na área indicada de Jacarepaguá. Para consultar outra localização, use o link de WhatsApp acima.';
+      form.bairro.focus();
+      return;
+    }
     const tel = form.telefone.value.replace(/\D/g, '');
     if (tel.length < 10) { form.telefone.setCustomValidity('Informe o WhatsApp com DDD.'); form.telefone.reportValidity(); form.telefone.setCustomValidity(''); return; }
     enviando = true;
@@ -543,6 +556,7 @@
       `Aguardo a confirmação de disponibilidade, entrega e total.`,
     ].join('\n');
     const url = `https://wa.me/${D.loja.whatsapp}?text=${encodeURIComponent(msg)}`;
+    medir('WhatsAppIntent', { value: total, num_items: totalMarmitas() + totalExtras() });
     if (janela) { janela.opener = null; janela.location.href = url; } else window.location.href = url;
 
     // Tela de confirmação
@@ -566,6 +580,10 @@
   $('#ok-fechar').addEventListener('click', fecharDialogo);
 
   // ---------- Marketing: chamadas e atalhos ----------
+  document.addEventListener('click', (e) => {
+    const link = e.target.closest('a[href^="https://wa.me/"]');
+    if (link && link.id !== 'btn-indicar') medir('Contact');
+  });
   const PC = D.primeiraCompra;
   const mascaraTel = (el) => el.addEventListener('input', () => {
     const d = el.value.replace(/\D/g, '').slice(0, 11);
@@ -620,6 +638,7 @@
       if (de300) estado.leves[p] = de300;
     });
     atualizar();
+    medir('AddToCart', { value: calcular().subtotal, num_items: totalMarmitas() });
     $('#montar').scrollIntoView();
   }
   document.querySelectorAll('[data-sugestao]').forEach((b) => b.addEventListener('click', () =>

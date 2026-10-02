@@ -2,7 +2,7 @@
 <html lang="pt-BR">
 <head>
   <meta charset="utf-8">
-  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src 'self' data:; connect-src 'self' https://fitpremium-api.onrender.com https://viacep.com.br; object-src 'none'; base-uri 'self'; form-action 'self'">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' https://connect.facebook.net; style-src 'self' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src 'self' data: https://www.facebook.com; connect-src 'self' https://fitpremium-api.onrender.com https://viacep.com.br https://www.facebook.com; object-src 'none'; base-uri 'self'; form-action 'self'">
   <meta name="referrer" content="strict-origin-when-cross-origin">
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
   <title>Marmitas Congeladas em Jacarepaguá | Fit Premium Marmitaria</title>
@@ -55,7 +55,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,700&family=DM+Sans:wght@400;500;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="estilo.css?v=20261001a">
+  <link rel="stylesheet" href="estilo.css?v=20261002b">
 </head>
 <body>
   <div class="aviso-topo" id="aviso-topo"></div>
@@ -280,7 +280,17 @@
     <p>Fit Premium Marmitaria · Jacarepaguá, Rio de Janeiro</p>
     <p class="pequeno">Preços e disponibilidade sujeitos à confirmação da equipe no WhatsApp.</p>
     <p><a href="avaliar.html" class="link-rodape">Já recebeu seu pedido? Avalie aqui ★</a></p>
+    <p><button type="button" class="link-limpar" id="medicao-preferencias">Preferências de medição</button></p>
   </footer>
+  <aside id="preferencias-medicao" class="preferencias-medicao" aria-label="Preferências de medição" hidden>
+    <strong>Medição de visitas e anúncios</strong>
+    <p>Você permite usar o Pixel da Meta para medir visitas, escolhas de produtos e cliques para o WhatsApp? A Meta recebe informações de navegação e identificadores do navegador. Os campos do seu pedido não são enviados por essa medição. Recusar não impede comprar. Você pode mudar sua escolha no rodapé.</p>
+    <a href="https://www.facebook.com/privacy/policy/" target="_blank" rel="noopener">Privacidade da Meta</a>
+    <div class="acoes-medicao">
+      <button type="button" class="btn btn-contorno" id="medicao-recusar">Continuar sem medição</button>
+      <button type="button" class="btn" id="medicao-aceitar">Permitir medição</button>
+    </div>
+  </aside>
 
   <!-- Barra fixa no celular -->
   <div class="barra-movel" id="barra-movel">
@@ -304,11 +314,12 @@
         <label>CEP<input name="cep" inputmode="numeric" autocomplete="postal-code" placeholder="00000-000 (preenche o endereço)" maxlength="9"></label>
         <label>Endereço completo<input name="endereco" autocomplete="street-address" placeholder="Rua, número, complemento" maxlength="200"></label>
         <div class="duas">
-          <label>Bairro<input name="bairro" list="lista-bairros" autocomplete="off" placeholder="Ex.: Taquara" maxlength="60"></label>
+          <label>Bairro<input name="bairro" list="lista-bairros" required autocomplete="off" placeholder="Ex.: Taquara" maxlength="60"></label>
           <label>Cidade<select name="cidade" id="sel-cidade"></select></label>
         </div>
         <datalist id="lista-bairros"></datalist>
         <p class="taxa-entrega" id="taxa-entrega" aria-live="polite"></p>
+        <a class="pequeno" href="https://wa.me/5521993046464?text=Ol%C3%A1!%20Quero%20consultar%20a%20entrega%20no%20meu%20bairro." target="_blank" rel="noopener">Não encontrou seu bairro? Consulte a entrega pelo WhatsApp</a>
       </div>
       <div class="duas">
         <label>Pagamento<select name="pagamento" id="sel-pagamento" required></select></label>
@@ -341,6 +352,7 @@
 
   <script src="dados.js?v=20261002a"></script>
   <script src="preco.js?v=20261001a"></script>
-  <script src="app.js?v=20261002a"></script>
+  <script src="medicao.js?v=20261002b"></script>
+  <script src="app.js?v=20261002b"></script>
 </body>
 </html>

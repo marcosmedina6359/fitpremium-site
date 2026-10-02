@@ -294,7 +294,7 @@
         <h3 id="checkout-titulo">Finalizar pedido</h3>
         <button type="button" class="fechar" id="btn-fechar" aria-label="Fechar">×</button>
       </div>
-      <p class="pequeno">Ao enviar, abriremos o WhatsApp da Fit Premium com o seu pedido pronto. A equipe confirma disponibilidade, entrega e total antes de fechar.</p>
+      <p class="pequeno">Ao continuar, abriremos o WhatsApp com seu pedido pronto. Toque em enviar no WhatsApp para Marcos Medina receber a mensagem e confirmar disponibilidade, entrega e total. Atendimento todos os dias, das 8h às 20h.</p>
       <label>Nome<input name="nome" required autocomplete="name" maxlength="80"></label>
       <label>Seu WhatsApp<input name="telefone" required inputmode="tel" autocomplete="tel-national" placeholder="(21) 99999-9999" maxlength="16"></label>
       <input type="hidden" name="tipo" value="Entrega">
@@ -325,7 +325,7 @@
         <p class="pequeno">Conferimos pelo seu WhatsApp se é a primeira compra. Créditos de indicação que você tiver entram sozinhos no total. Quem indica precisa já ter recebido um pedido.</p>
       </details>
       <div class="total-checkout" id="total-checkout"></div>
-      <p class="pequeno">Cartão: enviamos um link de pagamento seguro pelo WhatsApp. O pedido sai para entrega depois do pagamento confirmado.</p>
+      <p class="pequeno">Aguarde a confirmação de Marcos Medina antes de pagar. Depois da conferência do pedido, enviamos a chave Pix ou o link de pagamento pelo WhatsApp.</p>
       <p class="aviso" id="erro-checkout" role="alert"></p>
       <button class="btn btn-bloco btn-whats" type="submit">Enviar pedido pelo WhatsApp</button>
     </form>
@@ -333,19 +333,14 @@
       <p class="selo">Quase lá ✓</p>
       <h3 id="ok-codigo">Pedido registrado</h3>
       <p id="ok-texto"></p>
-      <div class="pix-box" id="pix-box" hidden>
-        <p><strong>Pagamento via Pix</strong><br>Chave (<span id="pix-tipo"></span>):</p>
-        <p class="pix-chave" id="pix-chave"></p>
-        <button type="button" class="btn btn-contorno btn-bloco" id="btn-copiar-pix">Copiar chave Pix</button>
-        <p class="pequeno">Depois de pagar, envie o comprovante no WhatsApp.</p>
-      </div>
+      <p class="pequeno">Seu pedido ainda depende de confirmação. Marcos Medina confere disponibilidade, entrega e total e envia a forma de pagamento pelo WhatsApp. Aguarde essa confirmação antes de pagar.</p>
       <a class="btn btn-bloco btn-whats" id="ok-whats" href="#" target="_blank" rel="noopener">Abrir o WhatsApp de novo</a>
       <button type="button" class="link-limpar" id="ok-fechar">Fechar</button>
     </div>
   </dialog>
 
-  <script src="dados.js?v=20261001a"></script>
+  <script src="dados.js?v=20261002a"></script>
   <script src="preco.js?v=20261001a"></script>
-  <script src="app.js?v=20261001a"></script>
+  <script src="app.js?v=20261002a"></script>
 </body>
 </html>

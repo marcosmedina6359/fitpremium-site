@@ -554,9 +554,6 @@
       + (credito > 0 ? ` Crédito de indicação aplicado: − ${brl(credito)}.` : '')
       + ' Agora é só tocar em enviar no WhatsApp para a equipe confirmar.';
     $('#ok-whats').href = url;
-    const pix = D.loja.pix;
-    $('#pix-box').hidden = !(f.pagamento === 'Pix' && pix && pix.chave);
-    if (pix && pix.chave) { $('#pix-tipo').textContent = pix.tipo.toLowerCase(); $('#pix-chave').textContent = pix.chave; }
     form.hidden = true;
     $('#pedido-ok').hidden = false;
     estado.itens = {}; estado.leves = {}; estado.extras = {}; estado.doces = {}; estado.avulsos = {};
@@ -564,10 +561,6 @@
     btn.disabled = false;
     btn.textContent = 'Enviar pedido pelo WhatsApp';
     enviando = false;
-  });
-  $('#btn-copiar-pix').addEventListener('click', async (e) => {
-    try { await navigator.clipboard.writeText(D.loja.pix.chave); e.target.textContent = 'Chave copiada ✓'; }
-    catch { e.target.textContent = 'Selecione e copie a chave acima'; }
   });
   const fecharDialogo = () => { dlg.close(); form.hidden = false; $('#pedido-ok').hidden = true; };
   $('#ok-fechar').addEventListener('click', fecharDialogo);

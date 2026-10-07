@@ -1,4 +1,4 @@
-// Banco de dados da Fit Premium — preços e regras de 30/09/2026 (linha Leve 300 g).
+// Banco de dados da Fit Premium — preços de 07/10/2026 (450 g reduzidos), regras de 30/09/2026 (linha Leve 300 g).
 // Para alterar preços, pratos ou kits, edite apenas este arquivo.
 window.FIT_DADOS = {
   loja: {
@@ -24,11 +24,11 @@ window.FIT_DADOS = {
 
   // Preço por marmita em cada combo, por categoria: precos = 450 g, precosLeve = 300 g.
   combos: [
-    { id: 10, nome: 'Kit Experimente', marmitas: 10, maxPratos: 4,  precos: { Frango: 30, Carne: 33, Peixe: 33 }, precosLeve: { Frango: 26, Carne: 29, Peixe: 29 }, freteGratis: false },
-    { id: 15, nome: 'Kit Rotina Fit',  marmitas: 15, maxPratos: 5,  precos: { Frango: 28, Carne: 32, Peixe: 32 }, precosLeve: { Frango: 24, Carne: 28, Peixe: 28 }, freteGratis: true, destaque: 'Para organizar a semana' },
-    { id: 30, nome: 'Kit Premium',     marmitas: 30, maxPratos: 10, precos: { Frango: 26, Carne: 30, Peixe: 30 }, precosLeve: { Frango: 22, Carne: 26, Peixe: 26 }, freteGratis: true, destaque: 'Melhor preço' },
+    { id: 10, nome: 'Kit Experimente', marmitas: 10, maxPratos: 4,  precos: { Frango: 28, Carne: 30, Peixe: 30 }, precosLeve: { Frango: 26, Carne: 29, Peixe: 29 }, freteGratis: false },
+    { id: 15, nome: 'Kit Rotina Fit',  marmitas: 15, maxPratos: 5,  precos: { Frango: 26, Carne: 28, Peixe: 28 }, precosLeve: { Frango: 24, Carne: 28, Peixe: 28 }, freteGratis: true, destaque: 'Para organizar a semana' },
+    { id: 30, nome: 'Kit Premium',     marmitas: 30, maxPratos: 10, precos: { Frango: 24, Carne: 26, Peixe: 26 }, precosLeve: { Frango: 22, Carne: 26, Peixe: 26 }, freteGratis: true, destaque: 'Melhor preço' },
     // Avulsas: de 1 a 9 marmitas, sem combo. Serve também de referência para mostrar a economia dos combos.
-    { id: 1, nome: 'Marmitas avulsas', avulso: true, minimo: 1, marmitas: 9, maxPratos: 9, precos: { Frango: 35, Carne: 38, Peixe: 38 }, precosLeve: { Frango: 30, Carne: 33, Peixe: 33 }, freteGratis: false },
+    { id: 1, nome: 'Marmitas avulsas', avulso: true, minimo: 1, marmitas: 9, maxPratos: 9, precos: { Frango: 29, Carne: 31, Peixe: 31 }, precosLeve: { Frango: 30, Carne: 33, Peixe: 33 }, freteGratis: false },
   ],
 
   pratos: {

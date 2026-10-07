@@ -29,9 +29,9 @@
       "marmitas": 10,
       "maxPratos": 4,
       "precos": {
-        "Frango": 30,
-        "Carne": 33,
-        "Peixe": 33
+        "Frango": 28,
+        "Carne": 30,
+        "Peixe": 30
       },
       "precosLeve": {
         "Frango": 26,
@@ -46,9 +46,9 @@
       "marmitas": 15,
       "maxPratos": 5,
       "precos": {
-        "Frango": 28,
-        "Carne": 32,
-        "Peixe": 32
+        "Frango": 26,
+        "Carne": 28,
+        "Peixe": 28
       },
       "precosLeve": {
         "Frango": 24,
@@ -64,9 +64,9 @@
       "marmitas": 30,
       "maxPratos": 10,
       "precos": {
-        "Frango": 26,
-        "Carne": 30,
-        "Peixe": 30
+        "Frango": 24,
+        "Carne": 26,
+        "Peixe": 26
       },
       "precosLeve": {
         "Frango": 22,
@@ -84,9 +84,9 @@
       "marmitas": 9,
       "maxPratos": 9,
       "precos": {
-        "Frango": 35,
-        "Carne": 38,
-        "Peixe": 38
+        "Frango": 29,
+        "Carne": 31,
+        "Peixe": 31
       },
       "precosLeve": {
         "Frango": 30,

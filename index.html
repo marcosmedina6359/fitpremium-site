@@ -218,7 +218,7 @@
       </div>
       <div class="info-card">
         <h3>Pagamento</h3>
-        <p id="lista-pagamentos"></p>
+        <p><span id="lista-pagamentos"></span><br>Combinado pelo WhatsApp, depois da confirmação do pedido.</p>
       </div>
       <div class="info-card">
         <h3>Atendimento</h3>
@@ -301,16 +301,13 @@
         <p class="taxa-entrega" id="taxa-entrega" aria-live="polite"></p>
         <a class="pequeno" href="https://wa.me/5521993046464?text=Ol%C3%A1!%20Quero%20consultar%20a%20entrega%20no%20meu%20bairro." target="_blank" rel="noopener">Não encontrou seu bairro? Consulte a entrega pelo WhatsApp</a>
       </div>
-      <div class="duas">
-        <label>Pagamento<select name="pagamento" id="sel-pagamento" required></select></label>
-        <label>Data desejada<input name="data" type="date" id="inp-data"></label>
-      </div>
+      <label>Data desejada<input name="data" type="date" id="inp-data"></label>
       <label>Período de entrega<select name="periodo" id="sel-periodo" required></select></label>
       <label class="check"><input type="checkbox" name="porteiro" value="sim"> A portaria (ou outra pessoa) pode receber</label>
       <p class="pequeno">🚚 Entregamos em até 1 dia útil após a confirmação do pedido. Deixe a data em branco para receber o quanto antes. As marmitas vão congeladas, em caixa térmica com gelo e lacrada.</p>
       <label>Observações<textarea name="obs" rows="2" placeholder="Opcional" maxlength="300"></textarea></label>
       <div class="total-checkout" id="total-checkout"></div>
-      <p class="pequeno">Aguarde a confirmação de Marcos Medina antes de pagar. Depois da conferência do pedido, enviamos a chave Pix ou o link de pagamento pelo WhatsApp.</p>
+      <p class="pequeno">💳 A forma de pagamento (Pix ou cartão) é combinada no WhatsApp: depois de conferir o pedido, Marcos Medina envia a chave Pix ou o link de pagamento. Aguarde essa confirmação antes de pagar.</p>
       <p class="aviso" id="erro-checkout" role="alert"></p>
       <button class="btn btn-bloco btn-whats" type="submit">Enviar pedido pelo WhatsApp</button>
     </form>
@@ -327,6 +324,6 @@
   <script src="dados.js?v=20261007b"></script>
   <script src="preco.js?v=20261007b"></script>
   <script src="medicao.js?v=20261002b"></script>
-  <script src="app.js?v=20261007b"></script>
+  <script src="app.js?v=20261007c"></script>
 </body>
 </html>

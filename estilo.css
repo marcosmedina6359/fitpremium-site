@@ -283,7 +283,7 @@ dialog::backdrop { background: rgba(43, 28, 22, .6); }
   #btn-doces { width: 100%; }
 }
 
-/* Entrega, brinde e indicação no checkout */
+/* Entrega e brinde no checkout */
 .info { grid-template-columns: repeat(2, minmax(0, 1fr)); }
 .taxa-entrega { margin: 0; font-size: .92rem; font-weight: 500; color: var(--marrom); min-height: 1.4em; }
 .taxa-entrega.gratis { color: var(--verde); font-weight: 700; }

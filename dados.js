@@ -1,4 +1,4 @@
-// Banco de dados da Fit Premium — preços de 07/10/2026 (450 g reduzidos), regras de 30/09/2026 (linha Leve 300 g).
+// Banco de dados da Fit Premium — preços e regras de 07/10/2026: 450 g e 350 g, sem cashback e sem indicação, entrega em até 1 dia útil.
 // Para alterar preços, pratos ou kits, edite apenas este arquivo.
 window.FIT_DADOS = {
   loja: {
@@ -12,23 +12,23 @@ window.FIT_DADOS = {
     instagram: 'fitpremiumarmitaria',
     horario: 'Todos os dias, das 8h às 20h',
     regiao: 'Jacarepaguá',
-    pesoMarmita: '450 g ou 300 g',
+    pesoMarmita: '450 g ou 350 g',
   },
 
   // Dois tamanhos com as mesmas receitas (desde 30/09/2026). Dá para misturar os dois no mesmo kit (ex.: casal).
-  // 300 g: menos acompanhamento e a mesma proteína — para quem come menos (dieta, porção menor).
+  // 350 g: menos acompanhamento e a mesma proteína — para quem come menos (dieta, porção menor).
   tamanhos: {
     tradicional: { peso: '450 g' },
-    leve: { peso: '300 g', descricao: 'porção menor, rica em proteína' },
+    leve: { peso: '350 g', descricao: 'porção menor, rica em proteína' },
   },
 
-  // Preço por marmita em cada combo, por categoria: precos = 450 g, precosLeve = 300 g.
+  // Preço por marmita em cada combo, por categoria: precos = 450 g, precosLeve = 350 g.
   combos: [
-    { id: 10, nome: 'Kit Experimente', marmitas: 10, maxPratos: 4,  precos: { Frango: 28, Carne: 30, Peixe: 30 }, precosLeve: { Frango: 26, Carne: 29, Peixe: 29 }, freteGratis: false },
-    { id: 15, nome: 'Kit Rotina Fit',  marmitas: 15, maxPratos: 5,  precos: { Frango: 26, Carne: 28, Peixe: 28 }, precosLeve: { Frango: 24, Carne: 28, Peixe: 28 }, freteGratis: true, destaque: 'Para organizar a semana' },
-    { id: 30, nome: 'Kit Premium',     marmitas: 30, maxPratos: 10, precos: { Frango: 24, Carne: 26, Peixe: 26 }, precosLeve: { Frango: 22, Carne: 26, Peixe: 26 }, freteGratis: true, destaque: 'Melhor preço' },
+    { id: 10, nome: 'Kit Experimente', marmitas: 10, maxPratos: 4,  precos: { Frango: 28, Carne: 30, Peixe: 30 }, precosLeve: { Frango: 25, Carne: 28, Peixe: 28 }, freteGratis: false },
+    { id: 15, nome: 'Kit Rotina Fit',  marmitas: 15, maxPratos: 5,  precos: { Frango: 26, Carne: 28, Peixe: 28 }, precosLeve: { Frango: 23, Carne: 26, Peixe: 26 }, freteGratis: true, destaque: 'Para organizar a semana' },
+    { id: 30, nome: 'Kit Premium',     marmitas: 30, maxPratos: 10, precos: { Frango: 24, Carne: 26, Peixe: 26 }, precosLeve: { Frango: 21, Carne: 24, Peixe: 24 }, freteGratis: true, destaque: 'Melhor preço' },
     // Avulsas: de 1 a 9 marmitas, sem combo. Serve também de referência para mostrar a economia dos combos.
-    { id: 1, nome: 'Marmitas avulsas', avulso: true, minimo: 1, marmitas: 9, maxPratos: 9, precos: { Frango: 29, Carne: 31, Peixe: 31 }, precosLeve: { Frango: 30, Carne: 33, Peixe: 33 }, freteGratis: false },
+    { id: 1, nome: 'Marmitas avulsas', avulso: true, minimo: 1, marmitas: 9, maxPratos: 9, precos: { Frango: 29, Carne: 31, Peixe: 31 }, precosLeve: { Frango: 26, Carne: 29, Peixe: 29 }, freteGratis: false },
   ],
 
   pratos: {
@@ -175,11 +175,7 @@ window.FIT_DADOS = {
     'Lasanha de berinjela': 'Leva carne moída',
   },
 
-  // Cashback da 1ª compra: kits a partir de 15 marmitas ganham crédito para a próxima compra, liberado na entrega.
-  primeiraCompra: { tipo: 'cashback', valor: 30, validadeDias: 30, aPartirDe: 15, texto: 'Primeira compra a partir de 15 marmitas? Ganhe R$ 30 de cashback para usar em até 30 dias!' },
-
-  // Indique e ganhe: quem indica ganha crédito quando o indicado recebe o 1º pedido.
-  indicacao: { valor: 30, validadeDias: 30 },
+  // Cashback da 1ª compra e indicação foram encerrados em 07/10/2026.
 
   // Entrega por motoboy de aplicativo (sem maquininha): cartão é pago por link antes do envio.
   // Vales (Alelo, Ticket, VR) voltam aqui quando o recebimento a distância for confirmado.

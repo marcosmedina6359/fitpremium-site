@@ -338,7 +338,7 @@ h1 .selo { display: block; font-family: var(--sans); font-size: .8rem; line-heig
   .quiz { padding: 18px; }
 }
 
-/* Dois tamanhos (450 g e 300 g) em cada prato: dois contadores sempre visíveis */
+/* Dois tamanhos (450 g e 350 g) em cada prato: dois contadores sempre visíveis */
 .prato-marmita { flex-wrap: wrap; }
 .tamanhos { display: flex; gap: 10px; flex-shrink: 0; }
 .tam { display: flex; flex-direction: column; align-items: center; gap: 2px; padding: 4px 6px; border-radius: 12px; background: var(--creme-claro); }

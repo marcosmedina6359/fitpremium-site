@@ -69,16 +69,16 @@
     });
 
     // Dois tamanhos com as mesmas receitas, que podem ir juntos no mesmo kit (ex.: casal):
-    // itens = 450 g (combo.precos) e leves = 300 g (combo.precosLeve). O peso vai escrito em cada linha do pedido.
+    // itens = 450 g (combo.precos) e leves = 350 g (combo.precosLeve). O peso vai escrito em cada linha do pedido.
     const T = D.tamanhos || {};
     const pesoT = (T.tradicional && T.tradicional.peso) || '450 g';
     const temLeve = !!(T.leve && combo && combo.precosLeve);
     const linha = (nome, qtd, peso, preco) => ({ nome: `${nome} (${peso})`, prato: nome, peso, qtd, preco, total: preco * qtd, categoria: categoriaDe[nome] });
     const tradicionais = ler(sel && sel.itens, Object.keys(categoriaDe), 'marmitas')
       .map(([nome, qtd]) => linha(nome, qtd, pesoT, combo ? combo.precos[categoriaDe[nome]] : 0));
-    const pedidosLeves = ler(sel && sel.leves, Object.keys(categoriaDe), 'marmitas de 300 g');
-    if (pedidosLeves.length && combo && !temLeve) erros.push('Marmita de 300 g indisponível neste kit.');
-    const leves = pedidosLeves.map(([nome, qtd]) => linha(nome, qtd, T.leve ? T.leve.peso : '300 g', temLeve ? combo.precosLeve[categoriaDe[nome]] : 0));
+    const pedidosLeves = ler(sel && sel.leves, Object.keys(categoriaDe), 'marmitas de 350 g');
+    if (pedidosLeves.length && combo && !temLeve) erros.push('Marmita de 350 g indisponível neste kit.');
+    const leves = pedidosLeves.map(([nome, qtd]) => linha(nome, qtd, T.leve ? T.leve.peso : '350 g', temLeve ? combo.precosLeve[categoriaDe[nome]] : 0));
     // Mesma ordem do cardápio, com os dois tamanhos do mesmo prato juntos.
     const ordem = Object.keys(categoriaDe);
     const itens = [...tradicionais, ...leves].sort((a, b) => ordem.indexOf(a.prato) - ordem.indexOf(b.prato));

@@ -11,7 +11,7 @@
 
   // ---------- Estado ----------
   const CHAVE = 'fitpremium-pedido';
-  // itens = marmitas de 450 g, leves = marmitas de 300 g (mesmos pratos; podem ir juntas no mesmo kit).
+  // itens = marmitas de 450 g, leves = marmitas de 350 g (mesmos pratos; podem ir juntas no mesmo kit).
   let estado = { combo: 15, itens: {}, leves: {}, extras: {}, doces: {}, avulsos: {}, filtro: 'Todos' };
   try {
     const salvo = JSON.parse(localStorage.getItem(CHAVE));
@@ -32,11 +32,11 @@
   const soma = (o) => Object.values(o).reduce((a, b) => a + b, 0);
   const totalTradicionais = () => soma(estado.itens), totalLeves = () => soma(estado.leves);
   const totalMarmitas = () => totalTradicionais() + totalLeves();
-  // O mesmo prato em 450 g e 300 g conta como um prato só.
+  // O mesmo prato em 450 g e 350 g conta como um prato só.
   const pratosDistintos = () => new Set([...Object.keys(estado.itens), ...Object.keys(estado.leves)]).size;
-  const T = D.tamanhos || { tradicional: { peso: '450 g' }, leve: { peso: '300 g', descricao: 'porção menor' } };
+  const T = D.tamanhos || { tradicional: { peso: '450 g' }, leve: { peso: '350 g', descricao: 'porção menor' } };
   const P450 = T.tradicional.peso, P300 = T.leve.peso;
-  // Preço de 300 g do kit (null quando o kit não tem 300 g: o site esconde essa opção em vez de quebrar).
+  // Preço de 350 g do kit (null quando o kit não tem 350 g: o site esconde essa opção em vez de quebrar).
   const pl = (c, cat) => (c && c.precosLeve && typeof c.precosLeve[cat] === 'number' ? c.precosLeve[cat] : null);
   const brlOu = (v) => (v == null ? '—' : brl(v));
   const minimo = (lista) => { const v = lista.filter((x) => typeof x === 'number'); return v.length ? Math.min(...v) : null; };
@@ -204,7 +204,7 @@
     return { c: combo(), linhas: r.itens, extras: r.extras, avulsos: r.avulsos, doces: r.doces, descontoDoces: r.descontoDoces, subtotal: r.subtotal };
   }
 
-  // " (10 de 450 g + 5 de 300 g)" — só quando o pedido tem marmitas dos dois tamanhos.
+  // " (10 de 450 g + 5 de 350 g)" — só quando o pedido tem marmitas dos dois tamanhos.
   function porTamanho(linhas) {
     const soma = (peso) => linhas.filter((l) => l.peso === peso).reduce((a, l) => a + l.qtd, 0);
     const a = soma(P450), b = soma(P300);
@@ -359,7 +359,7 @@
   $('#sel-periodo').innerHTML = (D.entrega.periodos || []).map((p) => `<option>${p}</option>`).join('');
   // Datas no fuso de Brasília (toISOString usa UTC e pulava um dia depois das 21h). O servidor aceita até 60 dias.
   const diaSP = (dias) => new Date(Date.now() + dias * 864e5).toLocaleDateString('en-CA', { timeZone: 'America/Sao_Paulo' });
-  $('#inp-data').min = diaSP(2); // entregamos em 2 dias
+  $('#inp-data').min = diaSP(1); // entregamos em até 1 dia útil
   $('#inp-data').max = diaSP(60);
 
   // ---------- Entrega: cidades, bairros e taxa ----------
@@ -373,11 +373,6 @@
   }
   const taxaAtual = () => window.FIT_PRECO.taxaEntrega(D, form.bairro.value, form.cidade.value, totalMarmitas());
   function atualizarTaxa() {
-    // Cashback da 1ª compra: só nos kits que dão direito (ex.: a partir de 15 marmitas).
-    const PC = D.primeiraCompra;
-    if (PC) $('#aviso-cashback').textContent = totalMarmitas() >= PC.aPartirDe
-      ? `🎁 Se for sua primeira compra, você ganha ${brlC(PC.valor)} de cashback para usar em até ${PC.validadeDias} dias. O crédito é liberado quando o pedido é entregue.`
-      : `🎁 Primeira compra a partir de ${PC.aPartirDe} marmitas ganha ${brlC(PC.valor)} de cashback para a próxima compra.`;
     const entrega = form.tipo.value === 'Entrega';
     const { subtotal } = calcular();
     const t = entrega ? taxaAtual() : { atendido: true, taxa: 0 };
@@ -419,10 +414,6 @@
     form.endereco.setSelectionRange(form.endereco.value.length, form.endereco.value.length);
   });
 
-  form.indicadoPor.addEventListener('input', () => {
-    const d = form.indicadoPor.value.replace(/\D/g, '').slice(0, 11);
-    form.indicadoPor.value = d.length > 7 ? `(${d.slice(0, 2)}) ${d.slice(2, d.length - 4)}-${d.slice(-4)}` : d.length > 2 ? `(${d.slice(0, 2)}) ${d.slice(2)}` : d;
-  });
 
   // "Será que entrega?"
   $('#form-sera').addEventListener('submit', async (e) => {
@@ -499,7 +490,7 @@
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ selecao: selecao(), cliente: {
             nome: f.nome, telefone: tel, tipo: f.tipo, endereco: f.endereco, bairro: f.bairro, cidade: f.cidade,
-            cep: f.cep, pagamento: f.pagamento, data: f.data, periodo: f.periodo, porteiro: f.porteiro === 'sim', obs: f.obs, indicadoPor: f.indicadoPor, site: f.site } }),
+            cep: f.cep, pagamento: f.pagamento, data: f.data, periodo: f.periodo, porteiro: f.porteiro === 'sim', obs: f.obs, site: f.site } }),
           signal: AbortSignal.timeout(12000),
         });
         if (r.ok) { srv = await r.json(); codigo = srv.codigo; }
@@ -523,7 +514,6 @@
     const taxa = srv ? srv.taxa : (tLocal.atendido ? tLocal.taxa : null);
     const credito = srv ? srv.credito : 0;
     const total = srv ? srv.total : subtotal + (taxa || 0);
-    const cashback = srv && srv.cashbackPrevisto;
 
     const data = f.data ? f.data.split('-').reverse().join('/') : 'A combinar';
     const msg = [
@@ -535,18 +525,16 @@
       ...(extras.length ? [``, `*Avulsos (camarão)*`, ...extras.map((l) => `• ${l.qtd}× ${l.nome} (${brl(l.preco)})`)] : []),
       ...(doces.length ? [``, `*Sobremesas (pote de ${S.peso})*`, ...doces.map((l) => `• ${l.qtd}× ${l.nome}${l.preco == null ? '' : ` (${brl(l.preco)})`}`),
         ...(descontoDoces > 0 ? [`Desconto nas sobremesas: − ${brl(descontoDoces)}`] : [])] : []),
-      ...(cashback ? [``, `🎁 *Cashback de 1ª compra:* ${brl(cashback.valor)} para usar em até ${cashback.validadeDias} dias (liberado na entrega)`] : []),
       ``,
       `Itens: ${brl(subtotal)}`,
       ...(f.tipo === 'Entrega' ? [`Entrega: ${taxa == null ? 'a combinar' : taxa === 0 ? 'grátis' : brl(taxa)}`] : []),
-      ...(credito > 0 ? [`Crédito de indicação: − ${brl(credito)}`] : []),
+      ...(credito > 0 ? [`Crédito: − ${brl(credito)}`] : []),
       `*Total: ${brl(total)}*${taxa == null && f.tipo === 'Entrega' ? ' + entrega' : ''}`,
       ``,
       `Nome: ${f.nome}`,
       `WhatsApp: ${form.telefone.value}`,
       `Recebimento: ${f.tipo}`,
       ...(f.tipo === 'Entrega' ? [`Endereço: ${f.endereco}`, `Bairro: ${f.bairro} · ${f.cidade}`, `CEP: ${f.cep || '-'}`] : []),
-      ...(f.indicadoPor && !srv ? [`Indicado por: ${f.indicadoPor}`] : []),
       `Pagamento: ${f.pagamento}`,
       `Data desejada: ${data}`,
       ...(f.periodo ? [`Período: ${f.periodo}`] : []),
@@ -564,8 +552,7 @@
     $('#ok-texto').textContent = (codigo
       ? `Seu pedido foi registrado. Total: ${brl(total)}${taxa == null && f.tipo === 'Entrega' ? ' + entrega' : ''}.`
       : `Total: ${brl(total)}.`)
-      + (cashback ? ` 🎁 Primeira compra: você vai ganhar ${brl(cashback.valor)} de cashback quando o pedido for entregue!` : '')
-      + (credito > 0 ? ` Crédito de indicação aplicado: − ${brl(credito)}.` : '')
+      + (credito > 0 ? ` Crédito aplicado: − ${brl(credito)}.` : '')
       + ' Agora é só tocar em enviar no WhatsApp para a equipe confirmar.';
     $('#ok-whats').href = url;
     form.hidden = true;
@@ -582,26 +569,22 @@
   // ---------- Marketing: chamadas e atalhos ----------
   document.addEventListener('click', (e) => {
     const link = e.target.closest('a[href^="https://wa.me/"]');
-    if (link && link.id !== 'btn-indicar') medir('Contact');
-  });
-  const PC = D.primeiraCompra;
-  const mascaraTel = (el) => el.addEventListener('input', () => {
-    const d = el.value.replace(/\D/g, '').slice(0, 11);
-    el.value = d.length > 7 ? `(${d.slice(0, 2)}) ${d.slice(2, d.length - 4)}-${d.slice(-4)}` : d.length > 2 ? `(${d.slice(0, 2)}) ${d.slice(2)}` : d;
+    if (link) medir('Contact');
   });
 
-  // Data real da próxima entrega (2 dias após a confirmação).
+  // Data real da próxima entrega: até 1 dia útil (seg. a sex.) após a confirmação; pedidos depois das 20h contam a partir de amanhã.
   const horaSP = Number(new Date().toLocaleString('en-US', { timeZone: 'America/Sao_Paulo', hour: 'numeric', hour12: false })) % 24;
-  const entregaEm = new Date(Date.now() + (horaSP >= 20 ? 3 : 2) * 864e5).toLocaleDateString('pt-BR', { timeZone: 'America/Sao_Paulo', weekday: 'long', day: '2-digit', month: '2-digit' });
-  $('#hero-entrega').textContent = `🚚 Pedindo hoje, você recebe a partir de ${entregaEm}.`;
+  let diaEntrega = new Date(Date.now() + (horaSP >= 20 ? 2 : 1) * 864e5);
+  const semanaSP = (d) => d.toLocaleDateString('en-US', { timeZone: 'America/Sao_Paulo', weekday: 'short' });
+  while (['Sat', 'Sun'].includes(semanaSP(diaEntrega))) diaEntrega = new Date(diaEntrega.getTime() + 864e5);
+  const entregaEm = diaEntrega.toLocaleDateString('pt-BR', { timeZone: 'America/Sao_Paulo', weekday: 'long', day: '2-digit', month: '2-digit' });
+  $('#hero-entrega').textContent = `🚚 Pedindo hoje, você recebe até ${entregaEm}.`;
 
   // Faixa de ofertas no topo (troca a cada 5 s).
   const ofertasTopo = [
-    PC && `🎁 1ª compra a partir de ${PC.aPartirDe} marmitas: ${brlC(PC.valor)} de crédito para o próximo pedido`,
-    '🚚 Frete grátis em Jacarepaguá a partir de 15 marmitas',
+    '🚚 Entrega em até 1 dia útil · frete grátis em Jacarepaguá a partir de 15 marmitas',
     `🍱 Marmitas de ${P450} ou ${P300} a partir de ${brlC(Math.min(...combosReais.map(menorPreco)))}`,
     `🥗 Come menos? Marmita de ${P300}: ${T.leve.descricao}`,
-    D.indicacao && `🤝 Indique um amigo e ganhe ${brlC(D.indicacao.valor)} de crédito`,
   ].filter(Boolean);
   let iOferta = 0;
   const trocarOferta = () => { $('#aviso-topo').textContent = ofertasTopo[iOferta++ % ofertasTopo.length]; };
@@ -620,16 +603,16 @@
     escolhidos.forEach((p, i) => { itens[p] = Math.floor(c.marmitas / escolhidos.length) + (i < c.marmitas % escolhidos.length ? 1 : 0); });
     return itens;
   }
-  // tamanho: '450' (tudo 450 g), '300' (tudo 300 g) ou 'misto' (metade de cada prato em cada tamanho, ex.: casal).
+  // tamanho: '450' (tudo 450 g), '300' (tudo 350 g) ou 'misto' (metade de cada prato em cada tamanho, ex.: casal).
   function montarPraMim(id, tamanho) {
     const c = D.combos.find((x) => x.id === id);
     if (!c || c.avulso) return;
-    if (pl(c, 'Frango') == null) tamanho = '450'; // kit sem 300 g
+    if (pl(c, 'Frango') == null) tamanho = '450'; // kit sem 350 g
     const pratos = sugestao(c);
     estado.combo = id;
     estado.itens = {};
     estado.leves = {};
-    // Metade de cada: cada prato vai dividido; as sobras (pratos com quantidade ímpar) completam a metade do kit em 300 g.
+    // Metade de cada: cada prato vai dividido; as sobras (pratos com quantidade ímpar) completam a metade do kit em 350 g.
     let sobra = Math.floor(c.marmitas / 2) - Object.values(pratos).reduce((a, q) => a + Math.floor(q / 2), 0);
     Object.entries(pratos).forEach(([p, q]) => {
       let de300 = tamanho === '300' ? q : tamanho === 'misto' ? Math.floor(q / 2) : 0;
@@ -663,45 +646,6 @@
   ['#quiz-refeicoes', '#quiz-pessoas', '#quiz-tamanho'].forEach((s) => $(s).addEventListener('change', recomendar));
   recomendar();
   $('#quiz-montar').addEventListener('click', () => montarPraMim(Number($('#quiz-montar').dataset.kit), $('#quiz-tamanho').value));
-
-  // Indique um amigo: mensagem pronta no WhatsApp.
-  if (D.indicacao) $('#btn-indicar').href = `https://wa.me/?text=${encodeURIComponent(
-    `Conhece a Fit Premium? Marmitas fit congeladas de ${P450} ou ${P300}, a partir de ${brlC(Math.min(...combosReais.map(menorPreco)))}. `
-    + `No primeiro pedido, informe o meu WhatsApp em "Quem te indicou?" 😉 Monte o seu: https://fitpremium.onrender.com`)}`;
-
-  // Saldo de cashback e créditos.
-  mascaraTel($('#inp-saldo'));
-  $('#form-saldo').addEventListener('submit', async (e) => {
-    e.preventDefault();
-    const tel = $('#inp-saldo').value.replace(/\D/g, '');
-    const res = $('#res-saldo');
-    if (tel.length < 10) { res.textContent = 'Digite o WhatsApp com DDD.'; return; }
-    res.textContent = 'Consultando…';
-    try {
-      const r = await fetch(`${D.loja.api}/api/saldo?telefone=${tel}`, { signal: AbortSignal.timeout(12000) });
-      if (!r.ok) throw new Error();
-      const j = await r.json();
-      const lista = (j.creditos || []).map((c) => `${brlC(c.valor)} até ${c.expira.split('-').reverse().join('/')}`).join(' · ');
-      res.textContent = j.total > 0 ? `💰 Você tem ${brlC(j.total)} de crédito (${lista}). Ele entra sozinho no próximo pedido com esse WhatsApp.` : 'Nenhum crédito disponível para esse WhatsApp no momento.';
-    } catch { res.textContent = 'Não foi possível consultar agora. Pergunte pelo WhatsApp que a equipe confere.'; }
-  });
-
-  // Lembrete do cashback: aparece uma vez por visita, depois de rolar metade da página ou 30 s, se o carrinho estiver vazio.
-  if (PC) {
-    let mostrado = false;
-    try { mostrado = sessionStorage.getItem('fp-lembrete') === '1'; } catch {}
-    const mostrar = () => {
-      if (mostrado || totalMarmitas() > 0 || dlg.open) return;
-      mostrado = true;
-      try { sessionStorage.setItem('fp-lembrete', '1'); } catch {}
-      $('#lembrete').hidden = false;
-    };
-    setTimeout(mostrar, 30000);
-    addEventListener('scroll', () => { if (scrollY > document.body.scrollHeight / 2) mostrar(); }, { passive: true });
-    const fechar = () => { $('#lembrete').hidden = true; };
-    $('#lembrete-fechar').addEventListener('click', fechar);
-    $('#lembrete-btn').addEventListener('click', fechar);
-  }
 
   desenharFiltros();
   atualizar();

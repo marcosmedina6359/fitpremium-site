@@ -11,14 +11,14 @@
     "instagram": "fitpremiumarmitaria",
     "horario": "Todos os dias, das 8h às 20h",
     "regiao": "Jacarepaguá",
-    "pesoMarmita": "450 g ou 300 g"
+    "pesoMarmita": "450 g ou 350 g"
   },
   "tamanhos": {
     "tradicional": {
       "peso": "450 g"
     },
     "leve": {
-      "peso": "300 g",
+      "peso": "350 g",
       "descricao": "porção menor, rica em proteína"
     }
   },
@@ -34,9 +34,9 @@
         "Peixe": 30
       },
       "precosLeve": {
-        "Frango": 26,
-        "Carne": 29,
-        "Peixe": 29
+        "Frango": 25,
+        "Carne": 28,
+        "Peixe": 28
       },
       "freteGratis": false
     },
@@ -51,9 +51,9 @@
         "Peixe": 28
       },
       "precosLeve": {
-        "Frango": 24,
-        "Carne": 28,
-        "Peixe": 28
+        "Frango": 23,
+        "Carne": 26,
+        "Peixe": 26
       },
       "freteGratis": true,
       "destaque": "Para organizar a semana"
@@ -69,9 +69,9 @@
         "Peixe": 26
       },
       "precosLeve": {
-        "Frango": 22,
-        "Carne": 26,
-        "Peixe": 26
+        "Frango": 21,
+        "Carne": 24,
+        "Peixe": 24
       },
       "freteGratis": true,
       "destaque": "Melhor preço"
@@ -89,9 +89,9 @@
         "Peixe": 31
       },
       "precosLeve": {
-        "Frango": 30,
-        "Carne": 33,
-        "Peixe": 33
+        "Frango": 26,
+        "Carne": 29,
+        "Peixe": 29
       },
       "freteGratis": false
     }
@@ -297,17 +297,6 @@
   "avaliacoes": [],
   "observacoes": {
     "Lasanha de berinjela": "Leva carne moída"
-  },
-  "primeiraCompra": {
-    "tipo": "cashback",
-    "valor": 30,
-    "validadeDias": 30,
-    "aPartirDe": 15,
-    "texto": "Primeira compra a partir de 15 marmitas? Ganhe R$ 30 de cashback para usar em até 30 dias!"
-  },
-  "indicacao": {
-    "valor": 30,
-    "validadeDias": 30
   },
   "pagamentos": [
     "Pix",

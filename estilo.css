@@ -304,6 +304,10 @@ dialog::backdrop { background: rgba(43, 28, 22, .6); }
 
 /* Marmitas avulsas e economia dos combos */
 .tabela-precos s { color: var(--suave); font-weight: 400; font-size: .85em; margin-right: 4px; }
+.combo.entrada { border: 2px solid var(--verde); background: #f3faf6; }
+.combo.entrada .tag { background: var(--verde); }
+.hero-entrada { display: inline-block; margin: -8px 0 18px; background: #fff; color: var(--verde); border: 2px dashed var(--verde); border-radius: 14px; padding: 10px 14px; font: 700 .95rem/1.35 var(--sans); text-align: left; cursor: pointer; }
+.hero-entrada:hover { background: #f3faf6; }
 .combo .economia { display: inline-block; align-self: flex-start; margin: 0 0 12px; background: #eaf6ef; color: var(--verde); font-weight: 700; font-size: .9rem; padding: 4px 12px; border-radius: 999px; }
 .avulsa-nota { grid-column: 1 / -1; text-align: center; color: var(--suave); margin: 4px 0 0; }
 .avulsa-nota .link-limpar { display: inline; margin: 0 0 0 6px; color: var(--laranja-escuro); font-weight: 700; }

@@ -24,6 +24,9 @@ window.FIT_DADOS = {
 
   // Preço por marmita em cada combo, por categoria: precos = 450 g, precosLeve = 350 g.
   combos: [
+    // Oferta de entrada (08/10/2026): 3 marmitas com entrega grátis, só na 1ª compra do WhatsApp (o servidor recusa quem já comprou).
+    // Serve para quem quer provar sem gastar muito; depois o cliente entra nos kits de 10, 15 e 30.
+    { id: 3, nome: 'Prove 3', marmitas: 3, maxPratos: 3, precos: { Frango: 23, Carne: 25, Peixe: 25 }, precosLeve: { Frango: 20, Carne: 20, Peixe: 20 }, freteGratis: true, primeiraCompra: true, destaque: 'Só na 1ª compra' },
     { id: 10, nome: 'Kit Experimente', marmitas: 10, maxPratos: 4,  precos: { Frango: 28, Carne: 30, Peixe: 30 }, precosLeve: { Frango: 25, Carne: 28, Peixe: 28 }, freteGratis: false },
     { id: 15, nome: 'Kit Rotina Fit',  marmitas: 15, maxPratos: 5,  precos: { Frango: 26, Carne: 28, Peixe: 28 }, precosLeve: { Frango: 23, Carne: 26, Peixe: 26 }, freteGratis: true, destaque: 'Para organizar a semana' },
     { id: 30, nome: 'Kit Premium',     marmitas: 30, maxPratos: 10, precos: { Frango: 24, Carne: 26, Peixe: 26 }, precosLeve: { Frango: 21, Carne: 24, Peixe: 24 }, freteGratis: true, destaque: 'Melhor preço' },

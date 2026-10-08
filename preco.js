@@ -25,10 +25,10 @@
   const normalizar = (t) => String(t || '').normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase().replace(/\s+/g, ' ').trim();
 
   /**
-   * Taxa de entrega pelo bairro/cidade. Retorna { atendido, taxa, gratis, bairro, cidade }.
+   * Taxa de entrega pelo bairro/cidade (combo opcional: kits com freteGratis isentam a taxa). Retorna { atendido, taxa, gratis, bairro, cidade }.
    * Bairro fora da tabela: atendido = false (a equipe combina pelo WhatsApp).
    */
-  function taxaEntrega(D, bairro, cidade, marmitas) {
+  function taxaEntrega(D, bairro, cidade, marmitas, combo) {
     const E = D.entrega;
     if (!E) return { atendido: false, taxa: null, gratis: false };
     let b = normalizar(bairro);
@@ -43,7 +43,9 @@
       if (nome) { achado = { f, nome }; break; }
     }
     if (!achado) return { atendido: false, taxa: null, gratis: false };
-    const gratis = !!achado.f.freteGratisAPartirDe && (marmitas || 0) >= achado.f.freteGratisAPartirDe;
+    // Grátis a partir de N marmitas na faixa, ou quando o kit escolhido tem entrega grátis (ex.: Prove 3) e está completo.
+    const gratis = (!!achado.f.freteGratisAPartirDe && (marmitas || 0) >= achado.f.freteGratisAPartirDe)
+      || !!(combo && combo.freteGratis && (marmitas || 0) >= (combo.marmitas || 0));
     return { atendido: true, taxa: gratis ? 0 : achado.f.taxa, taxaCheia: achado.f.taxa, gratis, bairro: achado.nome, cidade: achado.f.cidade };
   }
 

@@ -24,6 +24,25 @@
   },
   "combos": [
     {
+      "id": 3,
+      "nome": "Prove 3",
+      "marmitas": 3,
+      "maxPratos": 3,
+      "precos": {
+        "Frango": 23,
+        "Carne": 25,
+        "Peixe": 25
+      },
+      "precosLeve": {
+        "Frango": 20,
+        "Carne": 20,
+        "Peixe": 20
+      },
+      "freteGratis": true,
+      "primeiraCompra": true,
+      "destaque": "Só na 1ª compra"
+    },
+    {
       "id": 10,
       "nome": "Kit Experimente",
       "marmitas": 10,

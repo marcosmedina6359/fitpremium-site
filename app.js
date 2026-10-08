@@ -53,15 +53,17 @@
 
   // ---------- Cards de combos ----------
   const AVULSA = D.combos.find((c) => c.avulso);
-  const combosReais = D.combos.filter((c) => !c.avulso);
+  // Oferta de entrada (Prove 3): só na 1ª compra. Fica fora das sugestões (quiz, "faltam N", preço "a partir de").
+  const ENTRADA = D.combos.find((c) => c.primeiraCompra);
+  const combosReais = D.combos.filter((c) => !c.avulso && !c.primeiraCompra);
   // Economia do combo em relação a comprar as mesmas marmitas avulsas (frango).
   const economia = (c) => (AVULSA ? (AVULSA.precos.Frango - c.precos.Frango) * c.marmitas : 0);
-  $('#lista-combos').innerHTML = combosReais.map((c) => `
-    <article class="combo${c.destaque ? ' destaque' : ''}">
+  $('#lista-combos').innerHTML = [...(ENTRADA ? [ENTRADA] : []), ...combosReais].map((c) => `
+    <article class="combo${c.destaque ? ' destaque' : ''}${c.primeiraCompra ? ' entrada' : ''}">
       ${c.destaque ? `<span class="tag">${c.destaque}</span>` : ''}
       <div class="qtd">${c.marmitas}<small>marmitas</small></div>
       <h3>${c.nome}</h3>
-      <p class="sub">Até ${c.maxPratos} pratos diferentes</p>
+      <p class="sub">${c.primeiraCompra ? 'Para provar sem compromisso: até ' : 'Até '}${c.maxPratos} pratos diferentes</p>
       <p class="beneficio">Kit a partir de ${brl(menorPreco(c) * c.marmitas)}${c.freteGratis ? ' com entrega grátis' : ' + R$ 10 de entrega'}</p>
       <p class="sub">Valor mínimo para frango de ${pl(c, 'Frango') != null ? P300 : P450}, em Jacarepaguá.</p>
       <table class="tabela-precos">
@@ -72,7 +74,8 @@
       <p class="sub">Pode misturar ${P450} e ${P300} no mesmo kit</p>
       ${economia(c) > 0 ? `<p class="economia">Economize até ${brl(economia(c))}</p>` : ''}
       <p class="beneficio${c.freteGratis ? '' : ' neutro'}">${c.freteGratis ? 'Frete grátis em Jacarepaguá' : 'Entrega a partir de R$ 10'}</p>
-      <button class="btn${c.destaque ? '' : ' btn-contorno'}" data-escolher="${c.id}">Montar kit de ${c.marmitas}</button>
+      ${c.primeiraCompra ? '<p class="sub">Vale uma vez por cliente (1ª compra). Gostou? Os kits de 10, 15 e 30 saem ainda mais em conta por marmita.</p>' : ''}
+      <button class="btn${c.destaque ? '' : ' btn-contorno'}" data-escolher="${c.id}">${c.primeiraCompra ? 'Quero provar' : `Montar kit de ${c.marmitas}`}</button>
     </article>`).join('')
     + (AVULSA ? `<p class="avulsa-nota">Quer só algumas? Marmitas avulsas (de ${AVULSA.minimo} a ${AVULSA.marmitas}): ${P450} frango ${brl(AVULSA.precos.Frango)} · carne ou peixe ${brl(AVULSA.precos.Carne)}${pl(AVULSA, 'Frango') != null ? `; ${P300} frango ${brl(pl(AVULSA, 'Frango'))} · carne ou peixe ${brl(pl(AVULSA, 'Carne'))}` : ''}. <button class="link-limpar" data-escolher="${AVULSA.id}">Pedir avulsas</button></p>` : '');
 
@@ -260,7 +263,7 @@
     else if (total === 0 && totalExtras() > 0 && c.avulso) { aviso.textContent = 'Pronto! Pedido só de adicionais. É só finalizar.'; ok = true; }
     else if (total === 0) aviso.textContent = totalExtras() > 0 ? 'Para pedir só caldos, feijões, empadão, bolos, camarão ou sobremesas, escolha "Avulsas" acima.' : '';
     else if (total < c.marmitas) aviso.textContent = `Faltam ${c.marmitas - total} marmita${c.marmitas - total > 1 ? 's' : ''} para completar o kit.`;
-    else { aviso.textContent = 'Kit completo! É só finalizar.'; ok = true; }
+    else { aviso.textContent = c.primeiraCompra ? `Kit completo! Lembrando: o ${c.nome} vale só na 1ª compra. É só finalizar.` : 'Kit completo! É só finalizar.'; ok = true; }
     aviso.classList.toggle('ok', ok);
     $('#btn-finalizar').disabled = !ok;
 
@@ -284,7 +287,7 @@
 
   // ---------- Cardápio ----------
   $('#cardapio-lista').innerHTML = [
-    ...categorias.map((cat) => `<div class="cardapio-cat"><h3>${cat}<span>${P450} a partir de ${brl(Math.min(...D.combos.map((c) => c.precos[cat])))}${minimo(D.combos.map((c) => pl(c, cat))) != null ? ` · ${P300} a partir de ${brl(minimo(D.combos.map((c) => pl(c, cat))))}` : ''}</span></h3>
+    ...categorias.map((cat) => `<div class="cardapio-cat"><h3>${cat}<span>${P450} a partir de ${brl(Math.min(...combosReais.map((c) => c.precos[cat])))}${minimo(combosReais.map((c) => pl(c, cat))) != null ? ` · ${P300} a partir de ${brl(minimo(combosReais.map((c) => pl(c, cat))))}` : ''}</span></h3>
       <ul>${D.pratos[cat].map((p) => `<li>${p}${D.observacoes[p] ? ` <span class="pequeno">(${D.observacoes[p].toLowerCase()})</span>` : ''}</li>`).join('')}</ul></div>`),
     `<div class="cardapio-cat"><h3>${D.extras.categoria}<span>${brl(D.extras.preco)} cada</span></h3>
       <ul>${D.extras.pratos.map((p) => `<li>${p}</li>`).join('')}</ul><p class="pequeno">Peça junto com as marmitas ou sozinho, na opção Avulsas.</p></div>`,
@@ -370,14 +373,14 @@
     const nomes = E.faixas.filter((f) => f.cidade === c).flatMap((f) => f.bairros).sort((a, b) => a.localeCompare(b, 'pt-BR'));
     $('#lista-bairros').replaceChildren(...nomes.map((n) => new Option(n)));
   }
-  const taxaAtual = () => window.FIT_PRECO.taxaEntrega(D, form.bairro.value, form.cidade.value, totalMarmitas());
+  const taxaAtual = () => window.FIT_PRECO.taxaEntrega(D, form.bairro.value, form.cidade.value, totalMarmitas(), combo());
   function atualizarTaxa() {
     const entrega = form.tipo.value === 'Entrega';
     const { subtotal } = calcular();
     const t = entrega ? taxaAtual() : { atendido: true, taxa: 0 };
     const el = $('#taxa-entrega');
     if (!entrega) el.textContent = '';
-    else if (!form.bairro.value.trim()) el.textContent = totalMarmitas() >= 15 ? 'Entrega grátis em Jacarepaguá: informe o bairro (ou o CEP) para confirmar.' : 'Entrega R$ 10 em Jacarepaguá: informe o bairro (ou o CEP) para confirmar.';
+    else if (!form.bairro.value.trim()) el.textContent = totalMarmitas() >= 15 || combo().freteGratis ? 'Entrega grátis em Jacarepaguá: informe o bairro (ou o CEP) para confirmar.' : 'Entrega R$ 10 em Jacarepaguá: informe o bairro (ou o CEP) para confirmar.';
     else if (!t.atendido) el.textContent = '⚠️ Bairro fora da área atendida ou não reconhecido. Confira a grafia e escolha um bairro da lista. Se precisar, consulte a entrega pelo WhatsApp antes de montar o pedido.';
     else el.textContent = t.gratis ? `🎉 Entrega grátis em ${t.bairro}!` : `🚚 Entrega em ${t.bairro}: ${brl(t.taxa)}`;
     el.classList.toggle('gratis', !!t.gratis);
@@ -518,7 +521,7 @@
     const msg = [
       codigo ? `Olá, Fit Premium! Fiz o pedido *#${codigo}* pelo site 💚` : `Olá, Fit Premium! Quero fazer um pedido pelo site 💚`,
       ``,
-      (c.avulso ? `*${c.nome} — ${totalMarmitas()} un.*` : `*${c.nome} — ${c.marmitas} marmitas*`) + porTamanho(linhas),
+      (c.avulso ? `*${c.nome} — ${totalMarmitas()} un.*` : `*${c.nome} — ${c.marmitas} marmitas*`) + porTamanho(linhas) + (c.primeiraCompra ? ' (oferta de 1ª compra, entrega grátis)' : ''),
       ...linhas.map((l) => `• ${l.qtd}× ${l.nome} · ${brl(l.preco)}`),
       ...(avulsos.length ? [``, `*Caldos, feijões, empadão e bolos*`, ...avulsos.map((l) => `• ${l.qtd}× ${l.nome} (${brl(l.preco)})`)] : []),
       ...(extras.length ? [``, `*Avulsos (camarão)*`, ...extras.map((l) => `• ${l.qtd}× ${l.nome} (${brl(l.preco)})`)] : []),
@@ -578,9 +581,16 @@
   while (['Sat', 'Sun'].includes(semanaSP(diaEntrega))) diaEntrega = new Date(diaEntrega.getTime() + 864e5);
   const entregaEm = diaEntrega.toLocaleDateString('pt-BR', { timeZone: 'America/Sao_Paulo', weekday: 'long', day: '2-digit', month: '2-digit' });
   $('#hero-entrega').textContent = `🚚 Pedindo hoje, você recebe até ${entregaEm}.`;
+  if (ENTRADA) {
+    const b = $('#hero-entrada');
+    b.textContent = `🎁 Primeira vez? ${ENTRADA.nome}: ${ENTRADA.marmitas} marmitas de ${P300} por ${brlC(menorPreco(ENTRADA) * ENTRADA.marmitas)}, entrega grátis`;
+    b.hidden = false;
+    b.addEventListener('click', () => { escolherCombo(ENTRADA.id); $('#montar').scrollIntoView(); medir('AddToCart'); });
+  }
 
   // Faixa de ofertas no topo (troca a cada 5 s).
   const ofertasTopo = [
+    ENTRADA ? `🎁 Primeira vez? ${ENTRADA.nome}: ${ENTRADA.marmitas} marmitas por ${brlC(menorPreco(ENTRADA) * ENTRADA.marmitas)} com entrega grátis` : null,
     '🚚 Entrega em até 1 dia útil · frete grátis em Jacarepaguá a partir de 15 marmitas',
     `🍱 Marmitas de ${P450} ou ${P300} a partir de ${brlC(Math.min(...combosReais.map(menorPreco)))}`,
     `🥗 Come menos? Marmita de ${P300}: ${T.leve.descricao}`,

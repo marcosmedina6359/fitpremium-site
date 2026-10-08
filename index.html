@@ -39,6 +39,7 @@
     "openingHoursSpecification": [{ "@type": "OpeningHoursSpecification", "dayOfWeek": ["Monday","Tuesday","Wednesday","Thursday","Friday","Saturday","Sunday"], "opens": "08:00", "closes": "20:00" }],
     "sameAs": ["https://instagram.com/fitpremiumarmitaria", "https://wa.me/5521993046464"],
     "makesOffer": [
+      { "@type": "AggregateOffer", "name": "Prove 3 - 3 marmitas (1ª compra, entrega grátis)", "lowPrice": "60.00", "highPrice": "75.00", "priceCurrency": "BRL" },
       { "@type": "AggregateOffer", "name": "Kit Experimente - 10 marmitas", "lowPrice": "250.00", "highPrice": "300.00", "priceCurrency": "BRL" },
       { "@type": "AggregateOffer", "name": "Kit Rotina Fit - 15 marmitas", "lowPrice": "345.00", "highPrice": "420.00", "priceCurrency": "BRL" },
       { "@type": "AggregateOffer", "name": "Kit Premium - 30 marmitas", "lowPrice": "630.00", "highPrice": "780.00", "priceCurrency": "BRL" }
@@ -55,7 +56,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,700&family=DM+Sans:wght@400;500;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="estilo.css?v=20261007b">
+  <link rel="stylesheet" href="estilo.css?v=20261008">
 </head>
 <body>
   <div class="aviso-topo" id="aviso-topo"></div>
@@ -80,6 +81,7 @@
         <h1><span class="selo">Marmitas fit congeladas em Jacarepaguá</span>Mais sabor.<br>Mais praticidade.</h1>
         <p class="lead">Marmitas de <strong>450 g</strong> ou <strong>350 g</strong> (porção menor, rica em proteína) prontas para a sua rotina. Escolha o kit, monte com os seus pratos favoritos e finalize o pedido pelo WhatsApp.</p>
         <p class="hero-entrega" id="hero-entrega"></p>
+        <button type="button" class="hero-entrada" id="hero-entrada" hidden></button>
         <div class="hero-acoes">
           <a href="#montar" class="btn">Montar meu kit em 2 minutos</a>
           <a href="#quiz" class="btn btn-contorno">Qual kit é para mim?</a>
@@ -248,6 +250,7 @@
       <details><summary>E se eu não estiver em casa?</summary><p>A portaria ou outra pessoa pode receber, se você autorizar no pedido. Se não houver ninguém e o pedido voltar, combinamos uma nova entrega pelo WhatsApp, com nova taxa de entrega.</p></details>
       <details><summary>Quanto tempo a marmita dura?</summary><p>Até 3 meses no freezer. Depois de descongelada, consuma em até 3 dias (na geladeira).</p></details>
       <details><summary>Como esquento?</summary><p>No micro-ondas, por 5 a 7 minutos, mexendo na metade do tempo.</p></details>
+      <details><summary>Primeira vez aqui? Como funciona o Prove 3?</summary><p>É a nossa oferta de entrada: 3 marmitas (até 3 pratos diferentes) com entrega grátis em Jacarepaguá, por R$ 20 cada na de 350 g (R$ 60 o kit) ou a partir de R$ 23 na de 450 g. Vale uma vez por cliente, na primeira compra. Depois, os kits de 10, 15 e 30 têm o melhor preço por marmita.</p></details>
       <details><summary>Posso misturar frango, carne e peixe?</summary><p>Pode! Cada kit aceita um número de pratos diferentes (4, 5 ou 10) e você escolhe quantas marmitas de cada.</p></details>
       <details><summary>Qual a diferença entre 450 g e 350 g?</summary><p>É a mesma receita. A de 350 g tem menos acompanhamento e mantém a proteína: é para quem come menos ou está de dieta. Dá para misturar os dois tamanhos no mesmo kit (por exemplo, um casal). O mesmo prato nos dois tamanhos conta como um prato só.</p></details>
       <details><summary>Posso pedir só caldo, empadão, bolo ou sobremesa?</summary><p>Pode. Escolha "Avulsas" no montador e adicione só os itens que quiser.</p></details>
@@ -321,9 +324,9 @@
     </div>
   </dialog>
 
-  <script src="dados.js?v=20261007b"></script>
-  <script src="preco.js?v=20261007b"></script>
+  <script src="dados.js?v=20261008"></script>
+  <script src="preco.js?v=20261008"></script>
   <script src="medicao.js?v=20261002b"></script>
-  <script src="app.js?v=20261007c"></script>
+  <script src="app.js?v=20261008"></script>
 </body>
 </html>
